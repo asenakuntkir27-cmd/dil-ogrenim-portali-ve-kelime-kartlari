@@ -40,3 +40,27 @@ SQLAlchemy 2.x stiline (Mapped, mapped_column) uygun olarak Kullanıcı (User), 
 ### Sonraki Adımlar
 - İlk veritabanı migrasyonlarının (`flask db init`, `flask db migrate`) çalıştırılması ve veritabanı dosyasının yaratılması.
 - Giriş, kayıt veya anasayfa için Blueprint rotalarının ve şablonlarının oluşturulması.
+
+---
+
+## Oturum 3: Veritabanı Kurulumu ve Migrasyon Yönetimi
+**Tarih:** 19 Mayıs 2026
+
+### Hedef
+Sanal ortamın (virtual environment) ayarlanması ve `Flask-Migrate` komutları (`db init`, `db migrate`, `db upgrade`) kullanılarak ilk veritabanı şemasının ayağa kaldırılması.
+
+### Karşılaşılan Sorunlar ve Çözümleri
+- **PowerShell ExecutionPolicy Engeli:** Sanal ortamı `activate` scripti üzerinden aktifleştirmeye çalışırken Windows Execution Policy kısıtlamasına takıldık. Bu engeli aşmak için scriptleri çalıştırmak yerine, komutları doğrudan sanal ortamın içindeki çalıştırılabilir dosyalar (executable) üzerinden (örneğin `.\venv\Scripts\flask.exe`) güvenli bir sandbox mantığıyla yürüttük.
+- **Eksik Paket Kurulumu:** Projenin bağımlılıklarının (`requirements.txt`) sanal ortam içerisine kurulmadığı tespit edildi. Bu eksiklik `.\venv\Scripts\python.exe -m pip install` yöntemiyle paketler yüklenerek giderildi.
+- **.env Dosyası Eksikliği:** Flask'ın `FLASK_APP` gibi konfigürasyonları bulabilmesi için gereken `.env` dosyasının olmadığını fark ettik. `.env.example` dosyasının bir kopyası alınarak eksiklik tamamlandı.
+- **Flask-Migrate Entegrasyon Eksikliği:** `flask db` komutlarının çalışmamasının temel sebebi olarak, `app/__init__.py` içerisinde `Migrate(app, db)` tanımlamasının yapılmadığı görüldü. Gerekli kütüphane eklendi ve sistem başlatıldı.
+
+### Yapılanlar
+- Tespit edilen sorunların tamamı izole ortamda düzeltildikten sonra `migrations` klasörü temizlenerek sıfırdan oluşturuldu.
+- `flask db init` komutuyla Alembic ve Flask-Migrate altyapısı başarıyla kuruldu.
+- `flask db migrate -m "initial schema"` komutu çalıştırılarak `User`, `Deck` ve `Card` tabloları için migrasyon dosyası oluşturuldu.
+- `flask db upgrade` komutuyla tablo şemaları SQLite (`app.db`) veritabanına sorunsuz şekilde yansıtıldı.
+
+### Sonraki Adımlar
+- Blueprint rotalarının (Auth ve Main) detaylandırılarak kullanıcı arayüzü ile bağlanması.
+- Uygulamanın temel testlerinin gerçekleştirilmesi.
