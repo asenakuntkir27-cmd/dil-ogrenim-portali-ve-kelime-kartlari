@@ -21,3 +21,22 @@ Flask 3.x kullanılarak, Application Factory pattern ve Blueprint mimarisine sah
 - Geliştirme ortamının (Virtual Environment) kurulması ve paketlerin indirilmesi.
 - Veritabanı modellerinin (Kullanıcı, Kelime Kartları vb.) oluşturulması.
 - Blueprint'ler içerisine ilgili rotaların ve şablonların entegrasyonu.
+
+---
+
+## Oturum 2: Veritabanı Modellerinin Tasarlanması
+**Tarih:** 19 Mayıs 2026
+
+### Hedef
+SQLAlchemy 2.x stiline (Mapped, mapped_column) uygun olarak Kullanıcı (User), Kelime Destesi (Deck) ve Kelime Kartı (Card) modellerini tasarlamak ve aralarındaki ilişkileri kurmak.
+
+### Yapılanlar
+- **Veritabanı İlklendirmesi:** `app/__init__.py` dosyası güncellenerek `db = SQLAlchemy()` nesnesi oluşturuldu ve factory içerisinde (`db.init_app(app)`) uygulamaya dahil edildi. Modellerin sistem tarafından algılanabilmesi için uygun import satırı eklendi.
+- **Kullanıcı Modeli (User):** `username`, `email`, `password_hash` ve `created_at` alanları tanımlandı. Parola güvenliği için `werkzeug.security` aracılığıyla `set_password` ve `check_password` metotları oluşturuldu.
+- **Deste ve Kart Modelleri:** Kullanıcıların sahip olacağı desteleri (`Deck`) ve destelerin içindeki kelime kartlarını (`Card`) yönetecek modeller tanımlandı.
+- **İlişkiler:** User-Deck ve Deck-Card arasında modern SQLAlchemy `relationship` özellikleri kullanılarak bire-çok (One-to-Many) ilişkiler kuruldu. `cascade` işlemleri eklendi.
+- **Test ve Konsol İşlemleri:** Tüm modellerin konsolda anlaşılır bir biçimde gösterilmesi için `__repr__` metotları tanımlandı.
+
+### Sonraki Adımlar
+- İlk veritabanı migrasyonlarının (`flask db init`, `flask db migrate`) çalıştırılması ve veritabanı dosyasının yaratılması.
+- Giriş, kayıt veya anasayfa için Blueprint rotalarının ve şablonlarının oluşturulması.
