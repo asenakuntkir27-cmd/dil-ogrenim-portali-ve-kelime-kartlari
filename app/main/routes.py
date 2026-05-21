@@ -10,13 +10,13 @@ from app.models import Deck, Card
 @main.route('/index')
 def index():
     if not current_user.is_authenticated:
-        return render_template('index.html', title='Ana Sayfa')
+        return render_template('main/index.html', title='Ana Sayfa')
     
     # Kullanıcı giriş yaptıysa kendi destelerini getir
     decks = db.session.scalars(
         sa.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.created_at.desc())
     ).all()
-    return render_template('index.html', title='Destelerim', decks=decks)
+    return render_template('main/index.html', title='Destelerim', decks=decks)
 
 @main.route('/deck/new', methods=['GET', 'POST'])
 @login_required
