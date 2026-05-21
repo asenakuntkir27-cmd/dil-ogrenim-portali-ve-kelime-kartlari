@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Ana Sayfaya Hoş Geldiniz</h1>
+    {% if current_user.is_authenticated %}
+        <p>Merhaba, {{ current_user.username }}!</p>
+    {% else %}
+        <p>Giriş yapın veya kayıt olun.</p>
+    {% endif %}
+{% endblock %}
