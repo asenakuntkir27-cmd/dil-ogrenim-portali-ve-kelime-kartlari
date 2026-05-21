@@ -64,3 +64,33 @@ Sanal ortamın (virtual environment) ayarlanması ve `Flask-Migrate` komutları 
 ### Sonraki Adımlar
 - Blueprint rotalarının (Auth ve Main) detaylandırılarak kullanıcı arayüzü ile bağlanması.
 - Uygulamanın temel testlerinin gerçekleştirilmesi.
+
+---
+
+## Oturum 4: Kimlik Doğrulama (Auth) Sisteminin Kurulması
+**Tarih:** 21 Mayıs 2026
+
+### Hedef
+Kullanıcı kayıt (register), giriş (login) ve çıkış (logout) işlemlerini Flask-Login ve WTForms standartlarına uygun şekilde yönetecek bir `auth` Blueprint yapısının inşa edilmesi.
+
+### Yapılanlar
+- **Model ve Konfigürasyon:** 
+  - `app/models.py` içerisindeki `User` modeline `flask_login` kütüphanesinden `UserMixin` sınıfı entegre edildi.
+  - Oturum yönetimini sağlamak için `load_user` fonksiyonu (`@login_manager.user_loader`) eklendi.
+  - `app/__init__.py` dosyasına `LoginManager` dahil edildi ve yetkisiz erişimleri engellemek için `login_view = 'auth.login'` ayarı yapıldı.
+- **Form Sınıflarının Oluşturulması (WTForms):** 
+  - `app/auth/forms.py` dosyası oluşturuldu. 
+  - `LoginForm` (Kullanıcı Adı, Şifre, Beni Hatırla) ve `RegistrationForm` (Kullanıcı Adı, E-Posta, Şifre, Şifre Tekrar) sınıfları kodlandı.
+  - Kayıt formuna, aynı kullanıcı adı veya e-postanın kullanılıp kullanılmadığını veritabanından denetleyen özel validatörler (`validate_username`, `validate_email`) eklendi.
+- **Rotaların (Routes) Tasarlanması:** 
+  - `app/auth/routes.py` dosyası oluşturularak `/login`, `/register` ve `/logout` fonksiyonları yazıldı.
+  - Şifre doğrulama işlemlerinde model içerisinde daha önce yazılmış olan `set_password` ve `check_password` metotları kullanıldı.
+  - Oluşturulan rotalar `app/auth/__init__.py` içerisine import edilerek Blueprint aktif hale getirildi.
+- **HTML Şablonlarının (Templates) Eklenmesi:** 
+  - Ana iskelet yapısını tutan ve menü (navigasyon) çubuğunu barındıran `app/templates/base.html` oluşturuldu.
+  - WTForms bileşenlerini ve hata mesajlarını (validation errors, flash messages) ekrana yansıtan `login.html` ve `register.html` sayfaları oluşturuldu.
+  - Yönlendirme (redirect) hatalarını önlemek adına `app/main` Blueprint'i içerisinde basit bir ana sayfa (`/index`) rotası ve `index.html` şablonu eklendi.
+
+### Sonraki Adımlar
+- Kelime Destesi (Deck) ve Kelime Kartı (Card) yönetim arayüzlerinin (CRUD işlemleri) kodlanması.
+- Uygulama genelindeki HTML/CSS arayüzünün (UI) modern bir tasarımla (Tailwind/Bootstrap vb.) iyileştirilmesi.
