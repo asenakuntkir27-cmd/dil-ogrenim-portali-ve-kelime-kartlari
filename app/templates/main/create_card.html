@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Yeni Kart Ekle</h1>
+    <h3>Deste: {{ deck.name }}</h3>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.word.label }}<br>
+            {{ form.word(size=64) }}
+            {% for error in form.word.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.meaning.label }}<br>
+            {{ form.meaning(size=64) }}
+            {% for error in form.meaning.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.example_sentence.label }}<br>
+            {{ form.example_sentence(rows=3, cols=64) }}
+            {% for error in form.example_sentence.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <p><a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}">Desteye Dön</a></p>
+{% endblock %}

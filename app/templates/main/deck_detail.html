@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ deck.name }}</h1>
+    {% if deck.description %}
+        <p><em>{{ deck.description }}</em></p>
+    {% endif %}
+
+    <p><a href="{{ url_for('main.create_card', deck_id=deck.id) }}">[+ Yeni Kart Ekle]</a></p>
+
+    <h2>Kelime Kartları ({{ cards|length }})</h2>
+    {% if cards %}
+        <table border="1" cellpadding="8">
+            <thead>
+                <tr>
+                    <th>Kelime</th>
+                    <th>Anlamı</th>
+                    <th>Örnek Cümle</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for card in cards %}
+                <tr>
+                    <td><strong>{{ card.word }}</strong></td>
+                    <td>{{ card.meaning }}</td>
+                    <td>{{ card.example_sentence or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Bu destede henüz kart bulunmuyor.</p>
+    {% endif %}
+    <br>
+    <p><a href="{{ url_for('main.index') }}">&larr; Destelerime Dön</a></p>
+{% endblock %}

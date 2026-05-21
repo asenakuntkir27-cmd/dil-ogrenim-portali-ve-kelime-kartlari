@@ -1,10 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Ana Sayfaya Hoş Geldiniz</h1>
     {% if current_user.is_authenticated %}
-        <p>Merhaba, {{ current_user.username }}!</p>
+        <h1>Destelerim</h1>
+        <p><a href="{{ url_for('main.create_deck') }}">[+ Yeni Deste Oluştur]</a></p>
+        
+        {% if decks %}
+            <ul>
+            {% for deck in decks %}
+                <li>
+                    <strong><a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}">{{ deck.name }}</a></strong> 
+                    - {{ deck.cards|length }} Kart
+                    {% if deck.description %}
+                        <br><small>{{ deck.description }}</small>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>Henüz hiç desteniz yok. Yeni bir deste oluşturarak öğrenmeye başlayın!</p>
+        {% endif %}
+        
     {% else %}
-        <p>Giriş yapın veya kayıt olun.</p>
+        <h1>Dil Öğrenim Portalı'na Hoş Geldiniz</h1>
+        <p>Kelime kartları ile kendi destelerinizi oluşturun ve öğrenmeye başlayın.</p>
+        <p><a href="{{ url_for('auth.login') }}">Giriş Yap</a> veya <a href="{{ url_for('auth.register') }}">Kayıt Ol</a></p>
     {% endif %}
 {% endblock %}
