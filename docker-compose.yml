@@ -1,0 +1,31 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=prod-secret-key-lingorose-12345
+      - DATABASE_URL=postgresql://lingorose:password@db:5432/lingorosedb
+      - FLASK_DEBUG=0
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=lingorose
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=lingorosedb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lingorose -d lingorosedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

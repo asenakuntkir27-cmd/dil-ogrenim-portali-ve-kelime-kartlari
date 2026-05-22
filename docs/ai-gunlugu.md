@@ -183,3 +183,21 @@ Uygulamada eksik olan 404 ve 500 özel hata sayfalarını (templates ve error ha
 
 ### Sonraki Adımlar
 - Projenin yayına alınması veya ek modüllerin entegrasyonu.
+
+---
+
+## Oturum 9: Docker Entegrasyonu
+**Tarih:** 22 Mayıs 2026
+
+### Hedef
+Uygulamayı canlıda (production) çalıştırmak üzere Docker entegrasyonu kurmak; Gunicorn WSGI sunucusu ve PostgreSQL 15 veritabanı ile konteynerize edilmiş çoklu-konteyner orkestrasyon altyapısı hazırlamak.
+
+### Yapılanlar
+- **Gereksinimler:** `requirements.txt` dosyasına `gunicorn` ve `psycopg2-binary` paketleri eklenerek Docker içindeki web konteynerinin üretim WSGI sunucusuna ve PostgreSQL veritabanına bağlanması sağlandı.
+- **Dockerfile:** `python:3.11-slim` tabanlı, optimize edilmiş bir Dockerfile oluşturuldu. Konteyner başlangıcında `flask db upgrade` çalıştırılarak yeni şema göçlerinin uygulanması ve ardından `gunicorn` ile uygulamanın sunulması sağlandı.
+- **docker-compose.yml:** Web ve PostgreSQL servisleri tanımlandı. PostgreSQL servisi için `healthcheck` eklenerek web servisinin veritabanı hazır olana kadar beklemesini sağlayan `condition: service_healthy` orkestrasyonu kuruldu. Kalıcı veri depolaması için `postgres_data` volume entegrasyonu yapıldı.
+- **.dockerignore:** `venv/`, `__pycache__/`, yerel SQLite `app.db` gibi gereksiz veya yerel geliştirme dosyalarının Docker derleme sürecine dahil edilip imaj boyutunu büyütmesi engellendi.
+- **Doğrulama:** `docker compose config` komutuyla Docker Compose sözdizimi doğrulandı. Ayrıca yerel test paketleri (`python -m unittest discover -s tests`) yeniden çalıştırılarak bağımlılıkların eklenmesinin yerel sisteme herhangi bir yan etki yapmadığı, tüm 5 testin başarıyla geçtiği doğrulandı.
+
+### Sonraki Adımlar
+- Docker konteynerlerini yayına almak.
