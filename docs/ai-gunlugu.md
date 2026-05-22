@@ -160,3 +160,26 @@ Kullanıcının isteği üzerine sitenin ismini **LingoRose** olarak güncelleme
 
 ### Sonraki Adımlar
 - Yeni görsel tasarımı canlı olarak incelemek.
+
+---
+
+## Oturum 8: Hata Yönetimi ve Sayfalama (Pagination) Desteği
+**Tarih:** 22 Mayıs 2026
+
+### Hedef
+Uygulamada eksik olan 404 ve 500 özel hata sayfalarını (templates ve error handlers) eklemek; ana sayfada (dashboard) listelenen kullanıcı destelerini Flask-SQLAlchemy `db.paginate` özelliği ile 10 kayıt limitiyle sayfalamak.
+
+### Yapılanlar
+- **Özel Hata Sayfaları (Error Handlers):**
+  - `app/main/routes.py` dosyasına blueprint seviyesinde `@main.app_errorhandler(404)` ve `@main.app_errorhandler(500)` hata yönetim rotaları eklendi.
+  - `app/templates/errors/404.html` (Sayfa Bulunamadı) şablonu, pembe-mor gradyan temalı, animasyonlu üzgün yüz ikonu ve geri dönüş butonuyla tasarlandı.
+  - `app/templates/errors/500.html` (Sunucu Hatası) şablonu, parlayan uyarı ikonu ile tasarlandı.
+- **Veritabanı Sayfalama (Pagination):**
+  - `app/main/routes.py` dosyasındaki `index()` rotası güncellenerek `db.paginate` ile kullanıcının desteleri 10 limitli sayfalandı.
+  - `app/templates/main/index.html` dosyasına sayfalama durumunu gösteren bilgi metni ve LingoRose tasarım diline uygun (önceki, sonraki, sayfa numaraları) şık sayfalama kontrol butonları entegre edildi.
+- **Testler ve Doğrulama:**
+  - `tests/test_errors_and_pagination.py` adında yeni bir otomatik test dosyası yazıldı. Testlerde, geçersiz rotaların 404 dönüp özel sayfayı yüklediği ve 12 adet deste eklendiğinde sayfalama sisteminin (page 1'de 10 adet, page 2'de 2 adet) sorunsuz çalıştığı doğrulandı.
+  - Tüm test paketleri (`discover -s tests`) çalıştırılarak 5 testin tamamının başarıyla geçtiği onaylandı.
+
+### Sonraki Adımlar
+- Projenin yayına alınması veya ek modüllerin entegrasyonu.
