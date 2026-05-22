@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* 3D Flip Card custom utility styles */
+    .perspective-1000 {
+        perspective: 1000px;
+    }
+    .transform-style-3d {
+        transform-style: preserve-3d;
+    }
+    .backface-hidden {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+        transform: rotateY(180deg);
+    }
+    .flip-card-inner {
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flip-card-inner.flipped {
+        transform: rotateY(180deg);
+    }
+</style>
+
+<div class="max-w-3xl mx-auto py-4 sm:py-8 flex flex-col min-h-[75vh]">
+    <!-- Study Session Header -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-xs"></i> Çalışmayı Bitir
+            </a>
+            <h1 class="text-2xl font-extrabold text-white mt-2">{{ deck.name }}</h1>
+        </div>
+        <!-- Progress Text Indicator -->
+        <span id="progress-text" class="text-sm font-bold text-violet-400 bg-violet-950/30 border border-violet-900/30 px-3 py-1.5 rounded-xl">
+            Yükleniyor...
+        </span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="w-full bg-zinc-900 border border-zinc-800 rounded-full h-2 mb-8 overflow-hidden">
+        <div id="progress-bar" class="bg-gradient-to-r from-violet-600 to-indigo-650 h-full rounded-full transition-all duration-300 w-0"></div>
+    </div>
+
+    <!-- Main Quiz Interface -->
+    <div id="quiz-area" class="flex-1 flex flex-col items-center justify-center gap-8">
+        
+        <!-- 3D Card Container -->
+        <div class="w-full max-w-lg aspect-[3/2] perspective-1000 cursor-pointer group" onclick="flipCard()">
+            <div id="flip-card" class="w-full h-full transform-style-3d flip-card-inner relative rounded-2xl shadow-2xl">
+                
+                <!-- Front Side (Word) -->
+                <div class="absolute inset-0 w-full h-full backface-hidden bg-zinc-900 border-2 border-zinc-800 rounded-2xl p-8 flex flex-col justify-between items-center group-hover:border-zinc-700 transition-colors">
+                    <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest">KELİME</span>
+                    
+                    <div class="text-center py-6">
+                        <h2 id="card-word" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-normal"></h2>
+                    </div>
+                    
+                    <span class="text-xs font-medium text-zinc-400 flex items-center gap-1.5 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
+                        <i class="fa-solid fa-arrows-rotate"></i> Çevirmek için tıkla
+                    </span>
+                </div>
+
+                <!-- Back Side (Meaning & Example) -->
+                <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-zinc-900 border-2 border-violet-900/50 rounded-2xl p-8 flex flex-col justify-between items-center">
+                    <span class="text-xs font-bold text-violet-400 uppercase tracking-widest">ANLAM VE KULLANIM</span>
+                    
+                    <div class="text-center w-full py-4 flex flex-col justify-center items-center flex-1">
+                        <h3 id="card-meaning" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-normal"></h3>
+                        
+                        <!-- Example sentence box -->
+                        <div id="example-box" class="mt-4 bg-zinc-950/70 border border-zinc-850 rounded-xl p-4 w-full max-w-sm hidden">
+                            <span class="text-[9px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">ÖRNEK CÜMLE</span>
+                            <p id="card-example" class="text-xs text-zinc-400 italic leading-relaxed"></p>
+                        </div>
+                    </div>
+                    
+                    <span class="text-xs font-medium text-zinc-400 flex items-center gap-1.5 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-850">
+                        <i class="fa-solid fa-arrows-rotate"></i> Tekrar çevirmek için tıkla
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="w-full max-w-md flex flex-col gap-3 relative z-10">
+            <!-- Initial flip guidance -->
+            <button id="btn-flip" onclick="flipCard()" class="w-full py-3.5 px-6 font-semibold text-white bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl hover:bg-zinc-850 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 shadow">
+                <i class="fa-solid fa-rotate-right text-xs"></i> Kartı Çevir
+            </button>
+
+            <!-- Learning feedback controls (shown after flip) -->
+            <div id="feedback-controls" class="w-full grid grid-cols-2 gap-4 hidden">
+                <button onclick="markCard(false)" class="w-full py-3.5 px-6 font-bold text-rose-450 bg-rose-950/10 hover:bg-rose-950/20 border border-rose-900/30 hover:border-rose-900/60 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-sm"></i> Tekrar Et
+                </button>
+                <button onclick="markCard(true)" class="w-full py-3.5 px-6 font-bold text-emerald-450 bg-emerald-950/10 hover:bg-emerald-950/20 border border-emerald-900/30 hover:border-emerald-900/60 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-check text-sm"></i> Öğrendim
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Results Panel (Hidden by default) -->
+    <div id="results-area" class="hidden flex-1 flex flex-col items-center justify-center text-center py-12 px-6">
+        <div class="relative mb-6">
+            <!-- Glowing background ring -->
+            <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-violet-600 to-indigo-650 blur opacity-30 animate-pulse"></div>
+            <div class="relative flex h-20 w-20 items-center justify-center rounded-full bg-zinc-900 border-2 border-violet-500/30 text-violet-400">
+                <i class="fa-solid fa-trophy text-3xl"></i>
+            </div>
+        </div>
+
+        <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2">Çalışma Tamamlandı!</h2>
+        <p class="text-zinc-400 text-sm max-w-sm mb-8">Bu destedeki tüm kelime kartlarını başarıyla gözden geçirdiniz.</p>
+
+        <!-- Stats Card -->
+        <div class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8 shadow-xl">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-center p-3 bg-zinc-950 rounded-xl border border-zinc-850">
+                    <div class="text-2xl font-extrabold text-emerald-400" id="score-learned">0</div>
+                    <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mt-1">ÖĞRENİLEN</div>
+                </div>
+                <div class="text-center p-3 bg-zinc-950 rounded-xl border border-zinc-850">
+                    <div class="text-2xl font-extrabold text-rose-400" id="score-review">0</div>
+                    <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mt-1">TEKRAR EDİLECEK</div>
+                </div>
+            </div>
+            <!-- Score percentage bar -->
+            <div class="mt-6">
+                <div class="flex justify-between text-xs text-zinc-400 mb-1.5 font-medium">
+                    <span>Başarı Oranı</span>
+                    <span id="score-percentage">0%</span>
+                </div>
+                <div class="w-full bg-zinc-950 border border-zinc-850 rounded-full h-2 overflow-hidden">
+                    <div id="score-bar" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full w-0 transition-all duration-500"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- End Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 w-full max-w-xs sm:max-w-sm">
+            <button onclick="restartQuiz()" class="w-full py-3.5 px-6 font-semibold text-white bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-850 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow">
+                <i class="fa-solid fa-arrows-rotate text-xs"></i> Yeniden Başlat
+            </button>
+            <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="w-full py-3.5 px-6 font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/10">
+                Desteye Dön <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- Cards data payload from Jinja2 context -->
+<script>
+    const cards = [
+        {% for card in cards %}
+        {
+            id: {{ card.id }},
+            word: {{ card.word|tojson }},
+            meaning: {{ card.meaning|tojson }},
+            example_sentence: {{ (card.example_sentence or '')|tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    let currentIndex = 0;
+    let scores = {
+        learned: 0,
+        review: 0
+    };
+
+    function updateProgress() {
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        
+        const currentNum = currentIndex + 1;
+        const total = cards.length;
+        
+        progressText.innerHTML = `<i class="fa-regular fa-clone text-[10px] mr-1"></i> Kart ${currentNum} / ${total}`;
+        progressBar.style.width = `${(currentNum / total) * 100}%`;
+    }
+
+    function loadCard() {
+        if (currentIndex >= cards.length) {
+            showResults();
+            return;
+        }
+
+        const card = cards[currentIndex];
+        
+        // Reset card flip state
+        const flipCardElement = document.getElementById('flip-card');
+        flipCardElement.classList.remove('flipped');
+        
+        // Load text contents
+        document.getElementById('card-word').textContent = card.word;
+        document.getElementById('card-meaning').textContent = card.meaning;
+        
+        // Setup example sentence box
+        const exampleBox = document.getElementById('example-box');
+        const cardExample = document.getElementById('card-example');
+        if (card.example_sentence && card.example_sentence.trim() !== '') {
+            cardExample.textContent = card.example_sentence;
+            exampleBox.classList.remove('hidden');
+        } else {
+            exampleBox.classList.add('hidden');
+        }
+        
+        // Toggle controls
+        document.getElementById('btn-flip').classList.remove('hidden');
+        document.getElementById('feedback-controls').classList.add('hidden');
+        
+        updateProgress();
+    }
+
+    function flipCard() {
+        const flipCardElement = document.getElementById('flip-card');
+        const isFlipped = flipCardElement.classList.toggle('flipped');
+        
+        if (isFlipped) {
+            document.getElementById('btn-flip').classList.add('hidden');
+            document.getElementById('feedback-controls').classList.remove('hidden');
+        } else {
+            document.getElementById('btn-flip').classList.remove('hidden');
+            document.getElementById('feedback-controls').classList.add('hidden');
+        }
+    }
+
+    function markCard(learned) {
+        if (learned) {
+            scores.learned++;
+        } else {
+            scores.review++;
+        }
+        
+        // Move to next card with a slight delay to allow smooth flip transition reset
+        currentIndex++;
+        
+        // Add fade transition out effect on card
+        const cardArea = document.getElementById('quiz-area');
+        cardArea.classList.add('opacity-0', 'scale-95');
+        cardArea.style.transition = 'all 0.25s ease';
+        
+        setTimeout(() => {
+            loadCard();
+            cardArea.classList.remove('opacity-0', 'scale-95');
+        }, 250);
+    }
+
+    function showResults() {
+        document.getElementById('quiz-area').classList.add('hidden');
+        
+        // Load stats scores
+        document.getElementById('score-learned').textContent = scores.learned;
+        document.getElementById('score-review').textContent = scores.review;
+        
+        // Percentage Calculation
+        const percentage = Math.round((scores.learned / cards.length) * 100);
+        document.getElementById('score-percentage').textContent = `${percentage}%`;
+        document.getElementById('score-bar').style.width = `${percentage}%`;
+        
+        // Display results panel
+        document.getElementById('results-area').classList.remove('hidden');
+        document.getElementById('progress-text').innerHTML = `<i class="fa-solid fa-check-double text-[10px] mr-1"></i> Tamamlandı`;
+    }
+
+    function restartQuiz() {
+        currentIndex = 0;
+        scores.learned = 0;
+        scores.review = 0;
+        
+        document.getElementById('results-area').classList.add('hidden');
+        document.getElementById('quiz-area').classList.remove('hidden');
+        
+        loadCard();
+    }
+
+    // Initialize the quiz on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        if (cards && cards.length > 0) {
+            loadCard();
+        }
+    });
+</script>
+{% endblock %}

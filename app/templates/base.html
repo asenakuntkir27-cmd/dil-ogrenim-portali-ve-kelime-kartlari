@@ -1,36 +1,133 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LingoDeck, etkileşimli 3D kelime kartları (flashcards) ile dil öğreniminizi hızlandıran modern bir öğrenim portalıdır.">
     <title>{{ title if title else 'Uygulama' }} - Dil Öğrenim Portalı</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="{{ url_for('main.index') }}">Ana Sayfa</a>
-            {% if current_user.is_anonymous %}
-                <a href="{{ url_for('auth.login') }}">Giriş Yap</a>
-                <a href="{{ url_for('auth.register') }}">Kayıt Ol</a>
-            {% else %}
-                <span>Hoş geldin, {{ current_user.username }}</span>
-                <a href="{{ url_for('auth.logout') }}">Çıkış Yap</a>
-            {% endif %}
-        </nav>
+<body class="h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-violet-600 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center gap-2">
+                    <a href="{{ url_for('main.index') }}" class="flex items-center gap-2.5 group">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
+                            <i class="fa-solid fa-graduation-cap text-lg"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">LingoDeck</span>
+                    </a>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="flex items-center gap-4">
+                    <a href="{{ url_for('main.index') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">
+                        <i class="fa-solid fa-house mr-1.5"></i>Ana Sayfa
+                    </a>
+                    
+                    <div class="h-4 w-px bg-zinc-800"></div>
+
+                    {% if current_user.is_anonymous %}
+                        <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">Giriş Yap</a>
+                        <a href="{{ url_for('auth.register') }}" class="relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl hover:from-violet-500 hover:to-indigo-500 transition-all duration-200 shadow-md shadow-indigo-500/10 hover:shadow-indigo-500/25 active:scale-[0.98]">
+                            Kayıt Ol
+                        </a>
+                    {% else %}
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-zinc-400 hidden sm:inline">
+                                <i class="fa-solid fa-user mr-1.5 text-zinc-500"></i>Hoş geldin, <strong class="text-zinc-200 font-semibold">{{ current_user.username }}</strong>
+                            </span>
+                            <a href="{{ url_for('auth.logout') }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-red-400 border border-zinc-800 hover:border-red-900/50 rounded-xl bg-zinc-900/30 transition-all duration-200">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>Çıkış Yap
+                            </a>
+                        </div>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <main>
+    <!-- Main Content Area -->
+    <main class="flex-1 mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <ul>
+            <div class="mb-6 space-y-3">
             {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
+                <div class="flex items-center gap-3 p-4 rounded-xl border text-sm backdrop-blur-md 
+                    {% if category == 'success' %}
+                        bg-emerald-950/20 border-emerald-500/30 text-emerald-400
+                    {% elif category == 'warning' %}
+                        bg-amber-950/20 border-amber-500/30 text-amber-400
+                    {% else %}
+                        bg-rose-950/20 border-rose-500/30 text-rose-400
+                    {% endif %}">
+                    {% if category == 'success' %}
+                        <i class="fa-solid fa-circle-check text-base shrink-0"></i>
+                    {% elif category == 'warning' %}
+                        <i class="fa-solid fa-triangle-exclamation text-base shrink-0"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-exclamation text-base shrink-0"></i>
+                    {% endif %}
+                    <p class="font-medium">{{ message }}</p>
+                </div>
             {% endfor %}
-            </ul>
+            </div>
         {% endif %}
         {% endwith %}
 
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-zinc-900 bg-zinc-950 py-6">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+            <p>&copy; 2026 LingoDeck. Tüm hakları saklıdır.</p>
+            <div class="flex items-center gap-4">
+                <span>Kelime Kartları ile Dil Öğrenim Portalı</span>
+                <span class="text-zinc-700">|</span>
+                <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-violet-500"></i> ile tasarlandı</span>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>

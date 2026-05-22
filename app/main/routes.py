@@ -65,3 +65,21 @@ def create_card(deck_id):
         return redirect(url_for('main.deck_detail', deck_id=deck.id))
         
     return render_template('main/create_card.html', title='Yeni Kart Ekle', form=form, deck=deck)
+
+@main.route('/deck/<int:deck_id>/study')
+@login_required
+def study_deck(deck_id):
+    deck = db.session.get(Deck, deck_id)
+    if deck is None or deck.user_id != current_user.id:
+        abort(404)
+        
+    cards = db.session.scalars(
+        sa.select(Card).where(Card.deck_id == deck.id)
+    ).all()
+    
+    if not cards:
+        flash('Bu destede çalışılacak kart bulunmuyor. Lütfen önce kart ekleyin.', 'warning')
+        return redirect(url_for('main.deck_detail', deck_id=deck.id))
+        
+    return render_template('main/study.html', title=f'{deck.name} - Çalış', deck=deck, cards=cards)
+

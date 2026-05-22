@@ -1,37 +1,67 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Kayıt Ol</h1>
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}
-            {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+<div class="flex min-h-[70vh] flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 class="text-center text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">Yeni Hesap Oluşturun</h2>
+        <p class="mt-2 text-center text-sm text-zinc-400">
+            Veya
+            <a href="{{ url_for('auth.login') }}" class="font-medium text-violet-400 hover:text-violet-300 transition-colors">
+                zaten bir hesabınız varsa giriş yapın
+            </a>
         </p>
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=64) }}
-            {% for error in form.email.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}
-            {% for error in form.password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password_confirm.label }}<br>
-            {{ form.password_confirm(size=32) }}
-            {% for error in form.password_confirm.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-zinc-900 border border-zinc-800 px-6 py-8 shadow-xl shadow-black/40 rounded-2xl sm:px-10">
+            <form action="" method="post" novalidate class="space-y-6">
+                {{ form.hidden_tag() }}
+                
+                <div>
+                    {{ form.username.label(class="block text-sm font-medium text-zinc-300") }}
+                    <div class="mt-1.5">
+                        {{ form.username(class="w-full bg-zinc-950 border border-zinc-800 focus:border-violet-600 focus:ring-1 focus:ring-violet-600 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="Kullanıcı adınız") }}
+                    </div>
+                    {% for error in form.username.errors %}
+                        <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    {{ form.email.label(class="block text-sm font-medium text-zinc-300") }}
+                    <div class="mt-1.5">
+                        {{ form.email(class="w-full bg-zinc-950 border border-zinc-800 focus:border-violet-600 focus:ring-1 focus:ring-violet-600 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="ornek@eposta.com") }}
+                    </div>
+                    {% for error in form.email.errors %}
+                        <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    {{ form.password.label(class="block text-sm font-medium text-zinc-300") }}
+                    <div class="mt-1.5">
+                        {{ form.password(class="w-full bg-zinc-950 border border-zinc-800 focus:border-violet-600 focus:ring-1 focus:ring-violet-600 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="••••••••") }}
+                    </div>
+                    {% for error in form.password.errors %}
+                        <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    {{ form.password_confirm.label(class="block text-sm font-medium text-zinc-300") }}
+                    <div class="mt-1.5">
+                        {{ form.password_confirm(class="w-full bg-zinc-950 border border-zinc-800 focus:border-violet-600 focus:ring-1 focus:ring-violet-600 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="••••••••") }}
+                    </div>
+                    {% for error in form.password_confirm.errors %}
+                        <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    {{ form.submit(class="w-full flex justify-center py-3 px-4 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-all duration-200 active:scale-[0.98] shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20 cursor-pointer") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

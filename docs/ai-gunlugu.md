@@ -116,3 +116,27 @@ Kullanıcıların kendi kelime destelerini ve kelime kartlarını oluşturup yö
 ### Sonraki Adımlar
 - Arayüzün modern bir CSS framework'ü (Tailwind CSS, Bootstrap vb.) ile giydirilmesi ve mobil uyumlu hale getirilmesi.
 - Eklenen kelime kartları üzerinde çalışma/test yapma (Flashcard Quiz) modülünün geliştirilmesi.
+
+---
+
+## Oturum 6: Arayüz Modernizasyonu, Flashcard Quiz (Çalışma) Modülü ve Testler
+**Tarih:** 22 Mayıs 2026
+
+### Hedef
+Arayüzü Tailwind CSS kullanarak premium, modern ve mobil uyumlu bir tasarımla giydirmek; kullanıcıların destelerdeki kelimeleri interaktif şekilde çalışabilmesi için kart çevirme animasyonlu (flip card) bir Quiz (Çalışma) modülü geliştirmek ve sistemi testlerle doğrulamak.
+
+### Yapılanlar
+- **Tasarım Sistemi ve Arayüz Giydirme:**
+  - `templates/base.html` güncellenerek Tailwind CSS, Google Fonts (Outfit) ve FontAwesome ikonları entegre edildi.
+  - Giriş (`login.html`), kayıt (`register.html`), deste listeleme (`index.html`), deste detayı (`deck_detail.html`) ve form sayfaları (`create_deck.html`, `create_card.html`) modern Tailwind bileşenleri ve özel koyu/mor renk paletiyle estetik bir tasarıma kavuşturuldu.
+  - Kart tasarımlarına yumuşak gölgeler, hover geçişleri ve mikro animasyonlar eklendi.
+- **Çalışma/Quiz Modülü Geliştirilmesi:**
+  - Deste detay sayfasında bir "Çalışmaya Başla" butonu konumlandırıldı.
+  - `/deck/<deck_id>/study` rotası (`study.html`) oluşturularak, kullanıcının kartları tek tek görebileceği bir interaktif çalışma alanı tasarlandı.
+  - CSS 3D Transforms (`preserve-3d`, `rotateY`, `backface-visibility`) kullanılarak tıklama ile tetiklenen gerçekçi bir kart çevirme (flip) animasyonu entegre edildi (ön yüzde yabancı kelime, arka yüzde anlamı ve örnek cümle).
+  - Kullanıcıya her kart için "Öğrendim" ve "Tekrar Et" seçenekleri sunularak çalışma sonunda başarı istatistiği gösteren bir sonuç paneli ve yeniden başlatma butonu eklendi.
+- **Testler ve Doğrulama:**
+  - `tests/test_study.py` dosyası altında giriş gereksinimleri, boş deste yönlendirmesi ve kartlı destelerin başarılı şekilde yüklenmesini test eden bir `unittest` yapısı kuruldu. Tüm testler başarıyla çalıştırıldı ve onaylandı.
+
+### Sonraki Adımlar
+- Sistem canlıya alınabilir veya ek dil öğrenim özellikleri (örn. kelime eşleştirme oyunları) eklenebilir.
