@@ -9,7 +9,7 @@
                 <p class="mt-1 text-sm text-zinc-400">Çalışmak istediğiniz desteyi seçin veya yeni bir tane oluşturun.</p>
             </div>
             <div>
-                <a href="{{ url_for('main.create_deck') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-all duration-200 shadow-md shadow-indigo-500/10 hover:shadow-indigo-500/25 active:scale-[0.98]">
+                <a href="{{ url_for('main.create_deck') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 hover:from-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]">
                     <i class="fa-solid fa-plus text-xs"></i> Yeni Deste Oluştur
                 </a>
             </div>
@@ -23,10 +23,10 @@
                     <div>
                         <!-- Deck Card Header -->
                         <div class="flex items-start justify-between gap-4 mb-4">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-violet-400 group-hover:bg-violet-600 group-hover:text-white transition-colors duration-300 shadow-inner">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-pink-400 group-hover:bg-pink-600 group-hover:text-white transition-colors duration-300 shadow-inner">
                                 <i class="fa-solid fa-folder-open text-xl"></i>
                             </div>
-                            <span class="inline-flex items-center gap-1 rounded-lg bg-violet-950/30 border border-violet-900/30 px-2.5 py-1 text-xs font-semibold text-violet-400">
+                            <span class="inline-flex items-center gap-1 rounded-lg bg-pink-950/30 border border-pink-900/30 px-2.5 py-1 text-xs font-semibold text-pink-400">
                                 <i class="fa-solid fa-layer-group text-[10px]"></i> {{ deck.cards|length }} Kart
                             </span>
                         </div>
@@ -50,7 +50,7 @@
                             Detayları Gör <i class="fa-solid fa-chevron-right text-[10px]"></i>
                         </a>
                         {% if deck.cards|length > 0 %}
-                        <a href="{{ url_for('main.study_deck', deck_id=deck.id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-lg shadow transition-all duration-200 hover:scale-105 active:scale-[0.98]">
+                        <a href="{{ url_for('main.study_deck', deck_id=deck.id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 hover:from-pink-500 hover:to-fuchsia-500 rounded-lg shadow transition-all duration-200 hover:scale-105 active:scale-[0.98]">
                             <i class="fa-solid fa-circle-play text-sm"></i> Çalış
                         </a>
                         {% endif %}
@@ -66,7 +66,7 @@
                 </div>
                 <h3 class="text-lg font-bold text-zinc-200">Henüz Hiç Desteniz Yok</h3>
                 <p class="mt-1 text-sm text-zinc-500 max-w-sm">Yeni bir kelime destesi oluşturarak öğrenme serüveninize hemen başlayabilirsiniz.</p>
-                <a href="{{ url_for('main.create_deck') }}" class="mt-6 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 rounded-xl transition-colors duration-200">
+                <a href="{{ url_for('main.create_deck') }}" class="mt-6 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-pink-600 hover:bg-pink-500 rounded-xl transition-colors duration-200">
                     <i class="fa-solid fa-plus text-xs"></i> İlk Desteyi Oluştur
                 </a>
             </div>
@@ -78,8 +78,8 @@
             <div class="mx-auto max-w-3xl py-16 sm:py-20 lg:py-24 text-center">
                 <!-- Promo Badge -->
                 <div class="mb-8 flex justify-center">
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-400 ring-1 ring-inset ring-violet-500/20">
-                        <span class="flex h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse"></span>
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-pink-500/10 px-3 py-1 text-xs font-medium text-pink-400 ring-1 ring-inset ring-pink-500/20">
+                        <span class="flex h-1.5 w-1.5 rounded-full bg-pink-400 animate-pulse"></span>
                         İnteraktif Dil Öğrenme
                     </span>
                 </div>
@@ -91,12 +91,12 @@
                 
                 <!-- Description -->
                 <p class="mt-6 text-lg leading-8 text-zinc-400">
-                    LingoDeck ile kendi kelime destelerinizi oluşturun, 3D interaktif kart çevirme (flip card) modu ile kendinizi test edin ve dil öğrenme sürecinizi keyifli hale getirin.
+                    LingoRose ile kendi kelime destelerinizi oluşturun, 3D interaktif kart çevirme (flip card) modu ile kendinizi test edin ve dil öğrenme sürecinizi keyifli hale getirin.
                 </p>
 
                 <!-- Call to Actions -->
                 <div class="mt-10 flex items-center justify-center gap-x-6">
-                    <a href="{{ url_for('auth.register') }}" class="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/25 hover:from-violet-500 hover:to-indigo-500 transition-all duration-200 active:scale-[0.98]">
+                    <a href="{{ url_for('auth.register') }}" class="rounded-xl bg-gradient-to-r from-pink-600 to-fuchsia-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-pink-500/10 hover:shadow-pink-500/25 hover:from-pink-500 hover:to-fuchsia-500 transition-all duration-200 active:scale-[0.98]">
                         Hemen Ücretsiz Kayıt Ol
                     </a>
                     <a href="{{ url_for('auth.login') }}" class="text-base font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 transition-colors">
@@ -110,7 +110,7 @@
                 <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
                     <!-- Feature 1 -->
                     <div class="rounded-2xl border border-zinc-900 bg-zinc-900/20 p-6">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-950/40 border border-violet-900/30 text-violet-400 mb-4">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mb-4">
                             <i class="fa-solid fa-folder-open text-base"></i>
                         </div>
                         <h3 class="text-base font-bold text-zinc-200">Kişiselleştirilmiş Desteler</h3>
@@ -119,7 +119,7 @@
 
                     <!-- Feature 2 -->
                     <div class="rounded-2xl border border-zinc-900 bg-zinc-900/20 p-6">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-950/40 border border-violet-900/30 text-violet-400 mb-4">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mb-4">
                             <i class="fa-solid fa-arrows-rotate text-base"></i>
                         </div>
                         <h3 class="text-base font-bold text-zinc-200">3D Kart Çevirme (Flip)</h3>
@@ -128,7 +128,7 @@
 
                     <!-- Feature 3 -->
                     <div class="rounded-2xl border border-zinc-900 bg-zinc-900/20 p-6">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-950/40 border border-violet-900/30 text-violet-400 mb-4">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mb-4">
                             <i class="fa-solid fa-mobile-screen-button text-base"></i>
                         </div>
                         <h3 class="text-base font-bold text-zinc-200">Mobil Uyumlu Tasarım</h3>

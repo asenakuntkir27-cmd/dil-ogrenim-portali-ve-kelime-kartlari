@@ -140,3 +140,23 @@ Arayüzü Tailwind CSS kullanarak premium, modern ve mobil uyumlu bir tasarımla
 
 ### Sonraki Adımlar
 - Sistem canlıya alınabilir veya ek dil öğrenim özellikleri (örn. kelime eşleştirme oyunları) eklenebilir.
+
+---
+
+## Oturum 7: Sitenin Adının ve Renk Paletinin Özelleştirilmesi
+**Tarih:** 22 Mayıs 2026
+
+### Hedef
+Kullanıcının isteği üzerine sitenin ismini **LingoRose** olarak güncellemek ve renk temasını pembe, mor, gri ve siyah tonlarına uyarlamak.
+
+### Yapılanlar
+- **İsim Güncellemesi (LingoRose):** 
+  - `templates/base.html` ve `templates/main/index.html` dosyalarındaki tüm `LingoDeck` isim referansları, başlıklar ve telif hakkı ibareleri `LingoRose` olarak güncellendi.
+- **Renk Teması Özelleştirmeleri:**
+  - Tüm sayfa şablonlarındaki (`base.html`, `login.html`, `register.html`, `index.html`, `deck_detail.html`, `create_deck.html`, `create_card.html`, `study.html`) violet (menekşe) ve indigo (çivit) ağırlıklı Tailwind CSS renk sınıfları; pembe (`pink`), fuşya (`fuchsia`) ve mor (`purple`/`violet`) tonları ile değiştirildi.
+  - Arka planlar ve form girişleri gri (`zinc-900`/`zinc-950`) ve siyah tonlarında korunarak estetik bir uyum sağlandı.
+- **Doğrulama:**
+  - Değişikliklerin ardından tüm şablon yapısı ve çalışma sayfası testleri (`unittest`) yeniden çalıştırılarak doğrulandı.
+
+### Sonraki Adımlar
+- Yeni görsel tasarımı canlı olarak incelemek.

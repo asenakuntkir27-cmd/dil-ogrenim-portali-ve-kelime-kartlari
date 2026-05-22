@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="LingoDeck, etkileşimli 3D kelime kartları (flashcards) ile dil öğreniminizi hızlandıran modern bir öğrenim portalıdır.">
-    <title>{{ title if title else 'Uygulama' }} - Dil Öğrenim Portalı</title>
+    <meta name="description" content="LingoRose, etkileşimli 3D kelime kartları (flashcards) ile dil öğreniminizi hızlandıran modern bir öğrenim portalıdır.">
+    <title>{{ title if title else 'Uygulama' }} - LingoRose</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -41,7 +41,7 @@
         }
     </style>
 </head>
-<body class="h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-violet-600 selection:text-white">
+<body class="h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-pink-600 selection:text-white">
 
     <!-- Header / Navbar -->
     <header class="sticky top-0 z-40 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md">
@@ -50,10 +50,10 @@
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
                     <a href="{{ url_for('main.index') }}" class="flex items-center gap-2.5 group">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-pink-500 to-fuchsia-600 text-white shadow-lg shadow-pink-500/20 group-hover:scale-105 transition-transform duration-300">
                             <i class="fa-solid fa-graduation-cap text-lg"></i>
                         </div>
-                        <span class="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">LingoDeck</span>
+                        <span class="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">LingoRose</span>
                     </a>
                 </div>
 
@@ -67,7 +67,7 @@
 
                     {% if current_user.is_anonymous %}
                         <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">Giriş Yap</a>
-                        <a href="{{ url_for('auth.register') }}" class="relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl hover:from-violet-500 hover:to-indigo-500 transition-all duration-200 shadow-md shadow-indigo-500/10 hover:shadow-indigo-500/25 active:scale-[0.98]">
+                        <a href="{{ url_for('auth.register') }}" class="relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-650 rounded-xl hover:from-pink-500 hover:to-fuchsia-550 transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]">
                             Kayıt Ol
                         </a>
                     {% else %}
@@ -120,11 +120,11 @@
     <!-- Footer -->
     <footer class="w-full border-t border-zinc-900 bg-zinc-950 py-6">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-            <p>&copy; 2026 LingoDeck. Tüm hakları saklıdır.</p>
+            <p>&copy; 2026 LingoRose. Tüm hakları saklıdır.</p>
             <div class="flex items-center gap-4">
                 <span>Kelime Kartları ile Dil Öğrenim Portalı</span>
                 <span class="text-zinc-700">|</span>
-                <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-violet-500"></i> ile tasarlandı</span>
+                <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-pink-500"></i> ile tasarlandı</span>
             </div>
         </div>
     </footer>
