@@ -2,32 +2,61 @@
 
 {% block content %}
     {% if current_user.is_authenticated %}
-        <!-- Dashboard Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-white">Destelerim</h1>
-                <p class="mt-1 text-sm text-zinc-400">Çalışmak istediğiniz desteyi seçin veya yeni bir tane oluşturun.</p>
-            </div>
-            <div>
-                <a href="{{ url_for('main.create_deck') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 hover:from-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]">
-                    <i class="fa-solid fa-plus text-xs"></i> Yeni Deste Oluştur
-                </a>
-            </div>
+        <!-- Karşılama ve Amaç Bölümü -->
+        <div class="mb-10 text-center sm:text-left">
+            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">Ana Sayfa</h1>
+            <p class="mt-3 text-base sm:text-lg leading-relaxed text-zinc-400 max-w-3xl">
+                LingoRose ile dil öğrenim serüveninizi hızlandırın! Kelime dağarcığınızı zenginleştirmek için 3D kelime kartlarıyla pratik yapın veya öğrendiklerinizi eğlenceli oyunlarla pekiştirin.
+            </p>
         </div>
         
-        {% if decks %}
-            <!-- Tabs Navigation -->
-            <div class="flex items-center gap-2 border-b border-zinc-900 pb-4 mb-6">
-                <button id="tab-decks-btn" onclick="switchTab('decks')" class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 shadow shadow-pink-500/10 transition-all duration-200 cursor-pointer select-none">
-                    <i class="fa-solid fa-folder-open text-xs"></i> Destelerim
-                </button>
-                <button id="tab-games-btn" onclick="switchTab('games')" class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-zinc-400 hover:text-white hover:bg-zinc-900/60 transition-all duration-200 cursor-pointer select-none">
-                    <i class="fa-solid fa-gamepad text-xs"></i> Oyunlarım
-                </button>
+        <!-- İki Ana Modül Kutusu (Module Selector Cards) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
+            <!-- Kelime Destelerim Modülü -->
+            <div id="module-decks-btn" onclick="selectModule('decks')" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-pink-950/40 border border-pink-900/30 text-pink-400 group-hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-folder-open text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-250">Kelime Destelerim</h3>
+                        <p class="mt-1 text-xs sm:text-sm text-zinc-400">Öğrenmek istediğiniz dil kategorilerini inceleyin ve 3D kartlarla çalışın.</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Destelerim Tab Content -->
-            <div id="decks-section" class="space-y-6">
+            <!-- Eğitim Oyunları Modülü -->
+            <div id="module-games-btn" onclick="selectModule('games')" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-purple-950/40 border border-purple-900/30 text-purple-400 group-hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-gamepad text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-250">Eğitim Oyunları</h3>
+                        <p class="mt-1 text-xs sm:text-sm text-zinc-400">Öğrendiğiniz kelimeleri oyunlarla pekiştirin ve kendinizi test edin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if decks %}
+            <!-- Kelime Destelerim Modülü İçeriği -->
+            <div id="decks-module-content" class="space-y-6">
+                <!-- Header with Action -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                            <i class="fa-solid fa-folder-open text-pink-400 text-lg"></i> Kelime Destelerim
+                        </h2>
+                        <p class="mt-1 text-xs text-zinc-400 font-medium">Destelerden birini seçerek çalışmaya başlayın.</p>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('main.create_deck') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 hover:from-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 shadow-md shadow-pink-500/10 active:scale-[0.98]">
+                            <i class="fa-solid fa-plus text-[10px]"></i> Yeni Deste Oluştur
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Decks Grid -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {% for deck in decks %}
@@ -72,56 +101,106 @@
                 </div>
             </div>
 
-            <!-- Oyunlarım Tab Content -->
-            <div id="games-section" class="space-y-6 hidden">
-                <!-- Games Grid -->
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {% for deck in decks %}
-                    <div class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 hover:bg-zinc-900/70 hover:border-purple-750 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-300">
-                        <div>
-                            <!-- Deck Card Header -->
-                            <div class="flex items-start justify-between gap-4 mb-4">
-                                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 shadow-inner">
-                                    <i class="fa-solid fa-gamepad text-xl"></i>
+            <!-- Eğitim Oyunları Modülü İçeriği -->
+            <div id="games-module-content" class="space-y-6 hidden">
+                <!-- Oyun Seçenekleri Listesi (Step 1) -->
+                <div id="game-options-list" class="space-y-6">
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad text-purple-400 text-lg"></i> Eğitim Oyunları
+                        </h2>
+                        <p class="mt-1 text-xs text-zinc-400 font-medium">Oynamak istediğiniz eğitici oyunu seçin.</p>
+                    </div>
+
+                    <!-- Games Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Kelime Eşleştirme Oyunu Kartı -->
+                        <div id="game-select-matching" onclick="selectGame('matching')" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 hover:bg-zinc-900/70 hover:border-purple-600 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-300 cursor-pointer">
+                            <div>
+                                <div class="flex items-start justify-between gap-4 mb-4">
+                                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-950/40 border border-purple-900/30 text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+                                        <i class="fa-solid fa-puzzle-piece text-xl"></i>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-950/30 border border-emerald-900/30 px-2.5 py-1 text-xs font-semibold text-emerald-400">
+                                        Aktif
+                                    </span>
                                 </div>
-                                <span class="inline-flex items-center gap-1 rounded-lg bg-purple-950/30 border border-purple-900/30 px-2.5 py-1 text-xs font-semibold text-purple-400">
-                                    <i class="fa-solid fa-layer-group text-[10px]"></i> {{ deck.cards|length }} Kart
-                                </span>
+                                <h3 class="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors">Kelime Eşleştirme Oyunu</h3>
+                                <p class="mt-2 text-sm text-zinc-400 leading-relaxed">
+                                    Kelimelerin yabancı dildeki halleri ile Türkçe anlamlarını 4x4 grid üzerinde pratik yaparak ve eşleştirerek pekiştirin.
+                                </p>
                             </div>
-
-                            <!-- Deck Details -->
-                            <h3 class="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-200">
-                                <a href="{{ url_for('main.play_game', deck_id=deck.id) if deck.cards|length > 0 else url_for('main.deck_detail', deck_id=deck.id) }}">
-                                    <span class="absolute inset-0" aria-hidden="true"></span>
-                                    {{ deck.name.replace(current_language['name'] + ' - ', '') }}
-                                </a>
-                            </h3>
-                            
-                            <p class="mt-2 text-sm text-zinc-400 line-clamp-3">
-                                {{ deck.description if deck.description else 'Bu deste için bir açıklama girilmemiş.' }}
-                            </p>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="relative z-10 mt-6 flex items-center justify-between border-t border-zinc-800/60 pt-4">
-                            {% if deck.cards|length > 0 %}
-                            <a href="{{ url_for('main.play_game', deck_id=deck.id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl shadow transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
-                                <i class="fa-solid fa-play text-xs"></i> Oyunu Başlat
-                            </a>
-                            {% else %}
-                            <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-zinc-450 bg-zinc-900/60 border border-zinc-800 rounded-xl hover:text-white hover:bg-zinc-850 transition-colors">
-                                <i class="fa-solid fa-plus text-xs"></i> Kart Ekle (Oyun için kart gerekir)
-                            </a>
-                            {% endif %}
+                            <div class="mt-6 pt-4 border-t border-zinc-800/60 flex items-center justify-between text-xs font-semibold text-purple-400">
+                                <span>Hemen Oyna</span>
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </div>
                         </div>
                     </div>
-                {% endfor %}
+                </div>
+
+                <!-- Deste Listesi (Step 2 - Oyun Seçildikten Sonra) -->
+                <div id="game-decks-list" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                        <div>
+                            <button onclick="goBackToGames()" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-white transition-colors mb-2 cursor-pointer">
+                                <i class="fa-solid fa-chevron-left text-[9px]"></i> Oyun Seçimine Dön
+                            </button>
+                            <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                                <i class="fa-solid fa-puzzle-piece text-purple-400 text-lg"></i> Kelime Eşleştirme Oyunu
+                            </h2>
+                            <p class="mt-1 text-xs text-zinc-400 font-medium">Eşleştirme oyununa başlamak istediğiniz desteyi seçin.</p>
+                        </div>
+                    </div>
+
+                    <!-- Decks Grid for Matching Game -->
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {% for deck in decks %}
+                        <div class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 hover:bg-zinc-900/70 hover:border-purple-600 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-300">
+                            <div>
+                                <!-- Deck Card Header -->
+                                <div class="flex items-start justify-between gap-4 mb-4">
+                                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 shadow-inner">
+                                        <i class="fa-solid fa-gamepad text-xl"></i>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 rounded-lg bg-purple-950/30 border border-purple-900/30 px-2.5 py-1 text-xs font-semibold text-purple-400">
+                                        <i class="fa-solid fa-layer-group text-[10px]"></i> {{ deck.cards|length }} Kart
+                                    </span>
+                                </div>
+
+                                <!-- Deck Details -->
+                                <h3 class="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-200">
+                                    <a href="{{ url_for('main.play_game', deck_id=deck.id) if deck.cards|length > 0 else url_for('main.deck_detail', deck_id=deck.id) }}">
+                                        <span class="absolute inset-0" aria-hidden="true"></span>
+                                        {{ deck.name.replace(current_language['name'] + ' - ', '') }}
+                                    </a>
+                                </h3>
+                                
+                                <p class="mt-2 text-sm text-zinc-400 line-clamp-3">
+                                    {{ deck.description if deck.description else 'Bu deste için bir açıklama girilmemiş.' }}
+                                </p>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="relative z-10 mt-6 flex items-center justify-between border-t border-zinc-800/60 pt-4">
+                                {% if deck.cards|length > 0 %}
+                                <a href="{{ url_for('main.play_game', deck_id=deck.id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl shadow transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                                    <i class="fa-solid fa-play text-xs"></i> Oyunu Başlat
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-xl hover:text-white hover:bg-zinc-850 transition-colors">
+                                    <i class="fa-solid fa-plus text-xs"></i> Kart Ekle (Oyun için kart gerekir)
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
                 </div>
             </div>
-            
+
+            <!-- Pagination Controls (Outside sections, stays visible globally) -->
             {% if pagination and pagination.pages > 1 %}
-            <!-- Pagination Controls -->
-            <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-950 pt-6">
+            <div id="dashboard-pagination" class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-950 pt-6">
                 <!-- Info text -->
                 <p class="text-xs text-zinc-500">
                     Toplam <span class="font-semibold text-zinc-300">{{ pagination.total }}</span> deste arasından, 
@@ -147,7 +226,7 @@
                         {% if page_num %}
                             {% if page_num == pagination.page %}
                             <!-- Active page -->
-                            <span class="inline-flex h-9 min-w-[36px] px-2 items-center justify-center rounded-lg text-xs font-bold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 shadow shadow-pink-500/10">
+                            <span id="active-page-btn" class="inline-flex h-9 min-w-[36px] px-2 items-center justify-center rounded-lg text-xs font-bold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 shadow shadow-pink-500/10">
                                 {{ page_num }}
                             </span>
                             {% else %}
@@ -259,34 +338,110 @@
 
     {% if current_user.is_authenticated %}
     <script>
-        function switchTab(tabName) {
-            const decksTab = document.getElementById('tab-decks-btn');
-            const gamesTab = document.getElementById('tab-games-btn');
-            const decksSec = document.getElementById('decks-section');
-            const gamesSec = document.getElementById('games-section');
-            
-            if (!decksTab || !gamesTab || !decksSec || !gamesSec) return;
+        function selectModule(moduleName) {
+            const decksBtn = document.getElementById('module-decks-btn');
+            const gamesBtn = document.getElementById('module-games-btn');
+            const decksContent = document.getElementById('decks-module-content');
+            const gamesContent = document.getElementById('games-module-content');
+            const paginator = document.getElementById('dashboard-pagination');
+            const activePageBtn = document.getElementById('active-page-btn');
 
-            if (tabName === 'decks') {
-                // Activate decks tab (pink/fuchsia)
-                decksTab.className = 'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 shadow shadow-pink-500/10 transition-all duration-200 cursor-pointer select-none';
-                gamesTab.className = 'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-zinc-400 hover:text-white hover:bg-zinc-900/60 transition-all duration-200 cursor-pointer select-none';
-                decksSec.classList.remove('hidden');
-                gamesSec.classList.add('hidden');
-                sessionStorage.setItem('active_dashboard_tab', 'decks');
+            if (!decksBtn || !gamesBtn || !decksContent || !gamesContent) return;
+
+            // Save active module
+            sessionStorage.setItem('active_dashboard_module', moduleName);
+
+            if (moduleName === 'decks') {
+                // Style Active Decks Card
+                decksBtn.className = 'group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-pink-500 bg-zinc-900/80 p-6 shadow-lg shadow-pink-500/10 ring-1 ring-pink-500/20 transition-all duration-300 cursor-pointer select-none';
+                // Style Inactive Games Card
+                gamesBtn.className = 'group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none';
+                
+                // Show decks content
+                decksContent.classList.remove('hidden');
+                gamesContent.classList.add('hidden');
+                
+                // Show pagination if present
+                if (paginator) paginator.classList.remove('hidden');
+                
+                // Set pagination active page button styling back to pink
+                if (activePageBtn) {
+                    activePageBtn.className = 'inline-flex h-9 min-w-[36px] px-2 items-center justify-center rounded-lg text-xs font-bold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 shadow shadow-pink-500/10';
+                }
             } else {
-                // Activate games tab (purple/pink)
-                gamesTab.className = 'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 shadow shadow-purple-500/10 transition-all duration-200 cursor-pointer select-none';
-                decksTab.className = 'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-zinc-400 hover:text-white hover:bg-zinc-900/60 transition-all duration-200 cursor-pointer select-none';
-                gamesSec.classList.remove('hidden');
-                decksSec.classList.add('hidden');
-                sessionStorage.setItem('active_dashboard_tab', 'games');
+                // Style Active Games Card
+                gamesBtn.className = 'group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-purple-500 bg-zinc-900/80 p-6 shadow-lg shadow-purple-500/10 ring-1 ring-purple-500/20 transition-all duration-300 cursor-pointer select-none';
+                // Style Inactive Decks Card
+                decksBtn.className = 'group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none';
+                
+                // Show games content
+                gamesContent.classList.remove('hidden');
+                decksContent.classList.add('hidden');
+                
+                // Handle sub-step visibility based on storage
+                const selectedGame = sessionStorage.getItem('selected_dashboard_game');
+                if (selectedGame) {
+                    showGameDecks(selectedGame, false);
+                } else {
+                    showGameOptions(false);
+                }
+                
+                // Set pagination active page button styling to purple
+                if (activePageBtn) {
+                    activePageBtn.className = 'inline-flex h-9 min-w-[36px] px-2 items-center justify-center rounded-lg text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 shadow shadow-purple-500/10';
+                }
+            }
+        }
+
+        function selectGame(gameName) {
+            sessionStorage.setItem('selected_dashboard_game', gameName);
+            showGameDecks(gameName, true);
+        }
+
+        function showGameDecks(gameName, scroll) {
+            const optionsList = document.getElementById('game-options-list');
+            const decksList = document.getElementById('game-decks-list');
+            const paginator = document.getElementById('dashboard-pagination');
+
+            if (!optionsList || !decksList) return;
+
+            optionsList.classList.add('hidden');
+            decksList.classList.remove('hidden');
+            
+            // Show pagination when choosing deck for game
+            if (paginator) paginator.classList.remove('hidden');
+
+            if (scroll) {
+                decksList.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function goBackToGames() {
+            sessionStorage.removeItem('selected_dashboard_game');
+            showGameOptions(true);
+        }
+
+        function showGameOptions(scroll) {
+            const optionsList = document.getElementById('game-options-list');
+            const decksList = document.getElementById('game-decks-list');
+            const paginator = document.getElementById('dashboard-pagination');
+
+            if (!optionsList || !decksList) return;
+
+            decksList.classList.add('hidden');
+            optionsList.classList.remove('hidden');
+            
+            // Hide pagination when choosing game options
+            if (paginator) paginator.classList.add('hidden');
+
+            if (scroll) {
+                optionsList.scrollIntoView({ behavior: 'smooth' });
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const activeTab = sessionStorage.getItem('active_dashboard_tab') || 'decks';
-            switchTab(activeTab);
+            const activeModule = sessionStorage.getItem('active_dashboard_module') || 'decks';
+            selectModule(activeModule);
         });
     </script>
     {% endif %}
