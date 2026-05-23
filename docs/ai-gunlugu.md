@@ -201,3 +201,33 @@ Uygulamayı canlıda (production) çalıştırmak üzere Docker entegrasyonu kur
 
 ### Sonraki Adımlar
 - Docker konteynerlerini yayına almak.
+
+---
+
+## Oturum 10: Çoklu Dil Desteği, 1500 Kelimelik Hazır Paketler, Eşleştirme Oyunu ve Karşılama Paneli (Kapanış ve Cilalama)
+**Tarih:** 23 Mayıs 2026
+
+### Hedef
+Kullanıcı deneyimini en üst seviyeye çıkarmak için 5 dilli başlangıç veri seti (seeding) kurmak, dinamik dil filtrelemesi eklemek, Mini Kelime Eşleştirme Oyunu geliştirmek ve ana sayfayı profesyonel bir "Karşılama Paneli" mimarisine geçirmek.
+
+### Yapılanlar
+- **Çoklu Dil Altyapısı ve 1500 Kelimelik Paketler:**
+  - `app/vocabulary_data.py` modülü altında İngilizce, Almanca, İspanyolca, Fransızca ve İtalyanca dillerinde, 15 temel kategoride, her kategoride 20'şer kelime barındıran toplam 1500 kelimelik hazır kelime seti tanımlandı.
+  - `app/seeds.py` güncellenerek kayıt (`register`) ve giriş (`login`) anlarında veya `flask seed` komutuyla tüm dillerin/aktif dilin destelerinin kullanıcı hesabına otomatik kopyalanması sağlandı.
+- **Dil Filtreleme ve Kilitlenme Hatası Giderimi:**
+  - Üst menüden dil değiştirilmesine rağmen ana sayfada hep İtalyanca destelerinin gelmesi hatası analiz edildi. Hataya, index rotasında dile göre filtreleme yapılmamasının sebep olduğu tespit edildi.
+  - `app/main/routes.py` index sorgusuna oturumdaki aktif dil adına göre filtre eklendi (`Deck.name.like(f"{lang_name} - %")`).
+  - Özel oluşturulan destelerin isminin başına aktif dil adı otomatik eklendi ve Jinja şablonlarında (`index.html`, `deck_detail.html`, `study.html`, `create_card.html`) bu öneklerin temizlenerek (`replace(current_language['name'] + ' - ', '')`) kullanıcılara gösterilmesi sağlandı.
+- **Mini Kelime Eşleştirme Oyunu (Matching Game):**
+  - `/deck/<deck_id>/game` rotasında çalışan, Tailwind CSS ile tasarlanmış mobil uyumlu interaktif bir oyun geliştirildi.
+  - Kartlar (en fazla 8 kelime = 16 kutu) 4x4 gridde karıştırılarak gösterildi. Doğru eşleşmede yeşil yanıp kaybolma, yanlış eşleşmede kırmızı yanıp shake (titreşim) animasyonu entegre edildi.
+  - Oyun tamamlandığında `canvas-confetti` kütüphanesiyle konfeti efekti ve tebrik ekranı eklendi.
+- **Dashboard Karşılama Paneli (Karşılama & Modüler Yapı):**
+  - Sekmeli yapı kaldırılarak yerine modern bir "Karşılama Paneli" kuruldu. En üstte kurumsal karşılama yazısı ve altında parlayan iki ana modül kutusu ("Kelime Destelerim" ve "Eğitim Oyunları") yerleştirildi.
+  - Kullanıcı "Eğitim Oyunları" modülüne tıkladığında alt akış olarak Kelime Eşleştirme Oyunu kartı ve ona tıklayınca da hızlı oyun başlatma deste listesi listelenecek şekilde çok katmanlı dinamik bir akış kuruldu.
+  - `sessionStorage` yardımıyla kullanıcının son seçtiği modül ve oyun alt akış durumları oturum hafızasında saklanarak sayfa geçişlerinde durum kaybı engellendi.
+- **Testlerin Güncellenmesi:**
+  - `tests/test_study.py` ve `tests/test_errors_and_pagination.py` dosyaları yeni dil filtreleme ve oyun rotalarına göre güncellenerek toplam test sayısı 15'e çıkarıldı. Tüm testler başarıyla geçmiştir.
+
+### Sonraki Adımlar
+- Hocaya teslim dokümanlarını hazırlamak ve projeyi sunmak.
