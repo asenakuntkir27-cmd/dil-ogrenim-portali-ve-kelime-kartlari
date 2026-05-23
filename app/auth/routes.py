@@ -18,6 +18,11 @@ def login():
             flash('Geçersiz kullanıcı adı veya şifre', 'danger')
             return redirect(url_for('auth.login'))
         login_user(user, remember=form.remember_me.data)
+        
+        # Ensure user has the default A1-A2 deck
+        from app.seeds import seed_default_deck_for_user
+        seed_default_deck_for_user(user)
+
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
             next_page = url_for('main.index')
@@ -39,6 +44,11 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        
+        # Seed default deck for the newly registered user
+        from app.seeds import seed_default_deck_for_user
+        seed_default_deck_for_user(user)
+
         flash('Tebrikler, başarıyla kayıt oldunuz! Şimdi giriş yapabilirsiniz.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Kayıt Ol', form=form)
