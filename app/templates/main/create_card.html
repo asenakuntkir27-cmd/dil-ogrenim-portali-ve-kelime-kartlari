@@ -14,7 +14,7 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold tracking-tight text-white">Yeni Kart Ekle</h2>
-                <p class="mt-1 text-sm text-zinc-400">Deste: <strong class="text-pink-400">{{ deck.name }}</strong></p>
+                <p class="mt-1 text-sm text-zinc-400">Deste: <strong class="text-pink-400">{{ deck.name.replace(current_language['name'] + ' - ', '') }}</strong></p>
             </div>
             <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400">
                 <i class="fa-regular fa-clone text-lg"></i>

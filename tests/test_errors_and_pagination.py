@@ -43,7 +43,7 @@ class ErrorsAndPaginationTestCase(unittest.TestCase):
         base_time = datetime.now(timezone.utc)
         for i in range(1, 13):
             d = Deck(
-                name=f'Deste {i:02d}',
+                name=f'İngilizce - Deste {i:02d}',
                 description=f'Aciklama {i:02d}',
                 user=u,
                 created_at=base_time + timedelta(minutes=i)

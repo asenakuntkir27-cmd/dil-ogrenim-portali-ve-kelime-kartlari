@@ -14,8 +14,21 @@ def index():
         return render_template('main/index.html', title='Ana Sayfa')
     
     # Kullanıcı giriş yaptıysa kendi destelerini sayfalayarak getir
+    lang_code = session.get('learning_language', 'en')
+    languages = {
+        'en': 'İngilizce',
+        'de': 'Almanca',
+        'es': 'İspanyolca',
+        'fr': 'Fransızca',
+        'it': 'İtalyanca'
+    }
+    lang_name = languages.get(lang_code, 'İngilizce')
+    
     page = request.args.get('page', 1, type=int)
-    query = sa.select(Deck).where(Deck.user_id == current_user.id).order_by(Deck.created_at.desc())
+    query = sa.select(Deck).where(
+        Deck.user_id == current_user.id,
+        Deck.name.like(f"{lang_name} - %")
+    ).order_by(Deck.created_at.desc())
     pagination = db.paginate(query, page=page, per_page=10, error_out=False)
     
     return render_template('main/index.html', title='Destelerim', decks=pagination.items, pagination=pagination)
@@ -25,7 +38,18 @@ def index():
 def create_deck():
     form = DeckForm()
     if form.validate_on_submit():
-        deck = Deck(name=form.name.data, description=form.description.data, user=current_user)
+        lang_code = session.get('learning_language', 'en')
+        languages = {
+            'en': 'İngilizce',
+            'de': 'Almanca',
+            'es': 'İspanyolca',
+            'fr': 'Fransızca',
+            'it': 'İtalyanca'
+        }
+        lang_name = languages.get(lang_code, 'İngilizce')
+        prefixed_name = f"{lang_name} - {form.name.data}"
+        
+        deck = Deck(name=prefixed_name, description=form.description.data, user=current_user)
         db.session.add(deck)
         db.session.commit()
         flash('Yeni deste başarıyla oluşturuldu!', 'success')
@@ -43,7 +67,18 @@ def deck_detail(deck_id):
         sa.select(Card).where(Card.deck_id == deck.id)
     ).all()
     
-    return render_template('main/deck_detail.html', title=deck.name, deck=deck, cards=cards)
+    languages = {
+        'en': 'İngilizce',
+        'de': 'Almanca',
+        'es': 'İspanyolca',
+        'fr': 'Fransızca',
+        'it': 'İtalyanca'
+    }
+    lang_code = session.get('learning_language', 'en')
+    lang_name = languages.get(lang_code, 'İngilizce')
+    clean_name = deck.name.replace(f"{lang_name} - ", "")
+    
+    return render_template('main/deck_detail.html', title=clean_name, deck=deck, cards=cards)
 
 @main.route('/deck/<int:deck_id>/card/new', methods=['GET', 'POST'])
 @login_required
@@ -83,7 +118,18 @@ def study_deck(deck_id):
         flash('Bu destede çalışılacak kart bulunmuyor. Lütfen önce kart ekleyin.', 'warning')
         return redirect(url_for('main.deck_detail', deck_id=deck.id))
         
-    return render_template('main/study.html', title=f'{deck.name} - Çalış', deck=deck, cards=cards)
+    languages = {
+        'en': 'İngilizce',
+        'de': 'Almanca',
+        'es': 'İspanyolca',
+        'fr': 'Fransızca',
+        'it': 'İtalyanca'
+    }
+    lang_code = session.get('learning_language', 'en')
+    lang_name = languages.get(lang_code, 'İngilizce')
+    clean_name = deck.name.replace(f"{lang_name} - ", "")
+        
+    return render_template('main/study.html', title=f'{clean_name} - Çalış', deck=deck, cards=cards)
 
 
 @main.app_errorhandler(404)

@@ -17,7 +17,7 @@
                         <i class="fa-solid fa-graduation-cap text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">{{ deck.name }}</h1>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">{{ deck.name.replace(current_language['name'] + ' - ', '') }}</h1>
                         <span class="inline-flex items-center gap-1 mt-1 text-xs text-zinc-400">
                             <i class="fa-solid fa-layer-group text-[10px]"></i> {{ cards|length }} Kelime Kartı
                         </span>
