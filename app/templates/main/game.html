@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Confetti library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+    /* CSS animations for interactive cards */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-6px); }
+        40%, 80% { transform: translateX(6px); }
+    }
+    .animate-shake {
+        animation: shake 0.4s ease-in-out;
+    }
+</style>
+
+<div class="max-w-4xl mx-auto py-4 sm:py-8 flex flex-col min-h-[75vh]">
+    <!-- Game Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+            <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-xs"></i> Oyundan Çık
+            </a>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">{{ deck.name.replace(current_language['name'] + ' - ', '') }}</h1>
+            <p class="text-xs sm:text-sm text-zinc-450 mt-1">Kelimelerin yabancı dildeki halleri ile Türkçe anlamlarını eşleştirin.</p>
+        </div>
+        <!-- Progress Counter -->
+        <div class="flex items-center gap-3 self-start sm:self-center">
+            <span id="score-counter" class="text-sm font-bold text-purple-400 bg-purple-950/30 border border-purple-900/30 px-3 py-1.5 rounded-xl shadow-inner">
+                Eşleşen: 0 / 0
+            </span>
+        </div>
+    </div>
+
+    <!-- Main Game Area -->
+    <div id="game-container" class="flex-1 flex flex-col items-center justify-center">
+        <!-- Card Grid -->
+        <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-3xl py-4">
+            <!-- Dynamically populated via JavaScript -->
+        </div>
+    </div>
+
+    <!-- Victory Screen (Hidden by default) -->
+    <div id="victory-area" class="hidden flex-1 flex flex-col items-center justify-center text-center py-12 px-6">
+        <div class="relative mb-6">
+            <!-- Glowing background ring -->
+            <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-600 blur opacity-30 animate-pulse"></div>
+            <div class="relative flex h-20 w-20 items-center justify-center rounded-full bg-zinc-900 border-2 border-purple-500/30 text-purple-400 shadow-xl">
+                <i class="fa-solid fa-trophy text-3xl"></i>
+            </div>
+        </div>
+
+        <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2">Tebrikler!</h2>
+        <p class="text-zinc-400 text-sm max-w-sm mb-8">Tüm kelimeleri hatasız bir şekilde eşleştirdiniz ve bu desteyi mükemmel şekilde tamamladınız!</p>
+
+        <!-- Stats Card -->
+        <div class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8 shadow-xl">
+            <div class="flex items-center justify-between border-b border-zinc-800/60 pb-3 mb-3">
+                <span class="text-xs font-semibold text-zinc-400">Deste Adı</span>
+                <span class="text-xs font-bold text-zinc-200">{{ deck.name.replace(current_language['name'] + ' - ', '') }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-zinc-400">Eşleştirilen Kelime Sayısı</span>
+                <span id="victory-total-words" class="text-xs font-bold text-purple-400">0</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 w-full max-w-xs sm:max-w-sm">
+            <button onclick="initGame()" class="w-full py-3.5 px-6 font-semibold text-white bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-850 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow">
+                <i class="fa-solid fa-arrows-rotate text-xs"></i> Yeniden Oyna
+            </button>
+            <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="w-full py-3.5 px-6 font-semibold text-white bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:via-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-purple-500/10">
+                Desteye Dön <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Game data payload from Jinja
+    const deckCards = [
+        {% for card in cards %}
+        {
+            id: {{ card.id }},
+            word: {{ card.word|tojson }},
+            meaning: {{ card.meaning|tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    let gameItems = [];
+    let selectedItem = null;
+    let matchedCount = 0;
+    let totalPairs = 0;
+    let isProcessing = false;
+
+    // Shuffle helper (Fisher-Yates)
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // Select random subset and set up board
+    function initGame() {
+        // Reset state
+        selectedItem = null;
+        matchedCount = 0;
+        isProcessing = false;
+        
+        document.getElementById('victory-area').classList.add('hidden');
+        document.getElementById('game-container').classList.remove('hidden');
+
+        // Select subset of cards (maximum 8 cards, i.e., 16 grid items)
+        const maxPairs = Math.min(deckCards.length, 8);
+        totalPairs = maxPairs;
+        
+        // Randomize the subset of cards
+        const randomSubset = [...deckCards].sort(() => 0.5 - Math.random()).slice(0, maxPairs);
+
+        // Build list of items (words and meanings)
+        const items = [];
+        randomSubset.forEach(card => {
+            items.push({
+                cardId: card.id,
+                text: card.word,
+                type: 'word',
+                id: `item-${card.id}-word`
+            });
+            items.push({
+                cardId: card.id,
+                text: card.meaning,
+                type: 'meaning',
+                id: `item-${card.id}-meaning`
+            });
+        });
+
+        // Shuffle items
+        gameItems = shuffle(items);
+
+        // Render card grid
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '';
+        
+        gameItems.forEach(item => {
+            const cardEl = document.createElement('div');
+            cardEl.id = item.id;
+            cardEl.className = 'bg-zinc-900/40 border border-zinc-800 rounded-2xl py-6 px-4 text-center cursor-pointer transition-all duration-300 select-none hover:border-zinc-700 hover:bg-zinc-900/70 flex items-center justify-center min-h-[96px] text-sm sm:text-base font-semibold text-zinc-200 shadow-lg';
+            cardEl.textContent = item.text;
+            
+            // Add click handler
+            cardEl.addEventListener('click', () => handleCardClick(item));
+            grid.appendChild(cardEl);
+        });
+
+        updateScore();
+    }
+
+    function updateScore() {
+        const counter = document.getElementById('score-counter');
+        counter.innerHTML = `<i class="fa-solid fa-circle-check text-xs mr-1 text-purple-400"></i> Eşleşen: ${matchedCount} / ${totalPairs}`;
+    }
+
+    function handleCardClick(item) {
+        if (isProcessing) return;
+
+        const cardEl = document.getElementById(item.id);
+        
+        // If already matched, do nothing
+        if (cardEl.classList.contains('opacity-0') || cardEl.classList.contains('pointer-events-none')) return;
+
+        // If clicking the currently selected card, deselect it
+        if (selectedItem && selectedItem.id === item.id) {
+            cardEl.className = 'bg-zinc-900/40 border border-zinc-800 rounded-2xl py-6 px-4 text-center cursor-pointer transition-all duration-300 select-none hover:border-zinc-700 hover:bg-zinc-900/70 flex items-center justify-center min-h-[96px] text-sm sm:text-base font-semibold text-zinc-200 shadow-lg';
+            selectedItem = null;
+            return;
+        }
+
+        // Highlight selected card
+        cardEl.className = 'border-purple-500 bg-purple-950/20 text-purple-300 ring-2 ring-purple-500/20 rounded-2xl py-6 px-4 text-center cursor-pointer transition-all duration-200 select-none flex items-center justify-center min-h-[96px] text-sm sm:text-base font-bold shadow-lg';
+
+        if (!selectedItem) {
+            // First card selected
+            selectedItem = item;
+        } else {
+            // Second card selected, check match
+            isProcessing = true;
+            const prevCardEl = document.getElementById(selectedItem.id);
+
+            if (selectedItem.cardId === item.cardId && selectedItem.type !== item.type) {
+                // MATCH!
+                matchedCount++;
+                updateScore();
+
+                // Apply success styles
+                cardEl.className = 'border-emerald-500 bg-emerald-950/30 text-emerald-300 pointer-events-none scale-95 rounded-2xl py-6 px-4 text-center cursor-pointer transition-all duration-200 select-none flex items-center justify-center min-h-[96px] text-sm sm:text-base font-bold shadow-lg';
+                prevCardEl.className = 'border-emerald-500 bg-emerald-950/30 text-emerald-300 pointer-events-none scale-95 rounded-2xl py-6 px-4 text-center cursor-pointer transition-all duration-200 select-none flex items-center justify-center min-h-[96px] text-sm sm:text-base font-bold shadow-lg';
+
+                // Fade out after a delay
+                setTimeout(() => {
+                    cardEl.className = 'opacity-0 pointer-events-none rounded-2xl py-6 px-4 text-center flex items-center justify-center min-h-[96px] text-sm sm:text-base transition-all duration-500';
+                    prevCardEl.className = 'opacity-0 pointer-events-none rounded-2xl py-6 px-4 text-center flex items-center justify-center min-h-[96px] text-sm sm:text-base transition-all duration-500';
+                    
+                    selectedItem = null;
+                    isProcessing = false;
+
+                    // Check win condition
+                    if (matchedCount === totalPairs) {
+                        showVictory();
+                    }
+                }, 600);
+            } else {
+                // NO MATCH!
+                // Apply failure styles + shake animation
+                cardEl.className = 'border-rose-500 bg-rose-950/30 text-rose-300 animate-shake rounded-2xl py-6 px-4 text-center cursor-pointer select-none flex items-center justify-center min-h-[96px] text-sm sm:text-base font-bold shadow-lg';
+                prevCardEl.className = 'border-rose-500 bg-rose-950/30 text-rose-300 animate-shake rounded-2xl py-6 px-4 text-center cursor-pointer select-none flex items-center justify-center min-h-[96px] text-sm sm:text-base font-bold shadow-lg';
+
+                // Reset styles after animation finishes
+                setTimeout(() => {
+                    cardEl.className = 'bg-zinc-900/40 border border-zinc-800 rounded-2xl py-6 px-4 text-center cursor-pointer transition-all duration-300 select-none hover:border-zinc-700 hover:bg-zinc-900/70 flex items-center justify-center min-h-[96px] text-sm sm:text-base font-semibold text-zinc-200 shadow-lg';
+                    prevCardEl.className = 'bg-zinc-900/40 border border-zinc-800 rounded-2xl py-6 px-4 text-center cursor-pointer transition-all duration-300 select-none hover:border-zinc-700 hover:bg-zinc-900/70 flex items-center justify-center min-h-[96px] text-sm sm:text-base font-semibold text-zinc-200 shadow-lg';
+                    
+                    selectedItem = null;
+                    isProcessing = false;
+                }, 800);
+            }
+        }
+    }
+
+    function showVictory() {
+        document.getElementById('game-container').classList.add('hidden');
+        document.getElementById('victory-total-words').textContent = totalPairs;
+        document.getElementById('victory-area').classList.remove('hidden');
+
+        // Confetti!
+        var duration = 3 * 1000;
+        var end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#a855f7', '#ec4899', '#f43f5e']
+            });
+            confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#a855f7', '#ec4899', '#f43f5e']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+    }
+
+    // Initialize game on load
+    window.addEventListener('DOMContentLoaded', () => {
+        if (deckCards && deckCards.length > 0) {
+            initGame();
+        }
+    });
+</script>
+{% endblock %}
