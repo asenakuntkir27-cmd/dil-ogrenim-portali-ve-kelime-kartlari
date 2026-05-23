@@ -30,4 +30,17 @@ def create_app(config_class=Config):
     from app.auth import auth as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
+    # Register CLI commands
+    @app.cli.command("seed")
+    def seed_command():
+        """Seed the database with initial data."""
+        from app.seeds import seed_db
+        seed_db()
+
+    # Automatic database seeding on startup if not in testing mode
+    if not app.config.get('TESTING'):
+        with app.app_context():
+            from app.seeds import seed_db
+            seed_db()
+
     return app
