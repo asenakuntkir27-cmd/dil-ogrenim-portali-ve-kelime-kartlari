@@ -120,6 +120,9 @@ def set_language(lang_code):
     supported_languages = ['en', 'de', 'es', 'fr', 'it']
     if lang_code in supported_languages:
         session['learning_language'] = lang_code
+        if current_user.is_authenticated:
+            from app.seeds import seed_language_decks_for_user
+            seed_language_decks_for_user(current_user, lang_code)
     
     referrer = request.referrer
     if not referrer or urlsplit(referrer).netloc != '':

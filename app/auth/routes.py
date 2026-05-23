@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import current_user, login_user, logout_user
 from urllib.parse import urlsplit
 import sqlalchemy as sa
@@ -19,9 +19,10 @@ def login():
             return redirect(url_for('auth.login'))
         login_user(user, remember=form.remember_me.data)
         
-        # Ensure user has the default A1-A2 deck
-        from app.seeds import seed_default_deck_for_user
-        seed_default_deck_for_user(user)
+        # Ensure user has the decks for the current learning language
+        lang_code = session.get('learning_language', 'en')
+        from app.seeds import seed_language_decks_for_user
+        seed_language_decks_for_user(user, lang_code)
 
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
@@ -45,9 +46,9 @@ def register():
         db.session.add(user)
         db.session.commit()
         
-        # Seed default deck for the newly registered user
-        from app.seeds import seed_default_deck_for_user
-        seed_default_deck_for_user(user)
+        # Seed the default language (English) decks for the newly registered user
+        from app.seeds import seed_language_decks_for_user
+        seed_language_decks_for_user(user, 'en')
 
         flash('Tebrikler, başarıyla kayıt oldunuz! Şimdi giriş yapabilirsiniz.', 'success')
         return redirect(url_for('auth.login'))
