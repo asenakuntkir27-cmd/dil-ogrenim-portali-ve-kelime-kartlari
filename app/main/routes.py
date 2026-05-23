@@ -1,6 +1,7 @@
-from flask import render_template, flash, redirect, url_for, abort, request
+from flask import render_template, flash, redirect, url_for, abort, request, session
 from flask_login import current_user, login_required
 import sqlalchemy as sa
+from urllib.parse import urlsplit
 from app import db
 from app.main import main
 from app.main.forms import DeckForm, CardForm
@@ -94,3 +95,33 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('errors/500.html'), 500
+
+
+@main.app_context_processor
+def inject_learning_language():
+    languages = {
+        'en': {'name': 'İngilizce', 'flag': '🇺🇸'},
+        'de': {'name': 'Almanca', 'flag': '🇩🇪'},
+        'es': {'name': 'İspanyolca', 'flag': '🇪🇸'},
+        'fr': {'name': 'Fransızca', 'flag': '🇫🇷'},
+        'it': {'name': 'İtalyanca', 'flag': '🇮🇹'}
+    }
+    lang_code = session.get('learning_language', 'en')
+    current_lang = languages.get(lang_code, languages['en'])
+    return {
+        'learning_languages': languages,
+        'current_language_code': lang_code,
+        'current_language': current_lang
+    }
+
+
+@main.route('/set_language/<lang_code>')
+def set_language(lang_code):
+    supported_languages = ['en', 'de', 'es', 'fr', 'it']
+    if lang_code in supported_languages:
+        session['learning_language'] = lang_code
+    
+    referrer = request.referrer
+    if not referrer or urlsplit(referrer).netloc != '':
+        referrer = url_for('main.index')
+    return redirect(referrer)
