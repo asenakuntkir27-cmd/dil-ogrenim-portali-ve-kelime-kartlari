@@ -105,13 +105,19 @@ Kullanıcıların kendi kelime destelerini ve kelime kartlarını oluşturup yö
 
 ### Karşılaşılan Sorunlar ve Çözümleri
 - **500 Internal Server Error (Kayıt Formu):** Kullanıcı kayıt formunu gönderdiğinde Flask'ın 500 hatası verdiği tespit edildi. Hataya, WTForms'un `Email()` doğrulayıcısının çalışması için gereken `email-validator` kütüphanesinin eksikliğinin neden olduğu anlaşıldı. Bu kütüphane sanal ortama yüklenerek ve `requirements.txt` dosyasına eklenerek sorun çözüldü.
+
+  ![WTForms E-posta Doğrulama 500 Hata Mesajı](img/oturum5_500_hata_mesaji.png)
 - **Şablon Çakışması ve Önbellek (Cache) Sorunu:** Kullanıcı giriş yaptıktan sonra ana sayfada oluşturulan destelerin listelenmediği ve yeni deste butonunun çıkmadığı fark edildi. Bunun sebebi, `app/templates/index.html` olarak oluşturulan geçici ve eski ana sayfa dosyası ile Blueprint yapısına uygun oluşturulması gereken `app/templates/main/index.html` dosyalarının çakışması ve tarayıcının eskisini render etmesiydi.
   - *Çözüm:* Kök dizindeki eski `index.html` dosyası sol dosya panelinden manuel olarak temizlendi. `app/main/routes.py` rotalarındaki render hedefleri `main/index.html` olarak güncellendi. Değişikliklerin algılanması için dışarıdan PowerShell sunucusu yeniden başlatıldı (reset) ve sorun giderildi.
+
+  ![Şablon Çakışması ve Önbellek Çözüm Kanıtı](img/oturum5_sablon_hatasi_cozumu.jpg)
 
 ### Yapılanlar
 - **Formlar (app/main/forms.py):** Deste ekleme işlemleri için `DeckForm` ve desteye kart ekleme işlemleri için `CardForm` yapıları WTForms ile tasarlandı.
 - **Güvenli Rotalar (app/main/routes.py):** Destelerin listelendiği `/`, yeni deste oluşturulan `/deck/new`, deste detayının gösterildiği `/deck/<id>` ve desteye kart eklenen `/deck/<id>/card/new` rotaları oluşturuldu. Tüm rotalar `@login_required` ile korundu ve URL üzerinden başkasının destesine kart eklenmesini önlemek için `current_user` doğrulaması eklendi.
 - **Şablonlar (Templates):** `app/templates/main/` dizini altına `create_deck.html`, `deck_detail.html` ve `create_card.html` dosyaları eklendi. Ana sayfa `index.html` ise giriş yapan kullanıcıya kendi destelerini listeleyecek ve "Yeni Deste Oluştur" butonu sunacak şekilde yeniden yapılandırıldı.
+
+  ![Deste ve Kart Yönetimi Entegrasyon Plan ve Başarılı Çalışma](img/oturum5_deste_kart_gelistirme.jpg)
 
 ### Sonraki Adımlar
 - Arayüzün modern bir CSS framework'ü (Tailwind CSS, Bootstrap vb.) ile giydirilmesi ve mobil uyumlu hale getirilmesi.

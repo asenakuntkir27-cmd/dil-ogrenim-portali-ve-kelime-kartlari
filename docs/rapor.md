@@ -119,9 +119,13 @@ Platformun sunduğu geliştirme araçları arasından en yüksek katma değere s
 Uygulama aşamasına geçmeden önce ajanın bir **Uygulama Planı** (`implementation_plan.md`) hazırlaması ve kullanıcının onayına sunması, projenin başarısindeki en önemli faktördür.
 - **Neden Faydalı?** Bu özellik, ajanın kontrolsüz bir şekilde kod tabanında değişiklik yapmasını engellemiştir. Özellikle çoklu dil altyapısı, eşleştirme oyunu ve son olarak karşılama paneli gibi karmaşık modüllerde hangi dosyaların değişeceği, hangi rotaların ekleneceği ve bu değişikliklerin mevcut birim testlerini nasıl etkileyeceği önceden belirlenmiş ve mimari sapmalar engellenmiştir.
 
+  ![Antigravity Planlama Modu ve Geliştirme Kanıtı](img/oturum5_deste_kart_gelistirme.jpg)
+
 ### 2. Eser ve Süreç Takip Yapısı (Artifacts & Walkthroughs)
 Projenin her aşamasında güncellenen `task.md` ve `walkthrough.md` dosyalarının kullanımı, geliştirici ile ajan arasındaki koordinasyonu en üst düzeye çıkarmıştır.
 - **Neden Faydalı?** `task.md` sayesinde hangi işlerin tamamlandığı, hangilerinin devam ettiği anlık olarak takip edilebilmiştir. `walkthrough.md` ise geliştirme sonunda yapılan değişikliklerin, test kodlarının ve sonuçlarının düzenli bir özetini sunmuştur. Bu yapı, projenin izlenebilirliğini artırmış ve teslim raporu hazırlamayı son derece kolaylaştırmıştır.
+
+  ![Şablon Çakışması ve Önbellek Çözüm Kanıtı](img/oturum5_sablon_hatasi_cozumu.jpg)
 
 ---
 
@@ -141,6 +145,8 @@ Sayfalama testleri yazıldığında, döngü içerisinde hızlıca oluşturulan 
 ### 3. WTForms E-posta Doğrulama Kitaplığı Eksikliği (Session 5)
 Ajan, kayıt formunu oluştururken `email-validator` kütüphanesinin çalışma ortamında kurulu olduğunu varsaymıştır. Kullanıcı kayıt olmaya çalıştığında sistem `500 Internal Server Error` vermiştir.
 - **Düzeltme:** Hata günlükleri incelenerek eksik paket tespit edilmiş; yerel sanal ortama yüklenmiş ve `requirements.txt` güncellenerek üretim ortamında (Docker imajı dahil) bu hatanın tekrarlanması engellenmiştir.
+
+  ![WTForms E-posta Doğrulama 500 Hata Mesajı](img/oturum5_500_hata_mesaji.png)
 
 ---
 
