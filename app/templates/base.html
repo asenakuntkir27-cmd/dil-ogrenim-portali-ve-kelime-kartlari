@@ -100,6 +100,9 @@
                             <span class="text-sm text-zinc-400 hidden sm:inline">
                                 <i class="fa-solid fa-user mr-1.5 text-zinc-500"></i>Hoş geldin, <strong class="text-zinc-200 font-semibold">{{ current_user.username }}</strong>
                             </span>
+                            <a href="{{ url_for('main.profile') }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-300 hover:text-white border border-zinc-800 hover:border-pink-500/50 rounded-xl bg-zinc-900/30 hover:bg-pink-500/10 transition-all duration-200">
+                                <i class="fa-solid fa-gear text-pink-400"></i>Profil Ayarları
+                            </a>
                             <a href="{{ url_for('auth.logout') }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-red-400 border border-zinc-800 hover:border-red-900/50 rounded-xl bg-zinc-900/30 transition-all duration-200">
                                 <i class="fa-solid fa-arrow-right-from-bracket"></i>Çıkış Yap
                             </a>
@@ -122,6 +125,8 @@
                         bg-emerald-950/20 border-emerald-500/30 text-emerald-400
                     {% elif category == 'warning' %}
                         bg-amber-950/20 border-amber-500/30 text-amber-400
+                    {% elif category == 'pink' or category == 'profile_success' %}
+                        bg-pink-950/20 border-pink-500/30 text-pink-400 shadow-lg shadow-pink-500/5
                     {% else %}
                         bg-rose-950/20 border-rose-500/30 text-rose-400
                     {% endif %}">
@@ -129,6 +134,8 @@
                         <i class="fa-solid fa-circle-check text-base shrink-0"></i>
                     {% elif category == 'warning' %}
                         <i class="fa-solid fa-triangle-exclamation text-base shrink-0"></i>
+                    {% elif category == 'pink' or category == 'profile_success' %}
+                        <i class="fa-solid fa-circle-check text-base shrink-0 text-pink-400"></i>
                     {% else %}
                         <i class="fa-solid fa-circle-exclamation text-base shrink-0"></i>
                     {% endif %}

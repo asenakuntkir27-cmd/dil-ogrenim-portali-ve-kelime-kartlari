@@ -325,3 +325,52 @@ def set_language(lang_code):
     if not referrer or urlsplit(referrer).netloc != '':
         referrer = url_for('main.index')
     return redirect(referrer)
+
+
+@main.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    from app.auth.forms import EditProfileForm, ChangePasswordForm
+    
+    profile_form = EditProfileForm(
+        original_username=current_user.username,
+        original_email=current_user.email,
+        prefix="profile"
+    )
+    password_form = ChangePasswordForm(prefix="password")
+    
+    active_tab = request.args.get('tab', 'profile')
+    
+    if request.method == 'POST':
+        submit_type = request.form.get('submit_type')
+        
+        if submit_type == 'profile':
+            if profile_form.validate_on_submit():
+                current_user.username = profile_form.username.data
+                current_user.email = profile_form.email.data
+                db.session.commit()
+                flash('Profil bilgileriniz başarıyla güncellendi!', 'pink')
+                return redirect(url_for('main.profile', tab='profile'))
+            active_tab = 'profile'
+            
+        elif submit_type == 'password':
+            if password_form.validate_on_submit():
+                if not current_user.check_password(password_form.current_password.data):
+                    password_form.current_password.errors.append('Mevcut şifreniz yanlış.')
+                else:
+                    current_user.set_password(password_form.new_password.data)
+                    db.session.commit()
+                    flash('Şifreniz başarıyla güncellendi!', 'pink')
+                    return redirect(url_for('main.profile', tab='security'))
+            active_tab = 'security'
+            
+    # For GET or when validation fails for other form, pre-populate profile form
+    if request.method == 'GET' or request.form.get('submit_type') != 'profile':
+        profile_form.username.data = current_user.username
+        profile_form.email.data = current_user.email
+        
+    return render_template('auth/profile.html', 
+                           title='Profil Ayarları',
+                           profile_form=profile_form,
+                           password_form=password_form,
+                           active_tab=active_tab)

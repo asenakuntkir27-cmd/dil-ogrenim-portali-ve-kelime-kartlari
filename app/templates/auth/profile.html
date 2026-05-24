@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-extrabold tracking-tight text-white bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">Hesap Ayarları</h1>
+        <p class="mt-2 text-sm text-zinc-400">Profil bilgilerinizi düzenleyin, şifrenizi güncelleyin ve gizlilik tercihlerinizi yönetin.</p>
+    </div>
+
+    <!-- Responsive Layout Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+        
+        <!-- Left Sidebar / Navigation Tabs (3 cols) -->
+        <div class="md:col-span-4 lg:col-span-3 space-y-6">
+            <!-- User Overview Card -->
+            <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 text-center shadow-xl backdrop-blur-sm relative overflow-hidden group">
+                <div class="absolute -right-12 -top-12 h-24 w-24 rounded-full bg-pink-500/5 blur-xl group-hover:bg-pink-500/10 transition-all duration-500"></div>
+                <!-- Glowing Avatar Circle -->
+                <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 to-fuchsia-600 text-white font-bold text-3xl shadow-lg shadow-pink-500/20 mb-4 ring-2 ring-pink-500/30">
+                    {{ current_user.username[0].upper() }}
+                </div>
+                <h3 class="text-lg font-bold text-zinc-100">{{ current_user.username }}</h3>
+                <p class="text-xs text-zinc-500 mt-1 truncate">{{ current_user.email }}</p>
+                <div class="mt-4 pt-3 border-t border-zinc-800/80 text-[10px] text-zinc-600">
+                    Katılım: {{ current_user.created_at.strftime('%d.%m.%Y') }}
+                </div>
+            </div>
+
+            <!-- Vertical Menu (Tabs) -->
+            <div class="bg-zinc-900/20 border border-zinc-800/80 rounded-2xl p-2.5 space-y-1 shadow-inner">
+                <button onclick="switchTab('profile')" id="btn-tab-profile" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer select-none">
+                    <i class="fa-solid fa-user text-base shrink-0"></i>
+                    <span>Profil Bilgileri</span>
+                </button>
+                <button onclick="switchTab('security')" id="btn-tab-security" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer select-none">
+                    <i class="fa-solid fa-shield-halved text-base shrink-0"></i>
+                    <span>Güvenlik ve Şifre</span>
+                </button>
+                <button onclick="switchTab('privacy')" id="btn-tab-privacy" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer select-none">
+                    <i class="fa-solid fa-user-shield text-base shrink-0"></i>
+                    <span>Gizlilik ve Tercihler</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Content Cards (9 cols) -->
+        <div class="md:col-span-8 lg:col-span-9">
+            
+            <!-- Tab 1: Profil Bilgileri -->
+            <div id="content-tab-profile" class="hidden tab-content bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                <div class="border-b border-zinc-800/80 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user text-pink-400"></i> Profil Bilgileri
+                    </h2>
+                    <p class="text-xs text-zinc-400 mt-1">Kullanıcı adınızı ve e-posta adresinizi güncelleyebilirsiniz.</p>
+                </div>
+
+                <form action="{{ url_for('main.profile') }}" method="post" class="space-y-6">
+                    {{ profile_form.hidden_tag() }}
+                    <input type="hidden" name="submit_type" value="profile">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            {{ profile_form.username.label(class="block text-sm font-medium text-zinc-300") }}
+                            <div class="mt-1.5">
+                                {{ profile_form.username(class="w-full bg-zinc-950 border border-zinc-800 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="Kullanıcı adınız") }}
+                            </div>
+                            {% for error in profile_form.username.errors %}
+                                <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <div>
+                            {{ profile_form.email.label(class="block text-sm font-medium text-zinc-300") }}
+                            <div class="mt-1.5">
+                                {{ profile_form.email(class="w-full bg-zinc-950 border border-zinc-800 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="e-posta@ornek.com") }}
+                            </div>
+                            {% for error in profile_form.email.errors %}
+                                <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-zinc-850 flex justify-end">
+                        {{ profile_form.submit_profile(class="inline-flex justify-center items-center px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 hover:from-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 active:scale-[0.98] shadow-md shadow-pink-500/10 hover:shadow-pink-500/20 cursor-pointer") }}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab 2: Güvenlik ve Şifre -->
+            <div id="content-tab-security" class="hidden tab-content bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                <div class="border-b border-zinc-800/80 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-purple-400"></i> Şifre Güncelleme
+                    </h2>
+                    <p class="text-xs text-zinc-400 mt-1">Hesabınızın güvenliği için şifrenizi düzenli olarak değiştirin.</p>
+                </div>
+
+                <form action="{{ url_for('main.profile') }}" method="post" class="space-y-6">
+                    {{ password_form.hidden_tag() }}
+                    <input type="hidden" name="submit_type" value="password">
+
+                    <div class="max-w-md space-y-5">
+                        <div>
+                            {{ password_form.current_password.label(class="block text-sm font-medium text-zinc-300") }}
+                            <div class="mt-1.5">
+                                {{ password_form.current_password(class="w-full bg-zinc-950 border border-zinc-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="Mevcut şifreniz") }}
+                            </div>
+                            {% for error in password_form.current_password.errors %}
+                                <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="h-px bg-zinc-850 my-2"></div>
+
+                        <div>
+                            {{ password_form.new_password.label(class="block text-sm font-medium text-zinc-300") }}
+                            <div class="mt-1.5">
+                                {{ password_form.new_password(class="w-full bg-zinc-950 border border-zinc-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="En az 6 karakter") }}
+                            </div>
+                            {% for error in password_form.new_password.errors %}
+                                <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <div>
+                            {{ password_form.password_confirm.label(class="block text-sm font-medium text-zinc-300") }}
+                            <div class="mt-1.5">
+                                {{ password_form.password_confirm(class="w-full bg-zinc-950 border border-zinc-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl px-4 py-3 text-zinc-100 outline-none transition-all duration-200 text-sm", placeholder="Yeni şifrenizi tekrar girin") }}
+                            </div>
+                            {% for error in password_form.password_confirm.errors %}
+                                <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> {{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-zinc-850 flex justify-end">
+                        {{ password_form.submit_password(class="inline-flex justify-center items-center px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl transition-all duration-200 active:scale-[0.98] shadow-md shadow-purple-500/10 hover:shadow-purple-500/20 cursor-pointer") }}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab 3: Gizlilik ve Tercihler -->
+            <div id="content-tab-privacy" class="hidden tab-content bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                <div class="border-b border-zinc-800/80 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield text-pink-400"></i> Gizlilik ve Tercihler
+                    </h2>
+                    <p class="text-xs text-zinc-400 mt-1">Portal üzerindeki gizlilik durumunuzu ve sistem bildirimlerinizi yönetin.</p>
+                </div>
+
+                <!-- Privacy Switches -->
+                <div class="space-y-6">
+                    
+                    <!-- Toggle Row 1 -->
+                    <div class="flex items-center justify-between p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/80 hover:border-zinc-800 transition-colors">
+                        <div class="pr-4">
+                            <h4 class="text-sm font-semibold text-zinc-200">Profilimi Herkese Açık Yap</h4>
+                            <p class="text-xs text-zinc-500 mt-0.5">Diğer LingoRose kullanıcıları destelerimi, kelime istatistiklerimi ve puanlarımı görebilir.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                            <input type="checkbox" id="pref-public-profile" class="sr-only peer">
+                            <div class="w-11 h-6 bg-zinc-800 rounded-full peer peer-focus:ring-1 peer-focus:ring-pink-500/30 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 peer-checked:after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-fuchsia-600 shadow-inner"></div>
+                        </label>
+                    </div>
+
+                    <!-- Toggle Row 2 -->
+                    <div class="flex items-center justify-between p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/80 hover:border-zinc-800 transition-colors">
+                        <div class="pr-4">
+                            <h4 class="text-sm font-semibold text-zinc-200">Haftalık İlerleme Raporu</h4>
+                            <p class="text-xs text-zinc-500 mt-0.5">Eğitim performansım ve kelime hedeflerime dair haftalık özet e-postası alayım.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                            <input type="checkbox" id="pref-progress-report" class="sr-only peer">
+                            <div class="w-11 h-6 bg-zinc-800 rounded-full peer peer-focus:ring-1 peer-focus:ring-pink-500/30 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 peer-checked:after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-fuchsia-600 shadow-inner"></div>
+                        </label>
+                    </div>
+
+                    <!-- Toggle Row 3 -->
+                    <div class="flex items-center justify-between p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/80 hover:border-zinc-800 transition-colors">
+                        <div class="pr-4">
+                            <h4 class="text-sm font-semibold text-zinc-200">Yeni Oyun ve Özellik Bildirimleri</h4>
+                            <p class="text-xs text-zinc-500 mt-0.5">LingoRose platformuna yeni oyunlar veya çalışma modülleri eklendiğinde bilgilendirileyim.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                            <input type="checkbox" id="pref-notifications" class="sr-only peer">
+                            <div class="w-11 h-6 bg-zinc-800 rounded-full peer peer-focus:ring-1 peer-focus:ring-pink-500/30 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 peer-checked:after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-fuchsia-600 shadow-inner"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Info Box (Compliance/GDPR/KVKK) -->
+                <div class="mt-8 p-4 rounded-xl bg-pink-950/10 border border-pink-950/30 text-xs text-zinc-400 leading-relaxed flex gap-3">
+                    <i class="fa-solid fa-circle-info text-pink-400 text-sm mt-0.5 shrink-0"></i>
+                    <div>
+                        <span class="font-semibold text-zinc-300">Kişisel Verilerin Korunması (KVKK/GDPR):</span> LingoRose, kişisel verilerinizi üçüncü taraflarla kesinlikle paylaşmaz. Verileriniz sadece dil öğrenim deneyiminizi özelleştirmek ve ilerlemenizi kaydetmek amacıyla şifrelenmiş altyapımızda güvenle saklanır.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab switching engine
+    function switchTab(tabId) {
+        // Hide all tab contents
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.add('hidden'));
+
+        // Reset all tab button styles
+        const tabs = ['profile', 'security', 'privacy'];
+        tabs.forEach(t => {
+            const btn = document.getElementById(`btn-tab-${t}`);
+            if (btn) {
+                btn.className = "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer select-none text-zinc-400 hover:text-white hover:bg-zinc-900/35";
+            }
+        });
+
+        // Show selected tab content
+        const activeContent = document.getElementById(`content-tab-${tabId}`);
+        if (activeContent) {
+            activeContent.classList.remove('hidden');
+        }
+
+        // Highlight selected tab button
+        const activeBtn = document.getElementById(`btn-tab-${tabId}`);
+        if (activeBtn) {
+            if (tabId === 'profile') {
+                activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl bg-pink-500/10 border border-pink-950/30 text-pink-400 shadow shadow-pink-950/20 cursor-pointer select-none";
+            } else if (tabId === 'security') {
+                activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl bg-purple-500/10 border border-purple-950/30 text-purple-400 shadow shadow-purple-950/20 cursor-pointer select-none";
+            } else {
+                activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl bg-pink-500/10 border border-pink-950/30 text-pink-400 shadow shadow-pink-950/20 cursor-pointer select-none";
+            }
+        }
+
+        // Keep browser URL tab query sync without page reload
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('tab', tabId);
+        window.history.replaceState({ path: newUrl.href }, '', newUrl.href);
+    }
+
+    // Initialize layout and preferences
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load active tab from server side or default
+        const activeTab = "{{ active_tab }}";
+        switchTab(activeTab);
+
+        // Privacy preferences integration with localStorage
+        const toggles = ['public-profile', 'progress-report', 'notifications'];
+        toggles.forEach(toggleId => {
+            const el = document.getElementById(`pref-${toggleId}`);
+            if (el) {
+                // Load saved state
+                const savedState = localStorage.getItem(`lingorose-pref-${toggleId}`);
+                if (savedState !== null) {
+                    el.checked = savedState === 'true';
+                } else {
+                    // Set default checked states
+                    el.checked = true;
+                }
+
+                // Add change event listener to save choice
+                el.addEventListener('change', function() {
+                    localStorage.setItem(`lingorose-pref-${toggleId}`, el.checked);
+                    
+                    // Show a toast or micro notification for feedback
+                    console.log(`${toggleId} preference updated: ${el.checked}`);
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

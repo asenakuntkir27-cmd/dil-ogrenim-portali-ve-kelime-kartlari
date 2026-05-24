@@ -29,3 +29,33 @@ class RegistrationForm(FlaskForm):
         user = db.session.scalar(sa.select(User).where(User.email == email.data))
         if user is not None:
             raise ValidationError('Bu e-posta adresi zaten kullanılıyor. Lütfen farklı bir tane seçin.')
+
+class EditProfileForm(FlaskForm):
+    username = StringField('Kullanıcı Adı', validators=[DataRequired(), Length(min=3, max=64)])
+    email = StringField('E-Posta', validators=[DataRequired(), Email(), Length(max=120)])
+    submit_profile = SubmitField('Değişiklikleri Kaydet')
+
+    def __init__(self, original_username, original_email, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.original_username = original_username
+        self.original_email = original_email
+
+    def validate_username(self, username):
+        if username.data != self.original_username:
+            user = db.session.scalar(sa.select(User).where(User.username == username.data))
+            if user is not None:
+                raise ValidationError('Bu kullanıcı adı zaten alınmış. Lütfen farklı bir tane seçin.')
+
+    def validate_email(self, email):
+        if email.data != self.original_email:
+            user = db.session.scalar(sa.select(User).where(User.email == email.data))
+            if user is not None:
+                raise ValidationError('Bu e-posta adresi zaten kullanılıyor. Lütfen farklı bir tane seçin.')
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField('Mevcut Şifre', validators=[DataRequired()])
+    new_password = PasswordField('Yeni Şifre', validators=[DataRequired(), Length(min=6)])
+    password_confirm = PasswordField('Yeni Şifre Tekrar', validators=[
+        DataRequired(), EqualTo('new_password', message='Yeni şifreler eşleşmiyor.')
+    ])
+    submit_password = SubmitField('Şifreyi Güncelle')
