@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     email: Mapped[str] = mapped_column(String(120), index=True, unique=True)
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    avatar_url: Mapped[Optional[str]] = mapped_column(String(64), default='fa-user', server_default='fa-user')
 
     decks: Mapped[List["Deck"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 

@@ -17,8 +17,11 @@
             <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 text-center shadow-xl backdrop-blur-sm relative overflow-hidden group">
                 <div class="absolute -right-12 -top-12 h-24 w-24 rounded-full bg-pink-500/5 blur-xl group-hover:bg-pink-500/10 transition-all duration-500"></div>
                 <!-- Glowing Avatar Circle -->
-                <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 to-fuchsia-600 text-white font-bold text-3xl shadow-lg shadow-pink-500/20 mb-4 ring-2 ring-pink-500/30">
-                    {{ current_user.username[0].upper() }}
+                <div id="profile-avatar-trigger" onclick="openAvatarModal()" class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 to-fuchsia-600 text-white shadow-lg shadow-pink-500/20 mb-4 ring-2 ring-pink-500/30 cursor-pointer group hover:scale-105 active:scale-95 transition-all duration-300 relative">
+                    <div class="absolute inset-0 rounded-full bg-black/45 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <i class="fa-solid fa-pen text-xs text-white"></i>
+                    </div>
+                    <i id="profile-avatar-icon" class="fa-solid {{ current_user.avatar_url or 'fa-user' }} text-3xl"></i>
                 </div>
                 <h3 class="text-lg font-bold text-zinc-100">{{ current_user.username }}</h3>
                 <p class="text-xs text-zinc-500 mt-1 truncate">{{ current_user.email }}</p>
@@ -273,5 +276,109 @@
             }
         });
     });
+</script>
+
+<!-- Avatar Selection Modal -->
+<div id="avatar-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+    <div class="relative w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl animate-in zoom-in-95 duration-200 mx-4">
+        <!-- Close button -->
+        <button type="button" onclick="closeAvatarModal()" class="absolute right-4 top-4 text-zinc-400 hover:text-white transition-colors cursor-pointer">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+        
+        <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-circle-user text-pink-400"></i> Avatar Seçin
+        </h3>
+        <p class="text-xs text-zinc-400 mb-6">Profilinizi temsil edecek minimalist ve şık bir simge seçin.</p>
+        
+        <!-- Grid of avatars -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            {% set avatar_options = [
+                'fa-user', 'fa-robot', 'fa-user-ninja', 'fa-user-astronaut', 
+                'fa-ghost', 'fa-cat', 'fa-dog', 'fa-dragon', 'fa-graduation-cap'
+            ] %}
+            {% for avatar in avatar_options %}
+            <button type="button" onclick="updateAvatar('{{ avatar }}')" 
+                    class="avatar-option-btn flex flex-col items-center justify-center h-20 rounded-xl bg-zinc-950 border {% if current_user.avatar_url == avatar %} border-pink-500 text-pink-400 bg-pink-500/5 {% else %} border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white {% endif %} hover:bg-zinc-900/40 transition-all duration-200 cursor-pointer group">
+                <i class="fa-solid {{ avatar }} text-2xl group-hover:scale-110 transition-transform"></i>
+            </button>
+            {% endfor %}
+        </div>
+        
+        <div class="flex justify-end">
+            <button type="button" onclick="closeAvatarModal()" class="px-4 py-2 text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-800 hover:bg-zinc-750 rounded-xl transition-colors cursor-pointer">
+                Kapat
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Avatar modal functions
+    function openAvatarModal() {
+        const modal = document.getElementById('avatar-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function closeAvatarModal() {
+        const modal = document.getElementById('avatar-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    function updateAvatar(avatarUrl) {
+        // Send choice to backend via fetch
+        fetch("{{ url_for('main.update_avatar') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': "{{ csrf_token() if csrf_token is defined else '' }}"
+            },
+            body: JSON.stringify({ avatar_url: avatarUrl })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Avatar güncellenemedi.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update Sol Profil Kartı avatar icon
+                const profileIcon = document.getElementById('profile-avatar-icon');
+                if (profileIcon) {
+                    profileIcon.className = `fa-solid ${data.avatar_url} text-3xl`;
+                }
+
+                // Update Sağ Üst Navbar avatar icon
+                const navbarIcon = document.getElementById('navbar-avatar-icon');
+                if (navbarIcon) {
+                    navbarIcon.className = `fa-solid ${data.avatar_url} mr-1.5 text-pink-400`;
+                }
+
+                // Update modal option buttons styling (highlight selected one)
+                const buttons = document.querySelectorAll('.avatar-option-btn');
+                buttons.forEach(btn => {
+                    const onclickAttr = btn.getAttribute('onclick') || '';
+                    if (onclickAttr.includes(`'${data.avatar_url}'`)) {
+                        btn.className = "avatar-option-btn flex flex-col items-center justify-center h-20 rounded-xl bg-zinc-950 border border-pink-500 text-pink-400 bg-pink-500/5 transition-all duration-200 cursor-pointer group";
+                    } else {
+                        btn.className = "avatar-option-btn flex flex-col items-center justify-center h-20 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white hover:bg-zinc-900/40 transition-all duration-200 cursor-pointer group";
+                    }
+                });
+
+                closeAvatarModal();
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Avatar güncellenirken bir hata oluştu: ' + err.message);
+        });
+    }
 </script>
 {% endblock %}

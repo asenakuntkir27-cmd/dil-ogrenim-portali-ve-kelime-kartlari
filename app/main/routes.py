@@ -374,3 +374,25 @@ def profile():
                            profile_form=profile_form,
                            password_form=password_form,
                            active_tab=active_tab)
+
+
+@main.route('/update-avatar', methods=['POST'])
+@login_required
+def update_avatar():
+    from flask import jsonify
+    
+    data = request.get_json() or {}
+    avatar_url = data.get('avatar_url')
+    
+    allowed_avatars = [
+        'fa-user', 'fa-robot', 'fa-user-ninja', 'fa-user-astronaut', 
+        'fa-ghost', 'fa-cat', 'fa-dog', 'fa-dragon', 'fa-graduation-cap'
+    ]
+    
+    if avatar_url not in allowed_avatars:
+        return jsonify({'success': False, 'message': 'Geçersiz avatar seçimi.'}), 400
+        
+    current_user.avatar_url = avatar_url
+    db.session.commit()
+    
+    return jsonify({'success': True, 'avatar_url': avatar_url})

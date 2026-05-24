@@ -198,3 +198,51 @@ class AuthTestCase(unittest.TestCase):
             # Check db password still old password
             db_user = db.session.get(User, u.id)
             self.assertTrue(db_user.check_password('password123'))
+
+    def test_update_avatar_requires_login(self):
+        # Unauthenticated request to /update-avatar should redirect/fail
+        response = self.client.post('/update-avatar', json={'avatar_url': 'fa-robot'})
+        self.assertEqual(response.status_code, 302)
+
+    def test_update_avatar_success(self):
+        # Create and login user
+        u = User(username='avataruser', email='avatar@example.com')
+        u.set_password('password123')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'avataruser', 'password': 'password123'})
+            
+            response = self.client.post('/update-avatar', json={'avatar_url': 'fa-robot'})
+            self.assertEqual(response.status_code, 200)
+            
+            data = response.get_json()
+            self.assertTrue(data['success'])
+            self.assertEqual(data['avatar_url'], 'fa-robot')
+            
+            # Check DB
+            db_user = db.session.get(User, u.id)
+            self.assertEqual(db_user.avatar_url, 'fa-robot')
+
+    def test_update_avatar_invalid_rejected(self):
+        # Create and login user
+        u = User(username='avataruser2', email='avatar2@example.com')
+        u.set_password('password123')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'avataruser2', 'password': 'password123'})
+            
+            # Try to send a non-allowed avatar string
+            response = self.client.post('/update-avatar', json={'avatar_url': 'fa-invalid-hack'})
+            self.assertEqual(response.status_code, 400)
+            
+            data = response.get_json()
+            self.assertFalse(data['success'])
+            self.assertEqual(data['message'], 'Geçersiz avatar seçimi.')
+            
+            # Check DB is still default
+            db_user = db.session.get(User, u.id)
+            self.assertEqual(db_user.avatar_url, 'fa-user')
