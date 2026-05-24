@@ -304,5 +304,37 @@ class StudyTestCase(unittest.TestCase):
             self.assertIn(b'Apple', response.data)
             self.assertIn(b'Book', response.data)
 
+    def test_analytics_route_requires_login(self):
+        # Accessing analytics unauthenticated should redirect to login page
+        response = self.client.get('/analytics')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('login', response.headers.get('Location', '').lower())
+
+    def test_analytics_valid_load(self):
+        # Create user, login, and check successful analytics load
+        u = User(username='test_analytics', email='analytics@example.com')
+        u.set_password('password')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'test_analytics', 'password': 'password'})
+            
+            # Create a deck and card to have real data
+            d = Deck(name='İngilizce - Colors', user=u)
+            db.session.add(d)
+            db.session.commit()
+            
+            c = Card(word='Red', meaning='Kırmızı', deck=d)
+            db.session.add(c)
+            db.session.commit()
+
+            response = self.client.get('/analytics')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Renkler', response.data) # Should render a seeded deck name
+            self.assertIn(b'Haftal\xc4\xb1k \xc3\x87al\xc4\xb1\xc5\x9fma', response.data) # Haftalık Çalışma in utf-8
+            self.assertIn(b'Ayl\xc4\xb1k \xc4\xb0lerleme', response.data) # Aylık İlerleme in utf-8
+            self.assertIn(b'Destelere G\xc3\xb6re Da\xc4\x9f\xc4\xb1l\xc4\xb1m', response.data) # Destelere Göre Dağılım in utf-8
+
 if __name__ == '__main__':
     unittest.main()

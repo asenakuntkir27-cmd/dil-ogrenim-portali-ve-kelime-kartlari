@@ -10,8 +10,8 @@
             </p>
         </div>
         
-        <!-- İki Ana Modül Kutusu (Module Selector Cards) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
+        <!-- Üç Ana Modül Kutusu (Module Selector Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <!-- Kelime Destelerim Modülü -->
             <div id="module-decks-btn" onclick="selectModule('decks')" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
                 <div class="flex items-center gap-4">
@@ -37,6 +37,19 @@
                     </div>
                 </div>
             </div>
+
+            <!-- İlerleme Analizlerim Modülü -->
+            <a href="{{ url_for('main.analytics') }}" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-fuchsia-950/40 border border-fuchsia-900/30 text-fuchsia-400 group-hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-chart-simple text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-250">İlerleme Analizlerim</h3>
+                        <p class="mt-1 text-xs sm:text-sm text-zinc-400">Öğrenme performansınızı detaylı grafiklerle analiz edin ve gelişiminizi görün.</p>
+                    </div>
+                </div>
+            </a>
         </div>
 
         {% if decks %}

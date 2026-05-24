@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl">
+    <!-- Header -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent flex items-center gap-2.5">
+                <i class="fa-solid fa-chart-line text-pink-500"></i> İlerleme ve İstatistik Analizleri
+            </h1>
+            <p class="mt-2 text-sm text-zinc-400">Öğrenme istatistiklerinizi, çalışma sürelerinizi ve haftalık/aylık ilerleme grafiklerinizi buradan takip edin.</p>
+        </div>
+        <div>
+            <a href="{{ url_for('main.index') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-300 hover:text-white border border-zinc-800 hover:border-zinc-700 bg-zinc-900/30 rounded-xl transition-all duration-200 cursor-pointer">
+                <i class="fa-solid fa-chevron-left text-[10px]"></i> Panoya Geri Dön
+            </a>
+        </div>
+    </div>
+
+    <!-- Overview Stats Cards (Grid of 4) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        
+        <!-- Total Decks -->
+        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl flex items-center gap-4 hover:border-zinc-750 hover:shadow-lg hover:shadow-black/10 transition-all duration-200">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 shadow-inner shrink-0">
+                <i class="fa-solid fa-folder-open text-xl"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Toplam Deste</p>
+                <h3 class="text-2xl font-black text-white mt-1">{{ total_decks }}</h3>
+            </div>
+        </div>
+
+        <!-- Total Words -->
+        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl flex items-center gap-4 hover:border-zinc-750 hover:shadow-lg hover:shadow-black/10 transition-all duration-200">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-950/40 border border-purple-900/30 text-purple-400 shadow-inner shrink-0">
+                <i class="fa-solid fa-layer-group text-xl"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Toplam Kelime</p>
+                <h3 class="text-2xl font-black text-white mt-1">{{ total_cards }}</h3>
+            </div>
+        </div>
+
+        <!-- Total Practices -->
+        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl flex items-center gap-4 hover:border-zinc-750 hover:shadow-lg hover:shadow-black/10 transition-all duration-200">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-fuchsia-950/40 border border-fuchsia-900/30 text-fuchsia-400 shadow-inner shrink-0">
+                <i class="fa-solid fa-circle-check text-xl"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Toplam Pratik</p>
+                <h3 class="text-2xl font-black text-white mt-1">{{ total_words_studied }}</h3>
+            </div>
+        </div>
+
+        <!-- Active Streak -->
+        <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl flex items-center gap-4 hover:border-zinc-750 hover:shadow-lg hover:shadow-black/10 transition-all duration-200">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-950/40 border border-rose-900/30 text-rose-400 shadow-inner shrink-0 animate-pulse">
+                <i class="fa-solid fa-fire text-xl"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Aktif Seri (Gün)</p>
+                <h3 class="text-2xl font-black text-white mt-1">{{ active_streak }} Gün</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Side: Line and Bar Charts (8 cols) -->
+        <div class="lg:col-span-8 space-y-8">
+            <!-- Weekly Chart -->
+            <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-xl">
+                <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-week text-pink-400"></i> Haftalık Çalışma Performansı
+                </h3>
+                <p class="text-xs text-zinc-400 mb-6">Son 7 günde çalışılan kelimelerin ve oynanan oyunların dağılımı.</p>
+                <div class="relative h-80">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Monthly Chart -->
+            <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-xl">
+                <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-column text-purple-400"></i> Aylık İlerleme Trendi
+                </h3>
+                <p class="text-xs text-zinc-400 mb-6">Yıl içerisindeki aylara göre kelime dağarcığı büyüme istatistiği.</p>
+                <div class="relative h-80">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Doughnut and Recommendations (4 cols) -->
+        <div class="lg:col-span-4 space-y-8">
+            <!-- Deck Distribution Chart -->
+            <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-xl">
+                <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-fuchsia-400"></i> Destelere Göre Dağılım
+                </h3>
+                <p class="text-xs text-zinc-400 mb-6">Kelime kartlarınızın destelere göre oransal dağılımı.</p>
+                <div class="relative h-64 flex items-center justify-center">
+                    <canvas id="deckChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Study Recommendations Card -->
+            <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-xl relative overflow-hidden group">
+                <div class="absolute -right-16 -top-16 h-32 w-32 rounded-full bg-pink-500/5 blur-xl group-hover:bg-pink-500/10 transition-all duration-300"></div>
+                
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-pink-400 shrink-0"></i> Akıllı Çalışma Önerileri
+                </h3>
+                
+                <div class="space-y-4 text-sm leading-relaxed text-zinc-400">
+                    {% if total_decks == 0 or total_cards == 0 %}
+                        <div class="p-3.5 rounded-xl bg-pink-950/15 border border-pink-950/30 border-l-4 border-l-pink-500">
+                            <h4 class="font-bold text-zinc-200 mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-exclamation text-xs text-pink-400"></i> İlk Adımı Atın
+                            </h4>
+                            <p class="text-xs leading-normal">Henüz aktif bir kelime desteniz veya kartınız bulunmuyor. Hemen yeni bir kelime destesi oluşturup ilk kartlarınızı ekleyerek pratik yapmaya başlayın!</p>
+                        </div>
+                    {% elif total_cards < 15 %}
+                        <div class="p-3.5 rounded-xl bg-purple-950/15 border border-purple-950/30 border-l-4 border-l-purple-500">
+                            <h4 class="font-bold text-zinc-200 mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-bolt text-xs text-purple-400"></i> Temelinizi Güçlendirin
+                            </h4>
+                            <p class="text-xs leading-normal">Kelime dağarcığınız henüz başlangıç seviyesinde. Mevcut destelerinize günde en az 5 yeni kart ekleyip 3D kartlar üzerinde çalışarak kelime dağarcığınızı hızla büyütebilirsiniz.</p>
+                        </div>
+                    {% else %}
+                        <div class="p-3.5 rounded-xl bg-emerald-950/15 border border-emerald-950/30 border-l-4 border-l-emerald-500">
+                            <h4 class="font-bold text-zinc-200 mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-square-check text-xs text-emerald-400"></i> Harika Performans
+                            </h4>
+                            <p class="text-xs leading-normal">Göz alıcı bir kelime hacmine sahipsiniz! Şimdi öğrendiğiniz kelimeleri pekiştirmek için <strong>Hafıza Kartları (Memory Flip)</strong> veya <strong>Boşluk Doldurma</strong> oyunlarını oynayarak kendinizi zamana karşı test edin.</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="p-3.5 rounded-xl bg-zinc-950/50 border border-zinc-800 text-xs">
+                        <span class="font-semibold text-zinc-300">İpucu:</span> Düzenli kelime kartı pratikleri yapmak, uzun süreli hafızada kalıcılığı %80'e kadar artırmaktadır. Egzersizlerinizi her gün aynı saatte yapmaya özen gösterin.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Chart.js CDN inclusion -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Global configuration for Chart.js
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+        Chart.defaults.color = '#a1a1aa'; // zinc-400
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(9, 9, 11, 0.95)';
+        Chart.defaults.plugins.tooltip.borderColor = '#27272a';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.titleFont = { size: 12, weight: 'bold' };
+        Chart.defaults.plugins.tooltip.bodyFont = { size: 12 };
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+
+        // 1. Weekly Performance Chart (Line)
+        const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+        const pinkGrad = weeklyCtx.createLinearGradient(0, 0, 0, 300);
+        pinkGrad.addColorStop(0, 'rgba(236, 72, 153, 0.2)');
+        pinkGrad.addColorStop(1, 'rgba(236, 72, 153, 0.0)');
+
+        const weeklyChart = new Chart(weeklyCtx, {
+            type: 'line',
+            data: {
+                labels: {{ daily_labels|tojson }},
+                datasets: [
+                    {
+                        label: 'Çalışılan Kelime',
+                        data: {{ daily_words|tojson }},
+                        borderColor: '#ec4899', // pink-500
+                        backgroundColor: pinkGrad,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#ec4899',
+                        pointBorderColor: '#09090b',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    },
+                    {
+                        label: 'Oynanan Oyun',
+                        data: {{ daily_games|tojson }},
+                        borderColor: '#a855f7', // purple-500
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.3,
+                        pointBackgroundColor: '#a855f7',
+                        pointBorderColor: '#09090b',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#e4e4e7', // zinc-200
+                            usePointStyle: true,
+                            padding: 15,
+                            font: { size: 12, weight: '500' }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(39, 39, 42, 0.5)', // zinc-800
+                            drawTicks: false
+                        },
+                        ticks: { padding: 8 }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(39, 39, 42, 0.5)',
+                            drawTicks: false
+                        },
+                        ticks: {
+                            precision: 0,
+                            padding: 8
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Monthly Performance Chart (Bar)
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        const fuchsiaGrad = monthlyCtx.createLinearGradient(0, 0, 0, 300);
+        fuchsiaGrad.addColorStop(0, 'rgba(217, 70, 239, 0.85)'); // fuchsia-500
+        fuchsiaGrad.addColorStop(1, 'rgba(168, 85, 247, 0.2)'); // purple-500
+
+        const monthlyChart = new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ monthly_labels|tojson }},
+                datasets: [{
+                    label: 'Kelime İlerlemesi',
+                    data: {{ monthly_words|tojson }},
+                    backgroundColor: fuchsiaGrad,
+                    borderColor: '#d946ef',
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: { padding: 8 }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(39, 39, 42, 0.5)',
+                            drawTicks: false
+                        },
+                        ticks: {
+                            precision: 0,
+                            padding: 8
+                        }
+                    }
+                }
+            }
+        });
+
+        // 3. Deck Distribution Chart (Doughnut)
+        const deckCtx = document.getElementById('deckChart').getContext('2d');
+        const deckChart = new Chart(deckCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ deck_labels|tojson }},
+                datasets: [{
+                    data: {{ deck_card_counts|tojson }},
+                    backgroundColor: [
+                        'rgba(236, 72, 153, 0.75)', // pink
+                        'rgba(168, 85, 247, 0.75)', // purple
+                        'rgba(6, 182, 212, 0.75)',  // cyan
+                        'rgba(16, 185, 129, 0.75)', // emerald
+                        'rgba(245, 158, 11, 0.75)'  // amber
+                    ],
+                    borderColor: '#18181b', // zinc-900
+                    borderWidth: 3,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e4e4e7',
+                            padding: 12,
+                            boxWidth: 10,
+                            boxHeight: 10,
+                            usePointStyle: true,
+                            font: { size: 11, weight: '500' }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
