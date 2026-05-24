@@ -1,16 +1,23 @@
 # LingoRose Dil Öğrenim Portali ve Kelime Kartları Proje Raporu
 
----
-
-## 1. Projenin Amacı ve Genel Özeti
+---## 1. Projenin Amacı ve Genel Özeti
 
 Yabancı bir dil öğreniminde en büyük zorluklardan biri, yeni öğrenilen kelimelerin hafızada kalıcı hale getirilmesidir. Klasik ezberleme yöntemleri, öğreniciyi aktif bir süreç içerisine dahil etmediğinden verimsiz kalmaktadır. **LingoRose**, bu problemi çözmek amacıyla geliştirilmiş etkileşimli, çok dilli, modüler ve oyunlaştırılmış bir web tabanlı dil öğrenim portalidir.
 
 Uygulamanın temel amacı; kullanıcıların kendi çalışma alanlarını özelleştirerek kelime desteleri (decks) oluşturabilmesi, bu destelere diledikleri kelimeleri, anlamlarını ve örnek cümlelerini ekleyebilmesinin yanı sıra sistemde hazır sunulan zengin dil paketlerinden faydalanabilmesidir. LingoRose; **İngilizce, Almanca, İspanyolca, Fransızca ve İtalyanca** olmak üzere 5 farklı dili desteklemektedir. Sistem ilk kurulumda veya kullanıcı kayıt/giriş anlarında otomatik olarak her dil için 15 farklı kategoride (Sayılar, Hayvanlar, Renkler vb.) en az 20'şer adet kelimeden oluşan **toplam 1500 kartlık devasa bir başlangıç verisini (seed data)** kullanıcılara tanımlamaktadır.
 
-Öğrenme sürecini pekiştirmek için iki ana çalışma modülü sunulmaktadır ve bu modüller ana sayfadaki premium **Karşılama Paneli** üzerinden yönetilmektedir:
+Öğrenme ve pratik sürecini pekiştirmek için 6 farklı çalışma ve eğitim oyunu sunulmaktadır. Bu modüller ana sayfadaki premium **Karşılama Paneli** üzerinden dinamik olarak yönetilmektedir:
 1. **3D Kart Çevirme (Quiz) Modülü:** Kullanıcılar premium bir 3D çevirme animasyonuyla kartın ön yüzündeki yabancı kelimeyi görüp anlamını tahmin etmeye çalışmakta, ardından karta tıklayarak arka yüzündeki anlamını ve örnek cümlesini görüntülemektedir. Çalışma sonunda "Öğrendim" veya "Tekrar Et" butonlarıyla başarı skoru ölçülmektedir.
-2. **Kelime Eşleştirme Oyunu (Matching Game):** Kullanıcıların o anki aktif dillerine ait destedeki kelimelerin yabancı halleri ile Türkçe anlamlarını 4x4 dinamik bir grid üzerinde eşleştirdikleri süreye dayalı interaktif bir mini oyundur. Eşleşen kartlar yeşil yanarak kaybolmakta, yanlış eşleşmeler kırmızı yanıp titremekte (shake animasyonu) ve oyun sonunda konfeti animasyonlu şık bir tebrik paneli çıkmaktadır.
+2. **Kelime Eşleştirme Oyunu (Matching Game):** Kelimelerin yabancı halleri ile Türkçe anlamlarını 4x4 dinamik bir grid üzerinde eşleştirdikleri süreye dayalı interaktif bir mini oyundur. Eşleşen kartlar yeşil yanarak kaybolmakta, yanlış eşleşmeler kırmızı yanıp titremektedir (shake animasyonu).
+3. **Kelime Tetrisi (Word Drop):** Yukarıdan düşen yabancı kelimeler yere çarpmadan önce aşağıdaki 4 şıktan doğru Türkçe karşılığını seçerek puan toplanan dinamik bir oyundur.
+4. **Cümle Kurma (Sentence Builder):** Karışık verilen kelimeleri Türkçe anlam ipucunu kullanarak sürükleyip doğru sırayla dizerek cümle kurma yeteneğini geliştiren bir oyundur.
+5. **Hafıza Kartları (Memory Flip):** Kapalı kart çiftlerini çevirerek aynı kelime ve Türkçe anlamlarını FontAwesome Regular çizgisel ikon eşleşmeleriyle en kısa sürede bulmaya çalışılan, zamana karşı yarıştırılan bir oyundur.
+6. **Boşluk Doldurma Yarışı (Fill in the Blanks):** Örnek cümlelerdeki eksik kelimeyi Türkçe çeviri ipucunu kullanarak 10 saniyelik zaman barı ve 3 can sınırı altında bulmaya çalışılan bir çoktan seçmeli oyundur.
+
+Ayrıca platformda kullanıcıların kendi verilerini ve tercihlerini yönetmesi için şu modüller yer almaktadır:
+- **Profil, Gizlilik ve Güvenlik Paneli:** WTForms prefix yapısıyla çakışmasız çalışan, şifre ve kişisel bilgi güncellemelerini yöneten, localStorage entegrasyonlu dikey sekmeli panel.
+- **İnteraktif Avatar Seçici Modalı:** Kullanıcı profil dairesine tıklandığında açılan, Fetch API (AJAX) ile sayfa yenilenmeden avatarı navbarda ve profil alanında güncelleyen mor/pembe neon popup modal.
+- **İlerleme ve İstatistik Analiz Paneli:** Chart.js kütüphanesi yardımıyla Line, Bar ve Doughnut grafiklerle kelime pratiklerini ve destelere göre dağılımları görselleştiren, AI destekli çalışma önerileri sunan analiz paneli.
 
 Sistem, modern bir koyu tema (dark mode) üzerine kurulu, pembe ve mor gradyanlarla desteklenen estetik bir tasarım dili sunmakta; hem masaüstü hem de mobil cihazlarda kusursuz bir kullanıcı deneyimi (UX) hedeflemektedir.
 
@@ -59,6 +66,7 @@ dil-ogrenim-portali-ve-kelime-kartlari/
 │
 ├── tests/                         # Otomatik Birim (Unit) Testleri
 │   ├── __init__.py
+│   ├── test_auth.py                   # Kimlik Doğrulama, Profil ve Avatar Testleri
 │   ├── test_errors_and_pagination.py  # Sayfalama ve Hata Yönetimi Testleri
 │   ├── test_language.py               # Dil Seçim ve Session Testleri
 │   ├── test_seeding.py                # Otomatik Seed ve Backfill Mekanizması Testleri
@@ -82,6 +90,9 @@ dil-ogrenim-portali-ve-kelime-kartlari/
    - *Eğitim Oyunları* aktif edildiğinde, mevcut oyun seçenekleri ("Kelime Eşleştirme Oyunu") gelir. Oyuna tıklandığında deste listesi açılır ve bir desteye basıldığı an detay sayfası atlanarak doğrudan oyuna gidilir.
    - Bu iki modül ve alt akış seçimleri `sessionStorage` ile istemci hafızasında saklanır, böylece sayfa yönlendirmelerinde kullanıcının kaldığı görünüm kaybolmaz.
 5. **Sayfalama (Pagination):** Dashboard sayfasında SQL yükünü hafifletmek amacıyla sayfa başına en fazla 10 deste listelenmekte, sayfalama bileşeni ile diğer sayfalar yüklenebilmektedir. Test süreçlerinde kararlılık için test destelerine yapay zaman damgası farkları eklenmiştir.
+6. **Profil, Gizlilik ve Güvenlik Yönetimi (`/profile`):** Kullanıcının hesap bilgilerini güncellediği dikey sekmeli arayüzdür. Aynı sayfa üzerinde çakışma yaşamadan çalışan iki bağımsız WTForms (`EditProfileForm` ve `ChangePasswordForm`) nesnesi kullanılmıştır. Ayrıca, gizlilik ve güvenlik ayarlarındaki toggle switch durumları istemci tarafında `localStorage` üzerinde saklanarak sayfa yenilense de durumun korunması sağlanır.
+7. **İnteraktif Avatar Güncelleme (`/update-avatar`):** Profil resmine tıklanarak açılan buzlu cam efektli modal üzerinden yeni bir avatar seçildiğinde, CSRF token korumalı Fetch API isteği tetiklenir. Sunucu tarafında `User.avatar_url` güncellenirken, kullanıcı arayüzü (navbar ve profil sayfası) sayfa yenilenmeden dinamik olarak güncellenir.
+8. **İlerleme ve İstatistik Analiz Paneli (`/analytics`):** Chart.js entegrasyonu sayesinde kullanıcının dil öğrenme aktiviteleri Line, Bar ve Doughnut grafik modelleriyle görselleştirilir. Grafik verileri, kullanıcının veritabanındaki kelime ve destelerinden anlık hesaplanır. Panel ayrıca kullanıcıya akıllı çalışma önerileri sunan özel bir algoritma barındırır.
 
 ---
 
@@ -133,7 +144,33 @@ Ajan, kayıt formunu oluştururken `email-validator` kütüphanesinin çalışma
 
 ---
 
-## 6. AI Desteği Olmadan Proje Geliştirme Süresi Analizi
+## 6. Birim Testler ve Doğrulama
+
+LingoRose platformunun kararlılığını, güvenliğini ve performansını korumak amacıyla kapsamlı bir otomatik birim (unit) test altyapısı kurulmuştur. Testler Flask'ın yerleşik test istemcisi (`client`) ve Python'ın `unittest` kütüphanesi kullanılarak gerçekleştirilmektedir.
+
+Sistem genelinde 6 ana test modülü altında **toplam 40 birim testi (OK)** bulunmaktadır:
+1. **Kimlik Doğrulama ve Profil Testleri (`test_auth.py`):** Kayıt, giriş, çıkış işlemleri, çift WTForms yapısı ile çakışmasız profil bilgileri ve şifre güncellemeleri, yetkilendirme kontrolleri ve `/update-avatar` rotası Fetch API entegrasyonu.
+2. **Hata Sayfaları ve Sayfalama Testleri (`test_errors_and_pagination.py`):** 404/500 özel hata sayfalarının render edilmesi ve destelerin 10'arlı sayfalama (pagination) sınırlarında kararlı ve sıralı listelenmesi.
+3. **Çoklu Dil Seçimi Testleri (`test_language.py`):** Aktif dil seçimi, session durum yönetimi ve diller arası geçişlerin doğrulanması.
+4. **Veritabanı Seeding Testleri (`test_seeding.py`):** İlk kurulumda 1500 kelimelik hazır veri setinin oluşturulması ve kullanıcılar için otomatik dil backfill işlemlerinin yapılması.
+5. **Çalışma ve Oyun Modülü Testleri (`test_study.py`):** 3D Kart Çevirme (Quiz) modülü, Boşluk Doldurma (Fill in the Blanks) ve Kelime Eşleştirme (Matching) oyunlarının akış mantığı, can limitleri ve seçenek oluşturma motorlarının testleri.
+
+Testlerin tamamı terminal üzerinden aşağıdaki komutla çalıştırılmakta ve başarıyla tamamlanmaktadır:
+```powershell
+venv\Scripts\python.exe -m unittest discover -s tests
+```
+
+**Test Çıktı Özeti:**
+```text
+Ran 40 tests in 18.769s
+
+OK
+```
+Tüm test suitinin başarıyla (OK) geçmesi, uygulamanın kritik bileşenlerinin hatasız çalıştığını ve yeni eklenecek özellikler için regresyon riskinin en aza indirildiğini garanti etmektedir.
+
+---
+
+## 7. AI Desteği Olmadan Proje Geliştirme Süresi Analizi
 
 LingoRose projesinin sıfırdan, AI desteği olmadan tek bir geliştirici tarafından yapılması durumundaki zaman tahmini ve AI kullanımının sağladığı tasarruf analizi:
 
@@ -155,11 +192,11 @@ Geleneksel yöntemlerle yaklaşık 1.5 haftalık (70 saatlik) tam mesai gerektir
 
 ---
 
-## 7. Projenin Sürdürülebilirliği ve Sonraki Adımlar
+## 8. Projenin Sürdürülebilirliği ve Sonraki Adımlar
 
 LingoRose projesinin gelecekte daha kapsamlı ve ticari olarak sürdürülebilir bir platform haline gelebilmesi için planlanan sonraki aşamalar şunlardır:
 
 1. **Aralıklı Tekrarlama Sistemi (Spaced Repetition System - SRS):** Öğrenme verimliliğini maksimize etmek için SuperMemo (SM-2) algoritması entegre edilebilir. Kullanıcının "Tekrar Et" veya "Öğrendim" yanıtlarına göre, kelimeler hafıza eğrisine göre optimize edilmiş zaman aralıklarıyla (1 gün, 3 gün, 7 gün sonra) tekrar kullanıcının karşısına çıkarılır.
 2. **Yapay Zeka Destekli Sesli Okuma (Audio Pronunciation):** Kelime kartlarına ve oyun arayüzüne, kelimelerin doğru telaffuzlarını dinletebilecek bir Metinden Sese (Text-to-Speech) API entegrasyonu yapılarak işitsel öğrenme desteklenebilir.
-3. **Kapsamlı İstatistik ve Grafik Modülü:** Kullanıcının günlük çalışma sürelerini, öğrendiği kelime sayılarını ve başarı oranlarını `Chart.js` kütüphanesiyle görselleştiren gelişmiş bir grafik paneli (Dashboard Analytics) eklenebilir.
-4. **Sosyal Rekabet ve Liderlik Tablosu (Leaderboard):** Kullanıcıların kelime eşleştirme oyunundaki bitirme sürelerine göre birbirleriyle yarışabilecekleri, puan toplayıp haftalık liderlik tablolarında listelenebilecekleri bir sosyal oyunlaştırma katmanı eklenebilir.
+3. **Sosyal Rekabet ve Liderlik Tablosu (Leaderboard):** Kullanıcıların kelime eşleştirme oyunundaki bitirme sürelerine göre birbirleriyle yarışabilecekleri, puan toplayıp haftalık liderlik tablolarında listelenebilecekleri bir sosyal oyunlaştırma katmanı eklenebilir.
+4. **Çevrimdışı Çalışma Desteği (Offline Mode):** Service Worker'lar ve IndexedDB kullanılarak kullanıcının internet bağlantısı olmadığında dahi kelime kartlarını çalışabilmesi sağlanabilir.

@@ -229,5 +229,91 @@ Kullanıcı deneyimini en üst seviyeye çıkarmak için 5 dilli başlangıç ve
 - **Testlerin Güncellenmesi:**
   - `tests/test_study.py` ve `tests/test_errors_and_pagination.py` dosyaları yeni dil filtreleme ve oyun rotalarına göre güncellenerek toplam test sayısı 15'e çıkarıldı. Tüm testler başarıyla geçmiştir.
 
+
+---
+
+## Oturum 11-12: Boşluk Doldurma Yarışı (Fill in the Blanks) Entegrasyonu
+**Tarih:** 24 Mayıs 2026
+
+### Hedef
+Eğitim oyunları kategorisine 5. oyun olarak zamana karşı yarış hissi veren "Boşluk Doldurma (Fill in the Blanks)" oyununu eklemek ve test kapsamını genişletmek.
+
+### Yapılanlar
+- **Oyun Mekaniği:** Örnek cümledeki hedef kelimenin büyük/küçük harfe duyarsız bulunup sansürlenerek `[ ___ ]` şeklinde ekrana basılması sağlandı. Cümlenin Türkçe çevirisi ipucu olarak sunuldu.
+- **Arayüz ve Zaman Kontrolü:** 10 saniyelik dinamik azalan zaman barı (CSS transition) ve 3 can hakkı mekanizması kuruldu. Canlar ve süre tükendiğinde oyun sonu tebrik/başarısızlık ekranı tasarlandı.
+- **Seçenek Üretimi:** Aynı desteden 1 doğru 3 rastgele yanlış şık üreten JavaScript mantığı entegre edildi.
+- **Doğrulama ve Testler:** `test_study.py` güncellendi, boş deste ve doluluk durumları için test senaryoları yazılarak başarılı test sayısı 30'a yükseltildi.
+
+---
+
+## Oturum 13: Hafıza Kartları (Memory Flip) Görsel Revizyonu
+**Tarih:** 24 Mayıs 2026
+
+### Hedef
+Hafıza Kartları oyununun 3D ayna/çift yüz çakışma hatasını gidermek ve çocuksu ikonlar yerine kurumsal minimalist çizgisel simgeler yerleştirmek.
+
+### Yapılanlar
+- **3D Render Hatası Giderimi:** `.card-front` ve `.card-back` sınıflarına `backface-visibility: hidden;` uygulanarak ayna yansıması ve iç içe geçme hatası düzeltildi. Kart arkasına `transform: rotateY(180deg);` ve `position: absolute;` verildi.
+- **Minimalist Çizgisel Simgeler:** FontAwesome Regular (`far`) ailesinden içi boş minimalist simgeler (`far fa-clock`, `far fa-lightbulb`, vb.) entegre edildi.
+- **Akıllı Eşleştirme Motoru:** JavaScript tarafında kelimelerin anlamlarıyla eşleşen ikon sözlüğü (`iconMapping`) tanımlandı. Eşleşmeyen kelimeler için kararlı ve benzersiz bir fallback ikon atama hash mantığı yazıldı.
+
+---
+
+## Oturum 14: Modüler Profil Bilgileri, Gizlilik ve Güvenlik Paneli
+**Tarih:** 24 Mayıs 2026
+
+### Hedef
+Kullanıcıların kendi hesaplarını yönetebileceği mor/pembe parlayan, dikey sekmeli modern bir profil yönetim paneli oluşturmak.
+
+### Yapılanlar
+- **Çift WTForms Yapısı:** Aynı sayfada hem profil düzenlemeyi hem de şifre güncellemeyi destekleyen `EditProfileForm` ve `ChangePasswordForm` sınıfları WTForms prefix'leri kullanılarak çakışmasız şekilde entegre edildi.
+- **Şifre Değiştirme Mantığı:** Mevcut şifrenin `check_password` ile arka planda doğrulanıp yeni şifrenin güvenli bir şekilde hashlenip kaydedilmesi sağlandı.
+- **Arayüz ve Tercihler:** Sol tarafta dikey sekmeler (Profil, Güvenlik, Gizlilik) ve gradyanlı avatar alanı tasarlandı. Gizlilik sekmesindeki toggle switch durumları `localStorage` üzerinde saklanarak sayfa yenilense de durumun korunması sağlandı.
+- **Doğrulama ve Testler:** `tests/test_auth.py` test dosyası eklenerek yetkisiz erişim, profil ve şifre güncellemeleri test edildi. Test suite'inde başarılı test sayısı 35'e ulaştı.
+
+---
+
+## Oturum 15: İnteraktif Avatar Seçici Modalı Entegrasyonu
+**Tarih:** 24 Mayıs 2026
+
+### Hedef
+Kullanıcı profil kartına tıklayınca açılan buzlu cam efektli dinamik bir avatar seçim modalı eklemek ve sayfa yenilenmeden güncellenmesini sağlamak.
+
+### Yapılanlar
+- **Veritabanı Güncellemesi:** `User` modeline `avatar_url` alanı eklenerek varsayılan değer olarak `'fa-user'` atandı. Flask-Migrate ile Alembic migrasyon dosyası oluşturup veritabanına yansıtıldı (`flask db upgrade`).
+- **Seçim Modalı:** `profile.html` içerisine backdrop-blur özellikli, 9 şık minimalist hazır FontAwesome ikon alternatifi sunan modal entegre edildi.
+- **AJAX Fetch API:** Seçilen yeni avatar verisi CSRF token uyumlu Fetch API (POST) ile `/update-avatar` rotasına gönderilir. Sayfa yenilenmeden hem sol profil kartındaki büyük ikon hem de sağ üst navbar'daki küçük ikon anlık olarak güncellenir.
+- **Doğrulama ve Testler:** Yetkilendirme ve güncelleme testleri yazılarak başarılı test sayısı 38'e ulaştı.
+
+---
+
+## Oturum 16: İlerleme ve İstatistik Analiz Paneli Entegrasyonu
+**Tarih:** 24 Mayıs 2026
+
+### Hedef
+Kullanıcı performanslarını takip edecek Chart.js tabanlı şık bir analiz paneli eklemek ve görsel simetriyi tamamlamak.
+
+### Yapılanlar
+- **İstatistik Rotası (`/analytics`):** Kullanıcının destelerindeki kart sayılarını ve çalışma istatistiklerini hesaplayıp template'e gönderen rota eklendi.
+- **Chart.js Entegrasyonu:** Haftalık kelime/oyun performansını (Line), aylık ilerleme trendini (Bar) ve destelerin kelime hacmi dağılımlarını (Doughnut) mor/pembe neon gradyanlarla görselleştiren grafik yapısı kuruldu.
+- **Emoji Temizliği:** Arayüzdeki mor kutulu FontAwesome ikonlarıyla çakışan yeşil yapboz (🧩) emojileri oyun kartlarının başlıklarından tamamen silindi.
+- **Doğrulama ve Testler:** Analiz rotası yetkilendirme ve veri yükleme testleri yazılarak toplam test sayısı 40 başarılı teste (OK) ulaştı.
+
 ### Sonraki Adımlar
-- Hocaya teslim dokümanlarını hazırlamak ve projeyi sunmak.
+- Sistemi canlı ortama (Docker) aktarmak ve son sunumu gerçekleştirmek.
+
+---
+
+## Oturum 17: Proje Raporu ve Günlük Güncellemesi
+**Tarih:** 24 Mayıs 2026
+
+### Hedef
+LingoRose platformunun tüm modüllerinin (oyunlar, analiz ve profil) tamamlanmasının ardından, projenin resmi günlük ve rapor belgelerini son duruma göre güncellemek ve 40 başarılı birim testinin tamamlandığını teyit etmek.
+
+### Yapılanlar
+- **Proje Günlüğü ve Task Takibi:** `task.md` ve `docs/ai-gunlugu.md` dosyaları güncellenerek Oturum 12, 13, 14, 15 ve 16'daki tüm maddeler tamamlandı olarak işaretlendi ve süreç takibi başarıyla güncellendi.
+- **Teknik Tasarım Raporu ve Rota Detayları:** `walkthrough.md` ve `docs/rapor.md` dosyaları revize edilerek `/profile`, `/update-avatar` ve `/analytics` rotaları, kullanılan teknolojiler (Chart.js, Fetch API, FontAwesome Regular) ve 40 testlik birim test süreci sisteme eklendi.
+- **Doğrulama:** 40 birim testinin tamamının hatasız geçtiği ve sistemin tam kararlılıkla çalıştığı belgelendi.
+
+### Sonraki Adımlar
+- Projenin canlıya alınması veya yeni sürüm planlamalarının yapılması.
