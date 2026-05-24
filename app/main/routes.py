@@ -172,6 +172,35 @@ def play_game(deck_id):
     return render_template('main/game.html', title=f'{clean_name} - Eşleştirme Oyunu', deck=deck, cards=cards)
 
 
+@main.route('/deck/<int:deck_id>/word-drop')
+@login_required
+def word_drop(deck_id):
+    deck = db.session.get(Deck, deck_id)
+    if deck is None or deck.user_id != current_user.id:
+        abort(404)
+        
+    cards = db.session.scalars(
+        sa.select(Card).where(Card.deck_id == deck.id)
+    ).all()
+    
+    if not cards:
+        flash('Bu destede oyun oynamak için kart bulunmuyor. Lütfen önce kart ekleyin.', 'warning')
+        return redirect(url_for('main.deck_detail', deck_id=deck.id))
+        
+    languages = {
+        'en': 'İngilizce',
+        'de': 'Almanca',
+        'es': 'İspanyolca',
+        'fr': 'Fransızca',
+        'it': 'İtalyanca'
+    }
+    lang_code = session.get('learning_language', 'en')
+    lang_name = languages.get(lang_code, 'İngilizce')
+    clean_name = deck.name.replace(f"{lang_name} - ", "")
+    
+    return render_template('main/word_drop.html', title=f'{clean_name} - Kelime Tetrisi', deck=deck, cards=cards)
+
+
 @main.app_context_processor
 def inject_learning_language():
     languages = {

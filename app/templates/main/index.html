@@ -135,6 +135,28 @@
                                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
                             </div>
                         </div>
+
+                        <!-- Kelime Tetrisi (Word Drop) Oyunu Kartı -->
+                        <div id="game-select-worddrop" onclick="selectGame('word-drop')" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 hover:bg-zinc-900/70 hover:border-purple-600 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-300 cursor-pointer">
+                            <div>
+                                <div class="flex items-start justify-between gap-4 mb-4">
+                                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-950/40 border border-purple-900/30 text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+                                        <i class="fa-solid fa-cubes text-xl"></i>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-950/30 border border-emerald-900/30 px-2.5 py-1 text-xs font-semibold text-emerald-400">
+                                        Aktif
+                                    </span>
+                                </div>
+                                <h3 class="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors">🧩 Kelime Tetrisi (Word Drop)</h3>
+                                <p class="mt-2 text-sm text-zinc-400 leading-relaxed">
+                                    Yukarıdan düşen yabancı kelimeler yere çarpmadan önce aşağıdaki 4 şıktan doğru Türkçe karşılığını seçerek puan toplayın.
+                                </p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-zinc-800/60 flex items-center justify-between text-xs font-semibold text-purple-400">
+                                <span>Hemen Oyna</span>
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -145,14 +167,14 @@
                             <button onclick="goBackToGames()" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-white transition-colors mb-2 cursor-pointer">
                                 <i class="fa-solid fa-chevron-left text-[9px]"></i> Oyun Seçimine Dön
                             </button>
-                            <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                            <h2 id="game-deck-list-title" class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
                                 <i class="fa-solid fa-puzzle-piece text-purple-400 text-lg"></i> Kelime Eşleştirme Oyunu
                             </h2>
-                            <p class="mt-1 text-xs text-zinc-400 font-medium">Eşleştirme oyununa başlamak istediğiniz desteyi seçin.</p>
+                            <p id="game-deck-list-desc" class="mt-1 text-xs text-zinc-400 font-medium">Eşleştirme oyununa başlamak istediğiniz desteyi seçin.</p>
                         </div>
                     </div>
 
-                    <!-- Decks Grid for Matching Game -->
+                    <!-- Decks Grid for Games -->
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {% for deck in decks %}
                         <div class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 hover:bg-zinc-900/70 hover:border-purple-600 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-300">
@@ -169,7 +191,7 @@
 
                                 <!-- Deck Details -->
                                 <h3 class="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-200">
-                                    <a href="{{ url_for('main.play_game', deck_id=deck.id) if deck.cards|length > 0 else url_for('main.deck_detail', deck_id=deck.id) }}">
+                                    <a class="deck-game-link" data-deck-id="{{ deck.id }}" data-matching-url="{{ url_for('main.play_game', deck_id=deck.id) }}" data-worddrop-url="{{ url_for('main.word_drop', deck_id=deck.id) }}" href="{{ url_for('main.play_game', deck_id=deck.id) if deck.cards|length > 0 else url_for('main.deck_detail', deck_id=deck.id) }}">
                                         <span class="absolute inset-0" aria-hidden="true"></span>
                                         {{ deck.name.replace(current_language['name'] + ' - ', '') }}
                                     </a>
@@ -183,7 +205,11 @@
                             <!-- Actions -->
                             <div class="relative z-10 mt-6 flex items-center justify-between border-t border-zinc-800/60 pt-4">
                                 {% if deck.cards|length > 0 %}
-                                <a href="{{ url_for('main.play_game', deck_id=deck.id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl shadow transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                                <a class="deck-play-btn w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl shadow transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                                   data-deck-id="{{ deck.id }}"
+                                   data-matching-url="{{ url_for('main.play_game', deck_id=deck.id) }}"
+                                   data-worddrop-url="{{ url_for('main.word_drop', deck_id=deck.id) }}"
+                                   href="{{ url_for('main.play_game', deck_id=deck.id) }}">
                                     <i class="fa-solid fa-play text-xs"></i> Oyunu Başlat
                                 </a>
                                 {% else %}
@@ -404,6 +430,32 @@
             const paginator = document.getElementById('dashboard-pagination');
 
             if (!optionsList || !decksList) return;
+
+            // Dynamically update game headers in Step 2
+            const titleEl = document.getElementById('game-deck-list-title');
+            const descEl = document.getElementById('game-deck-list-desc');
+            if (titleEl && descEl) {
+                if (gameName === 'matching') {
+                    titleEl.innerHTML = '<i class="fa-solid fa-puzzle-piece text-purple-400 text-lg"></i> Kelime Eşleştirme Oyunu';
+                    descEl.textContent = 'Eşleştirme oyununa başlamak istediğiniz desteyi seçin.';
+                } else if (gameName === 'word-drop') {
+                    titleEl.innerHTML = '<i class="fa-solid fa-cubes text-purple-400 text-lg"></i> Kelime Tetrisi (Word Drop)';
+                    descEl.textContent = 'Kelime Tetrisi oyununa başlamak istediğiniz desteyi seçin.';
+                }
+            }
+
+            // Dynamically update deck card urls
+            const deckGameLinks = document.querySelectorAll('.deck-game-link');
+            deckGameLinks.forEach(link => {
+                const targetUrl = gameName === 'matching' ? link.getAttribute('data-matching-url') : link.getAttribute('data-worddrop-url');
+                link.href = targetUrl;
+            });
+
+            const deckPlayBtns = document.querySelectorAll('.deck-play-btn');
+            deckPlayBtns.forEach(btn => {
+                const targetUrl = gameName === 'matching' ? btn.getAttribute('data-matching-url') : btn.getAttribute('data-worddrop-url');
+                btn.href = targetUrl;
+            });
 
             optionsList.classList.add('hidden');
             decksList.classList.remove('hidden');
