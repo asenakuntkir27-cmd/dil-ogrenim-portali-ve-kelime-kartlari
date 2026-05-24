@@ -1,0 +1,653 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Confetti library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+    /* Styling & Animations */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-6px); }
+        40%, 80% { transform: translateX(6px); }
+    }
+    .animate-shake {
+        animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes game-shake {
+        0%, 100% { transform: translate(0, 0); }
+        10%, 30%, 50%, 70%, 90% { transform: translate(-4px, -2px); }
+        20%, 40%, 60%, 80% { transform: translate(4px, 2px); }
+    }
+    .animate-game-shake {
+        animation: game-shake 0.5s ease-in-out;
+    }
+
+    .heart-icon {
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s;
+    }
+    .heart-pop {
+        transform: scale(1.4);
+    }
+    
+    .option-btn {
+        transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s;
+    }
+    .option-btn:active {
+        transform: scale(0.97);
+    }
+</style>
+
+<div class="max-w-4xl mx-auto py-4 sm:py-6 flex flex-col min-h-[80vh]">
+    <!-- Game Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <div>
+            <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-xs"></i> Oyundan Çık
+            </a>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">{{ deck.name.replace(current_language['name'] + ' - ', '') }}</h1>
+            <p class="text-xs sm:text-sm text-zinc-450 mt-1">Cümledeki boşluğa gelecek doğru kelimeyi bulun.</p>
+        </div>
+        
+        <!-- Game Dashboard Stats -->
+        <div class="flex items-center gap-4 self-start sm:self-center">
+            <!-- Progress Counter -->
+            <span id="progress-counter" class="text-xs sm:text-sm font-bold text-purple-400 bg-purple-950/30 border border-purple-900/30 px-3.5 py-2 rounded-xl shadow-inner">
+                Soru: 0 / 0
+            </span>
+            <!-- Score Counter -->
+            <div class="flex items-center gap-2 bg-purple-950/20 border border-purple-900/30 px-4 py-2 rounded-xl shadow-inner">
+                <i class="fa-solid fa-star text-purple-400 text-sm"></i>
+                <span class="text-xs font-semibold text-zinc-450">Skor:</span>
+                <span id="score-counter" class="text-sm font-bold text-purple-300">0</span>
+            </div>
+            <!-- Lives Counter -->
+            <div class="flex items-center gap-1.5 bg-rose-950/10 border border-rose-900/20 px-4 py-2 rounded-xl shadow-inner">
+                <span class="text-xs font-semibold text-zinc-450 mr-1">Can:</span>
+                <div id="lives-container" class="flex items-center gap-1">
+                    <i class="fa-solid fa-heart text-rose-500 text-base heart-icon" data-index="1"></i>
+                    <i class="fa-solid fa-heart text-rose-500 text-base heart-icon" data-index="2"></i>
+                    <i class="fa-solid fa-heart text-rose-500 text-base heart-icon" data-index="3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Countdown Timer Bar (10 seconds per question) -->
+    <div class="w-full bg-zinc-950 border border-zinc-850 rounded-full h-2.5 overflow-hidden mb-6 relative shadow-inner">
+        <div id="timer-bar" class="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-600 transition-all duration-100 ease-linear w-full"></div>
+    </div>
+
+    <!-- Main Game Section -->
+    <div id="game-board-container" class="relative flex-1 flex flex-col gap-6">
+        
+        <!-- 1. Masked Sentence Display -->
+        <div id="sentence-area" class="w-full bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 sm:p-8 text-center shadow-lg relative min-h-[140px] flex flex-col items-center justify-center">
+            <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-3">Boşluğu Doldurun</span>
+            <p id="masked-sentence" class="text-lg sm:text-xl font-extrabold text-zinc-100 leading-relaxed tracking-wide">
+                <!-- E.g. The [ ___ ] is sleeping on the sofa. -->
+            </p>
+        </div>
+
+        <!-- 2. Clue Box (Türkçe Çeviri İpucu) -->
+        <div class="w-full bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-4 sm:p-5 text-center shadow-md relative overflow-hidden">
+            <div class="absolute top-0 left-0 h-[2px] w-16 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+            <span class="text-[9px] font-bold text-purple-400/90 uppercase tracking-widest block mb-1">Türkçe Çeviri İpucu</span>
+            <p id="clue-text" class="text-sm sm:text-base font-bold text-zinc-350 leading-relaxed">
+                <!-- Set via JS -->
+            </p>
+        </div>
+
+        <!-- 3. Choice Options Grid (4 Buttons) -->
+        <div id="options-grid" class="grid grid-cols-2 gap-3 sm:gap-4 w-full">
+            <!-- Dynamically populated options buttons -->
+        </div>
+
+        <!-- START GAME OVERLAY -->
+        <div id="start-overlay" class="absolute inset-0 bg-zinc-950/90 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-center p-6 rounded-2xl border border-zinc-800/40">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-900 border border-purple-500/30 text-purple-400 shadow-xl mb-5 animate-pulse">
+                <i class="fa-solid fa-pen-to-square text-2xl"></i>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">Boşluk Doldurma Yarışı</h2>
+            <p class="text-zinc-400 text-xs sm:text-sm max-w-md mb-6 leading-relaxed">
+                Örnek cümlelerdeki eksik kelimeyi Türkçe çeviri ipucunu kullanarak bulun. Her soru için sadece **10 saniyeniz** var, acele edin!
+            </p>
+            <button onclick="startGame()" class="w-full max-w-xs py-3.5 px-6 font-bold text-white bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:via-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-lg shadow-purple-500/10 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-play"></i> Oyunu Başlat
+            </button>
+        </div>
+
+        <!-- GAME OVER OVERLAY -->
+        <div id="gameover-overlay" class="absolute inset-0 bg-zinc-950/95 backdrop-blur-md z-30 flex flex-col items-center justify-center text-center p-6 rounded-2xl border border-zinc-800/40 hidden">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-900 border border-rose-500/30 text-rose-450 shadow-xl mb-5">
+                <i class="fa-solid fa-heart-crack text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-white tracking-tight mb-1">Oyun Bitti!</h2>
+            <p class="text-zinc-550 text-sm mb-6">Tüm canlarınızı tükettiniz.</p>
+            
+            <div class="w-full max-w-sm bg-zinc-900/80 border border-zinc-800 rounded-2xl p-5 mb-8 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-zinc-450">Erişilen Skor</span>
+                    <span id="gameover-final-score" class="text-base font-bold text-purple-400">0</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                <button onclick="startGame()" class="w-full py-3.5 px-6 font-semibold text-white bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-850 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow">
+                    <i class="fa-solid fa-arrows-rotate text-xs"></i> Yeniden Dene
+                </button>
+                <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="w-full py-3.5 px-6 font-semibold text-white bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:via-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-purple-500/10">
+                    Desteye Dön <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- VICTORY OVERLAY -->
+        <div id="victory-overlay" class="absolute inset-0 bg-zinc-950/95 backdrop-blur-md z-30 flex flex-col items-center justify-center text-center p-6 rounded-2xl border border-zinc-800/40 hidden">
+            <div class="relative mb-5">
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-600 blur opacity-40 animate-pulse"></div>
+                <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-zinc-900 border border-purple-500/30 text-purple-400 shadow-xl">
+                    <i class="fa-solid fa-trophy text-2xl animate-bounce"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2">Harika Yarış!</h2>
+            <p class="text-zinc-400 text-sm max-w-sm mb-6">Destedeki tüm boşluk doldurma sorularını tamamladınız!</p>
+            
+            <div class="w-full max-w-sm bg-zinc-900/80 border border-zinc-800 rounded-2xl p-5 mb-8 shadow-xl">
+                <div class="flex items-center justify-between border-b border-zinc-850 pb-2.5 mb-2.5">
+                    <span class="text-xs font-semibold text-zinc-450">Kazanılan Toplam Puan</span>
+                    <span id="victory-final-score" class="text-base font-bold text-purple-400">0</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-zinc-450">Çözülen Soru Sayısı</span>
+                    <span id="victory-total-questions" class="text-xs font-bold text-zinc-200">0</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                <button onclick="startGame()" class="w-full py-3.5 px-6 font-semibold text-white bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-850 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow">
+                    <i class="fa-solid fa-arrows-rotate text-xs"></i> Yeniden Oyna
+                </button>
+                <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="w-full py-3.5 px-6 font-semibold text-white bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:via-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-purple-500/10">
+                    Desteye Dön <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Game data from Flask
+    const deckCards = [
+        {% for card in cards %}
+        {
+            id: {{ card.id }},
+            word: {{ card.word|tojson }},
+            meaning: {{ card.meaning|tojson }},
+            example_sentence: {{ card.example_sentence|tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    // Seeded sentences translations (lookup dictionary)
+    const translationDict = {
+        // İngilizce Cümleler (Numbers)
+        "Zero is a very important number in math.": "Matematikte sıfır çok önemli bir sayıdır.",
+        "I have only one sister.": "Sadece bir kız kardeşim var.",
+        "There are two cats under the table.": "Masanın altında iki kedi var.",
+        "We stayed in Paris for three days.": "Paris'te üç gün kaldık.",
+        "A square has four equal sides.": "Bir karenin dört eşit kenarı vardır.",
+        "He gave me five red apples.": "Bana beş kırmızı elma verdi.",
+        "She bought six boxes of milk.": "Altı kutu süt satın aldı.",
+        "There are seven days in a week.": "Bir haftada yedi gün vardır.",
+        "The library opens at eight in the morning.": "Kütüphane sabah saat sekizde açılır.",
+        "My little brother is nine years old.": "Küçük erkek kardeşim dokuz yaşında.",
+        "Ten people attended the meeting.": "Toplantıya on kişi katıldı.",
+        "Eleven players form a soccer team.": "On bir oyuncu bir futbol takımı oluşturur.",
+        "A year has twelve months.": "Bir yıl on iki aydır.",
+        "There are twenty students in our class.": "Sınıfımızda yirmi öğrenci var.",
+        "The temperature is thirty degrees Celsius.": "Sıcaklık otuz santigrat derecedir.",
+        "My father is forty years old.": "Babam kırk yaşında.",
+        "The speed limit is fifty kilometers per hour.": "Hız sınırı saatte elli kilometredir.",
+        "An hour consists of sixty minutes.": "Bir saat altmış dakikadan oluşur.",
+        "One hundred cents make one dollar.": "Yüz sent bir dolar eder.",
+        "A thousand meters is equal to one kilometer.": "Bin metre bir kilometreye eşittir.",
+        // İngilizce Cümleler (Animals)
+        "The cat is sleeping on the sofa.": "Kedi koltukta uyuyor.",
+        "The dog barked at the stranger.": "Köpek yabancıya havladı.",
+        "A blue bird is singing in the garden.": "Bahçede mavi bir kuş şarkı söylüyor.",
+        "The gold fish swims in the aquarium.": "Japon balığı akvaryumda yüzüyor.",
+        "She loves riding a horse on weekends.": "Hafta sonları ata binmeyi çok seviyor.",
+        "Cows give us fresh milk.": "İnekler bize taze süt verir.",
+        "The sheep are grazing in the field.": "Koyunlar merada otluyor.",
+        "The chicken laid a big egg today.": "Tavuk bugün büyük bir yumurta yumurtladı.",
+        "The lion is known as the king of the forest.": "Aslan ormanın kralı olarak bilinir.",
+        "The elephant is the largest land mammal.": "Fil en büyük kara memelisidir.",
+        "A monkey is eating bananas on the tree.": "Bir maymun ağaçta muz yiyor.",
+        "The brown bear catches fish from the river.": "Bozayı nehirden balık yakalıyor.",
+        "The cat chased the mouse away.": "Kedi fareyi kovalayıp uzaklaştırdı.",
+        "The white rabbit loves eating carrots.": "Beyaz tavşan havuç yemeyi çok sever.",
+        "The duck is swimming in the pond.": "Ördek gölette yüzüyor.",
+        "Bees make sweet honey.": "Arılar tatlı bal yapar.",
+        "A green frog jumped into the water.": "Yeşil bir kurbağa suya atladı.",
+        "A spider is making a web in the corner.": "Köşede bir örümcek ağ yapıyor.",
+        "Some snakes are very poisonous.": "Bazı yılanlar çok zehirlidir.",
+        "The butterfly has beautiful colorful wings.": "Kelebeğin güzel renkli kanatları var.",
+        // İngilizce Cümleler (Colors)
+        "He drove a shiny red car.": "Parlak kırmızı bir araba sürdü.",
+        "The sky is clear and blue today.": "Gökyüzü bugün açık ve mavidir.",
+        "The grass is always green in spring.": "İlkbaharda çimler her zaman yeşildir.",
+        "Sunflowers are bright yellow.": "Ayçiçekleri parlak sarıdır.",
+        "She wore a elegant black dress.": "Zarif siyah bir elbise giydi.",
+        "The peaks of the mountains are covered in white snow.": "Dağların zirveleri beyaz karla kaplıdır.",
+        "Oranges are orange in color.": "Portakallar turuncu renktedir.",
+        "Grapes can be purple or green.": "Üzümler mor veya yeşil olabilir.",
+        "Roses are often pink or red.": "Güller genellikle pembe veya kırmızıdır.",
+        "The wooden table is dark brown.": "Ahşap masa koyu kahverengidir.",
+        "The sky turned grey before the rain.": "Yağmurdan önce gökyüzü griye döndü.",
+        "She received a gold medal for her performance.": "Performansı için altın madalya aldı.",
+        "My grandfather has a silver pocket watch.": "Dedemin gümüş bir köstekli saati var.",
+        "The walls of the living room are painted beige.": "Oturma odasının duvarları bej rengine boyanmıştır.",
+        "The sea in the Maldives is turquoise.": "Maldivler'de deniz turkuaz renktedir.",
+        "Violets are violet, and roses are red.": "Menekşeler menekşe rengidir, güller ise kırmızı.",
+        "The school uniform is navy blue.": "Okul üniforması laciverttir.",
+        "His new jacket is maroon.": "Yeni ceketi bordo renktedir.",
+        "Indigo is one of the colors of the rainbow.": "Çivit mavisi gökkuşağının renklerinden biridir.",
+        "The statue is made of solid bronze.": "Heykel som bronzdan yapılmıştır.",
+
+        // Almanca Cümleler (German)
+        "Null ist die erste Zahl.": "Sıfır ilk sayıdır.",
+        "Ich habe nur eins Schwester.": "Sadece bir kız kardeşim var.",
+        "Da sind zwei Katzen unter dem Tisch.": "Masanın altında iki kedi var.",
+        "Wir blieben drei Tage in Paris.": "Paris'te üç gün kaldık.",
+        "Ein Auto hat vier Räder.": "Bir arabanın doert tekerleği vardır.",
+        "Er gab mir fünf rote Äpfel.": "Bana beş kırmızı elma verdi.",
+        "Sie kaufte sechs Packungen Milch.": "Altı paket süt satın aldı.",
+        "Die Woche hat sieben Tage.": "Haftanın yedi günü vardır.",
+        "Die Bibliothek öffnet um acht Uhr morgens.": "Kütüphane sabah saat sekizde açılır.",
+        "Mein kleiner Bruder ist neun Jahre alt.": "Küçük erkek kardeşim dokuz yaşında.",
+        "Zehn Personen nahmen an dem Treffen teil.": "Toplantıya on kişi katıldı.",
+        "Elf Spieler bilden eine Fußballmannschaft.": "On bir oyuncu bir futbol takımı oluşturur.",
+        "Ein Jahr hat zwölf Monate.": "Bir yıl on iki aydır.",
+        "Es sind zwanzig Schüler in unserer Klasse.": "Sınıfımızda yirmi öğrenci var.",
+        "Die Temperatur beträgt dreißig Grad.": "Sıcaklık otuz derecedir.",
+        "Mein Vater ist vierzig Jahre alt.": "Babam kırk yaşında.",
+        "Das Tempolimit beträgt fünfzig Kilometer pro Stunde.": "Hız sınırı saatte elli kilometredir.",
+        "Eine Stunde hat sechzig Minuten.": "Bir saat altmış dakikadır.",
+        "Einhundert Cent ergeben einen Euro.": "Yüz sent bir euro eder.",
+        "Ein Kilometer hat tausend Meter.": "Bir kilometre bin metredir.",
+        "Die Katze schläft auf dem Sofa.": "Kedi koltukta uyuyor.",
+        "Der Hund bellt den Fremden an.": "Köpek yabancıya havlıyor.",
+        "Ein blauer Vogel singt im Garten.": "Bahçede mavi bir kuş şarkı söylüyor.",
+        "Der Goldfisch schwimmt im Aquarium.": "Japon balığı akvaryumda yüzüyor.",
+        "Sie reitet am Wochenende gerne ein Pferd.": "Hafta sonları ata binmeyi çok seviyor.",
+        "Kühe geben uns frische Milch.": "İnekler bize taze süt verir.",
+        "Die Schafe grasen auf der Wiese.": "Koyunlar çayırda otluyor.",
+        "Das Huhn hat heute ein großes Ei gelegt.": "Tavuk bugün büyük bir yumurta yumurtladı.",
+        "Der Löwe ist als König des Waldes bekannt.": "Aslan ormanın kralı olarak bilinir.",
+        "Der Elefant ist das größte Landsäugetier.": "Fil en büyük kara memelisidir.",
+        "Ein Affe frisst Bananen auf dem Baum.": "Bir maymun ağaçta muz yiyor.",
+        "Der Braunbär fängt Fische aus dem Fluss.": "Bozayı nehirden balık yakalıyor.",
+        "Die Katze jagte die Maus weg.": "Kedi fareyi kovalayıp uzaklaştırdı.",
+        "Das weiße Kaninchen frisst gerne Karotten.": "Beyaz tavşan havuç yemeyi çok sever.",
+        "Die Ente schwimmt im Teich.": "Ördek gölette yüzüyor.",
+        "Bienen machen süßen Honig.": "Arılar tatlı bal yapar.",
+        "Ein grüner Frosch sprang ins Wasser.": "Yeşil bir kurbağa suya atladı.",
+        "Eine Spinne baut ein Netz in der Ecke.": "Köşede bir örümcek ağ yapıyor.",
+        "Einige Schlangen sind sehr giftig.": "Bazı yılanlar çok zehirlidir.",
+        "Der Schmetterling hat wunderschöne bunte Flügel.": "Kelebeğin muhteşem renkli kanatları vardır.",
+        "Er fuhr ein glänzendes rotes Auto.": "Parlak kırmızı bir araba sürdü.",
+        "Der Himmel ist heute klar und blau.": "Gökyüzü bugün açık ve mavidir.",
+        "Das Gras ist im Frühling immer grün.": "İlkbaharda çimler her zaman yeşildir.",
+        "Sonnenblumen sind leuchtend gelb.": "Ayçiçekleri parlak sarıdır.",
+        "Sie trug ein elegantes schwarzes Kleid.": "Zarif siyah bir elbise giydi.",
+        "Die Gipfel der Berge sind mit weißem Schnee bedeckt.": "Dağların zirveleri beyaz karla kaplıdır.",
+        "Orangen sind orange gefärbt.": "Portakallar turuncu renktedir.",
+        "Weintrauben können lila oder grün sein.": "Üzümler mor veya yeşil olabilir.",
+        "Rosen sind oft rosa oder rot.": "Güller genellikle pembe veya kırmızıdır.",
+        "Der Holztisch ist dunkelbraun.": "Ahşap masa koyu kahverengidir.",
+        "Der Himmel wurde vor dem Regen grau.": "Yağmurdan önce gökyüzü griye döndü.",
+        "Sie erhielt eine Goldmedaille für ihre Leistung.": "Performansı için altın madalya aldı.",
+        "Mein Großvater hat eine silberne Taschenuhr.": "Dedemin gümüş bir köstekli saati var.",
+        "Die Wände des Wohnzimmers sind beige gestrichen.": "Oturma odasının duvarları bej rengine boyanmıştır.",
+        "Das Meer auf den Malediven ist türkis.": "Maldivler'de deniz turkuaz renktedir.",
+        "Veilchen sind violett und Rosen sind rot.": "Menekşeler menekşe rengidir, güller ise kırmızı.",
+        "Die Schuluniform ist dunkelblau.": "Okul üniforması koyu laciverttir.",
+        "Seine neue Jacke ist bordeauxrot.": "Yeni ceketi bordo kırmızıdır.",
+        "Indigo ist eine der Farben des Regenbogens.": "Çivit mavisi gökkuşağının renklerinden biridir.",
+        "Die Statue besteht aus massiver Bronze.": "Heykel som bronzdan yapılmıştır."
+    };
+
+    // Generic distractor backup words if deck is small
+    const backupDistractors = [
+        "Apple", "Book", "Desk", "Dog", "Cat", "Sun", "Water", "Time",
+        "Red", "Blue", "Green", "House", "Friend", "Happy", "Work", "Good",
+        "School", "Car", "Tree", "Milk", "Coffee", "Tea", "Door", "Key"
+    ];
+
+    // Game states
+    let score = 0;
+    let lives = 3;
+    let currentCardIndex = 0;
+    let gameCards = [];
+    let isGameOver = false;
+    let isChecking = false;
+
+    // Timer variables
+    const questionTimeLimit = 10; // 10 seconds per question
+    let questionTimeLeft = 10;
+    let timerInterval = null;
+    let isTimerRunning = false;
+
+    // Fisher-Yates Shuffle
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // Initialize Game
+    function startGame() {
+        score = 0;
+        lives = 3;
+        currentCardIndex = 0;
+        isGameOver = false;
+        isChecking = false;
+
+        // Shuffle cards and filter valid ones (holding example sentence)
+        gameCards = shuffle(deckCards.filter(c => c.example_sentence && c.example_sentence.trim().length > 0));
+
+        // Reset UI
+        document.getElementById('score-counter').textContent = score;
+        updateLivesUI();
+
+        document.getElementById('start-overlay').classList.add('hidden');
+        document.getElementById('gameover-overlay').classList.add('hidden');
+        document.getElementById('victory-overlay').classList.add('hidden');
+
+        if (gameCards.length > 0) {
+            loadQuestion(0);
+        }
+    }
+
+    function updateLivesUI() {
+        const hearts = document.querySelectorAll('.heart-icon');
+        hearts.forEach((heart, idx) => {
+            if (idx < lives) {
+                heart.className = 'fa-solid fa-heart text-rose-500 text-base heart-icon';
+            } else {
+                heart.className = 'fa-regular fa-heart text-zinc-700 text-base heart-icon';
+            }
+        });
+    }
+
+    // Mask target word inside example sentence
+    function maskSentence(sentence, targetWord) {
+        const escapedWord = targetWord.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        // Matches word boundaries, handles optional plural s/es
+        const regex = new RegExp('\\b' + escapedWord + '(s|es)?\\b', 'gi');
+        
+        if (!regex.test(sentence)) {
+            // Fallback: simple case insensitive replace
+            return sentence.replace(new RegExp(escapedWord, 'gi'), '[ _____ ]');
+        }
+        return sentence.replace(regex, '[ _____ ]');
+    }
+
+    // Generate 4 multiple choice options
+    function generateChoices(correctWord) {
+        const choices = [correctWord];
+
+        // Fetch other words in deck
+        const otherWords = deckCards
+            .filter(c => c.word.toLowerCase() !== correctWord.toLowerCase())
+            .map(c => c.word);
+
+        const shuffledOthers = shuffle([...new Set(otherWords)]);
+
+        // Push unique words
+        while (choices.length < 4 && shuffledOthers.length > 0) {
+            const word = shuffledOthers.pop();
+            if (!choices.map(c => c.toLowerCase()).includes(word.toLowerCase())) {
+                choices.push(word);
+            }
+        }
+
+        // Pull from backups if still not enough
+        const shuffledBackups = shuffle([...backupDistractors]);
+        while (choices.length < 4 && shuffledBackups.length > 0) {
+            const backup = shuffledBackups.pop();
+            if (!choices.map(c => c.toLowerCase()).includes(backup.toLowerCase())) {
+                choices.push(backup);
+            }
+        }
+
+        return shuffle(choices);
+    }
+
+    // Load active question
+    function loadQuestion(index) {
+        currentCardIndex = index;
+        isChecking = false;
+
+        document.getElementById('progress-counter').textContent = `Soru: ${currentCardIndex + 1} / ${gameCards.length}`;
+
+        const card = gameCards[currentCardIndex];
+
+        // Mask sentence and display
+        const masked = maskSentence(card.example_sentence, card.word);
+        document.getElementById('masked-sentence').textContent = masked;
+
+        // Display translation clue
+        const translation = translationDict[card.example_sentence] || `"${card.meaning}" kelimesini içeren cümle boşluğunu doldurun.`;
+        document.getElementById('clue-text').textContent = translation;
+
+        // Render options buttons
+        const choices = generateChoices(card.word);
+        const optionsGrid = document.getElementById('options-grid');
+        optionsGrid.innerHTML = '';
+
+        choices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn bg-zinc-900 border border-zinc-800 rounded-xl py-3.5 px-4 text-center text-zinc-200 hover:border-purple-500 hover:text-white transition-all cursor-pointer font-bold shadow hover:scale-[1.02] active:scale-[0.98] select-none';
+            btn.textContent = choice;
+            btn.addEventListener('click', () => handleOptionClick(choice, btn));
+            optionsGrid.appendChild(btn);
+        });
+
+        // Reset timer bar to full
+        questionTimeLeft = questionTimeLimit;
+        document.getElementById('timer-bar').style.width = '100%';
+        document.getElementById('timer-bar').className = 'h-full bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-600 transition-all duration-100 ease-linear w-full';
+
+        // Start countdown
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+        isTimerRunning = true;
+        timerInterval = setInterval(tick, 100);
+    }
+
+    // Timer Ticking Function (runs every 100ms)
+    function tick() {
+        if (!isTimerRunning) return;
+
+        questionTimeLeft -= 0.1;
+        if (questionTimeLeft <= 0) {
+            questionTimeLeft = 0;
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            handleTimeout();
+        }
+
+        // Update progress bar UI
+        const percent = (questionTimeLeft / questionTimeLimit) * 100;
+        const bar = document.getElementById('timer-bar');
+        bar.style.width = `${percent}%`;
+
+        // Turn red when time is low (< 30%)
+        if (percent < 30) {
+            bar.className = 'h-full bg-rose-600 transition-all duration-100 ease-linear w-full animate-pulse';
+        }
+    }
+
+    // Handles clicking an option
+    function handleOptionClick(selectedWord, btnEl) {
+        if (isGameOver || isChecking) return;
+
+        isChecking = true;
+        isTimerRunning = false;
+        clearInterval(timerInterval);
+
+        // Disable options click
+        const buttons = document.querySelectorAll('#options-grid button');
+        buttons.forEach(btn => btn.classList.add('pointer-events-none', 'opacity-60'));
+
+        const card = gameCards[currentCardIndex];
+        const isCorrect = (selectedWord.toLowerCase() === card.word.toLowerCase());
+
+        const sentenceArea = document.getElementById('sentence-area');
+
+        if (isCorrect) {
+            // CORRECT!
+            btnEl.className = 'option-btn bg-emerald-600 border-emerald-500 text-white rounded-xl py-3.5 px-4 text-center font-bold shadow select-none';
+            sentenceArea.classList.add('border-emerald-500', 'bg-emerald-950/20');
+            
+            // Reveal answer inside sentence
+            document.getElementById('masked-sentence').innerHTML = card.example_sentence.replace(
+                new RegExp('\\b' + card.word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '(s|es)?\\b', 'gi'), 
+                `<span class="text-emerald-450 underline font-extrabold">${selectedWord}</span>`
+            );
+
+            score += 10;
+            document.getElementById('score-counter').textContent = score;
+
+            // Confetti burst
+            confetti({
+                particleCount: 15,
+                spread: 45,
+                origin: { y: 0.8 },
+                colors: ['#34d399', '#059669', '#6ee7b7']
+            });
+
+            setTimeout(proceed, 1200);
+        } else {
+            // INCORRECT!
+            btnEl.className = 'option-btn bg-rose-600 border-rose-500 text-white rounded-xl py-3.5 px-4 text-center font-bold shadow select-none animate-shake';
+            sentenceArea.classList.add('border-rose-500', 'bg-rose-950/20', 'animate-game-shake');
+
+            // Find and highlight correct button
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase() === card.word.toLowerCase()) {
+                    btn.className = 'option-btn bg-emerald-600/35 border-emerald-500/50 text-emerald-400 rounded-xl py-3.5 px-4 text-center font-bold shadow select-none pointer-events-none';
+                }
+            });
+
+            deductLife();
+        }
+    }
+
+    // Handles question timeout
+    function handleTimeout() {
+        if (isGameOver || isChecking) return;
+
+        isChecking = true;
+
+        // Disable options click
+        const buttons = document.querySelectorAll('#options-grid button');
+        buttons.forEach(btn => btn.classList.add('pointer-events-none', 'opacity-60'));
+
+        const card = gameCards[currentCardIndex];
+        const sentenceArea = document.getElementById('sentence-area');
+        sentenceArea.classList.add('border-rose-500', 'bg-rose-950/20', 'animate-game-shake');
+
+        // Find and highlight correct button
+        buttons.forEach(btn => {
+            if (btn.textContent.toLowerCase() === card.word.toLowerCase()) {
+                btn.className = 'option-btn bg-emerald-600/35 border-emerald-500/50 text-emerald-400 rounded-xl py-3.5 px-4 text-center font-bold shadow select-none pointer-events-none';
+            }
+        });
+
+        deductLife();
+    }
+
+    function deductLife() {
+        lives--;
+
+        // Animate heart shake/pop
+        const lostHeart = document.querySelector(`.heart-icon[data-index="${lives + 1}"]`);
+        if (lostHeart) {
+            lostHeart.classList.add('heart-pop');
+            setTimeout(() => {
+                lostHeart.classList.remove('heart-pop');
+                updateLivesUI();
+            }, 300);
+        }
+
+        if (lives <= 0) {
+            setTimeout(showGameOver, 1200);
+        } else {
+            setTimeout(proceed, 1500);
+        }
+    }
+
+    // Clean class styles and proceed
+    function proceed() {
+        const sentenceArea = document.getElementById('sentence-area');
+        sentenceArea.className = 'w-full bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 sm:p-8 text-center shadow-lg relative min-h-[140px] flex flex-col items-center justify-center';
+
+        if (currentCardIndex + 1 < gameCards.length) {
+            loadQuestion(currentCardIndex + 1);
+        } else {
+            showVictory();
+        }
+    }
+
+    // Display loss overlay
+    function showGameOver() {
+        isGameOver = true;
+        clearInterval(timerInterval);
+        document.getElementById('gameover-final-score').textContent = score;
+        document.getElementById('gameover-overlay').classList.remove('hidden');
+    }
+
+    // Display victory overlay
+    function showVictory() {
+        isGameOver = true;
+        clearInterval(timerInterval);
+        document.getElementById('victory-final-score').textContent = score;
+        document.getElementById('victory-total-questions').textContent = gameCards.length;
+        document.getElementById('victory-overlay').classList.remove('hidden');
+
+        // Confetti celebration!
+        const duration = 3.5 * 1000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.8 },
+                colors: ['#a855f7', '#ec4899', '#f43f5e']
+            });
+            confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.8 },
+                colors: ['#a855f7', '#ec4899', '#f43f5e']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+    }
+</script>
+{% endblock %}
