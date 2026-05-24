@@ -240,268 +240,139 @@
         {% endfor %}
     ];
 
-    // Icon Mapping dictionary
-    const iconMapping = {
-        // Animals
-        "cat": { icon: "fa-solid fa-cat", color: "text-amber-400" },
-        "kedi": { icon: "fa-solid fa-cat", color: "text-amber-400" },
-        "katze": { icon: "fa-solid fa-cat", color: "text-amber-400" },
-        "dog": { icon: "fa-solid fa-dog", color: "text-amber-600" },
-        "köpek": { icon: "fa-solid fa-dog", color: "text-amber-600" },
-        "hund": { icon: "fa-solid fa-dog", color: "text-amber-600" },
-        "bird": { icon: "fa-solid fa-dove", color: "text-sky-400" },
-        "kuş": { icon: "fa-solid fa-dove", color: "text-sky-400" },
-        "vogel": { icon: "fa-solid fa-dove", color: "text-sky-400" },
-        "fish": { icon: "fa-solid fa-fish", color: "text-cyan-400" },
-        "balık": { icon: "fa-solid fa-fish", color: "text-cyan-400" },
-        "fisch": { icon: "fa-solid fa-fish", color: "text-cyan-400" },
-        "horse": { icon: "fa-solid fa-horse", color: "text-amber-700" },
-        "at": { icon: "fa-solid fa-horse", color: "text-amber-700" },
-        "pferd": { icon: "fa-solid fa-horse", color: "text-amber-700" },
-        "cow": { icon: "fa-solid fa-cow", color: "text-zinc-300" },
-        "inek": { icon: "fa-solid fa-cow", color: "text-zinc-300" },
-        "kuh": { icon: "fa-solid fa-cow", color: "text-zinc-300" },
-        "sheep": { icon: "fa-solid fa-sheep", color: "text-zinc-200" },
-        "koyun": { icon: "fa-solid fa-sheep", color: "text-zinc-200" },
-        "schaf": { icon: "fa-solid fa-sheep", color: "text-zinc-200" },
-        "chicken": { icon: "fa-solid fa-egg", color: "text-yellow-500" },
-        "tavuk": { icon: "fa-solid fa-egg", color: "text-yellow-500" },
-        "huhn": { icon: "fa-solid fa-egg", color: "text-yellow-500" },
-        "egg": { icon: "fa-solid fa-egg", color: "text-yellow-500" },
-        "yumurta": { icon: "fa-solid fa-egg", color: "text-yellow-500" },
-        "ei": { icon: "fa-solid fa-egg", color: "text-yellow-500" },
-        "lion": { icon: "fa-solid fa-paw", color: "text-orange-500" },
-        "aslan": { icon: "fa-solid fa-paw", color: "text-orange-500" },
-        "löwe": { icon: "fa-solid fa-paw", color: "text-orange-500" },
-        "elephant": { icon: "fa-solid fa-paw", color: "text-slate-400" },
-        "fil": { icon: "fa-solid fa-paw", color: "text-slate-400" },
-        "elefant": { icon: "fa-solid fa-paw", color: "text-slate-400" },
-        "monkey": { icon: "fa-solid fa-face-smile", color: "text-amber-800" },
-        "maymun": { icon: "fa-solid fa-face-smile", color: "text-amber-800" },
-        "affe": { icon: "fa-solid fa-face-smile", color: "text-amber-800" },
-        "bear": { icon: "fa-solid fa-paw", color: "text-amber-900" },
-        "ayı": { icon: "fa-solid fa-paw", color: "text-amber-900" },
-        "bär": { icon: "fa-solid fa-paw", color: "text-amber-900" },
-        "mouse": { icon: "fa-solid fa-locust", color: "text-zinc-400" },
-        "fare": { icon: "fa-solid fa-locust", color: "text-zinc-400" },
-        "maus": { icon: "fa-solid fa-locust", color: "text-zinc-400" },
-        "rabbit": { icon: "fa-solid fa-carrot", color: "text-orange-400" },
-        "tavşan": { icon: "fa-solid fa-carrot", color: "text-orange-400" },
-        "kaninchen": { icon: "fa-solid fa-carrot", color: "text-orange-400" },
-        "duck": { icon: "fa-solid fa-kiwi-bird", color: "text-yellow-600" },
-        "ördek": { icon: "fa-solid fa-kiwi-bird", color: "text-yellow-600" },
-        "ente": { icon: "fa-solid fa-kiwi-bird", color: "text-yellow-600" },
-        "bee": { icon: "fa-solid fa-bugs", color: "text-yellow-400" },
-        "arı": { icon: "fa-solid fa-bugs", color: "text-yellow-400" },
-        "biene": { icon: "fa-solid fa-bugs", color: "text-yellow-400" },
-        "honey": { icon: "fa-solid fa-jar", color: "text-amber-500" },
-        "bal": { icon: "fa-solid fa-jar", color: "text-amber-500" },
-        "honig": { icon: "fa-solid fa-jar", color: "text-amber-500" },
-        "frog": { icon: "fa-solid fa-frog", color: "text-emerald-500" },
-        "kurbağa": { icon: "fa-solid fa-frog", color: "text-emerald-500" },
-        "frosch": { icon: "fa-solid fa-frog", color: "text-emerald-500" },
-        "spider": { icon: "fa-solid fa-spider", color: "text-zinc-600" },
-        "örümcek": { icon: "fa-solid fa-spider", color: "text-zinc-600" },
-        "spinne": { icon: "fa-solid fa-spider", color: "text-zinc-600" },
-        "snake": { icon: "fa-solid fa-staff-snake", color: "text-emerald-700" },
-        "yılan": { icon: "fa-solid fa-staff-snake", color: "text-emerald-700" },
-        "schlange": { icon: "fa-solid fa-staff-snake", color: "text-emerald-700" },
-        "butterfly": { icon: "fa-solid fa-snowflake", color: "text-pink-400" },
-        "kelebek": { icon: "fa-solid fa-snowflake", color: "text-pink-400" },
-        "schmetterling": { icon: "fa-solid fa-snowflake", color: "text-pink-400" },
+    // Smart word-to-icon mapping engine
+    function getIconForCard(word, meaning) {
+        const text1 = (word || "").toLowerCase().trim();
+        const text2 = (meaning || "").toLowerCase().trim();
+        
+        // Dictionary mapping keywords to specific outline (far) FontAwesome icons
+        const matches = [
+            // Education / Book / School / Lesson
+            {
+                keywords: [
+                    "teach", "student", "school", "book", "lesson", "read", "learn", "study", "class",
+                    "lehrer", "schüler", "schule", "buch", "lernen", "klasse", "unterricht",
+                    "öğretmen", "öğrenci", "okul", "kitap", "ders", "okuma", "öğrenme", "çalış"
+                ],
+                icon: "far fa-bookmark",
+                color: "text-indigo-400"
+            },
+            // Fire / Emergency / Alarm
+            {
+                keywords: [
+                    "fire", "extinguish", "burn", "flame", "emergency", "alert",
+                    "feuerwehr", "feuer", "löschen", "notfall", "alarm",
+                    "yangın", "ateş", "söndürme", "itfaiye", "acil", "alarm"
+                ],
+                icon: "far fa-bell",
+                color: "text-red-400"
+            },
+            // Health / Hospital / Doctor / Medicine
+            {
+                keywords: [
+                    "hospital", "doctor", "nurse", "health", "medicine", "sick", "cure", "clinic",
+                    "arzt", "krankenhaus", "gesundheit", "medizin", "krank", "klinik",
+                    "doktor", "hemşire", "hastane", "sağlık", "tıp", "hasta", "klinik", "ilaç"
+                ],
+                icon: "far fa-hospital",
+                color: "text-rose-400"
+            },
+            // Time / Clock / Calendar
+            {
+                keywords: [
+                    "clock", "time", "date", "day", "month", "year", "hour", "minute", "second", "week", "calendar",
+                    "uhr", "zeit", "tag", "jahr", "monat", "stunde", "minute", "sekunde", "woche", "kalender",
+                    "saat", "zaman", "gün", "ay", "yıl", "saniye", "hafta", "takvim", "dakika"
+                ],
+                icon: "far fa-clock",
+                color: "text-purple-400"
+            },
+            // Place / House / Building / Family
+            {
+                keywords: [
+                    "house", "building", "room", "family", "home", "apartment", "wall", "door", "window",
+                    "haus", "familie", "zimmer", "wohnung", "wand", "tür", "fenster",
+                    "ev", "bina", "oda", "aile", "konut", "daire", "duvar", "kapı", "pencere"
+                ],
+                icon: "far fa-image",
+                color: "text-emerald-400"
+            },
+            // Travel / Vehicle / Transport
+            {
+                keywords: [
+                    "car", "bus", "travel", "journey", "trip", "drive", "plane", "flight", "road",
+                    "auto", "reise", "fahrt", "flug", "straße", "weg",
+                    "araba", "otobüs", "yolculuk", "seyahat", "uçuş", "yol", "sürüş"
+                ],
+                icon: "far fa-paper-plane",
+                color: "text-pink-400"
+            },
+            // Food / Eat / Fruits / Drink
+            {
+                keywords: [
+                    "apple", "lemon", "fruit", "food", "bread", "eat", "drink", "milk", "coffee", "tea", "water",
+                    "apfel", "essen", "brot", "trinken", "milch", "kaffee", "tee", "wasser",
+                    "elma", "yemek", "meyve", "ekmek", "içmek", "süt", "kahve", "çay", "su"
+                ],
+                icon: "far fa-lemon",
+                color: "text-yellow-400"
+            },
+            // Nature / Elements / Weather
+            {
+                keywords: [
+                    "sun", "moon", "star", "tree", "river", "pond", "sky", "grass", "flower", "weather", "wind", "rain",
+                    "sonne", "mond", "stern", "baum", "fluss", "himmel", "wetter", "regen", "wind",
+                    "güneş", "ay", "yıldız", "ağaç", "nehir", "gölet", "gökyüzü", "hava", "yağmur", "rüzgar", "çiçek"
+                ],
+                icon: "far fa-compass",
+                color: "text-cyan-400"
+            },
+            // Animals / Pets
+            {
+                keywords: [
+                    "cat", "dog", "bird", "animal", "pet", "cow", "sheep", "chicken", "lion", "elephant", "bear",
+                    "katze", "hund", "vogel", "tier", "kuh", "schaf", "huhn", "löwe", "elefant", "bär",
+                    "kedi", "köpek", "kuş", "hayvan", "inek", "koyun", "tavuk", "aslan", "fil", "ayı"
+                ],
+                icon: "far fa-face-smile",
+                color: "text-amber-500"
+            }
+        ];
 
-        // Colors
-        "red": { icon: "fa-solid fa-circle", color: "text-red-500" },
-        "kırmızı": { icon: "fa-solid fa-circle", color: "text-red-500" },
-        "rot": { icon: "fa-solid fa-circle", color: "text-red-500" },
-        "blue": { icon: "fa-solid fa-circle", color: "text-blue-500" },
-        "mavi": { icon: "fa-solid fa-circle", color: "text-blue-500" },
-        "blau": { icon: "fa-solid fa-circle", color: "text-blue-500" },
-        "green": { icon: "fa-solid fa-circle", color: "text-green-500" },
-        "yeşil": { icon: "fa-solid fa-circle", color: "text-green-500" },
-        "grün": { icon: "fa-solid fa-circle", color: "text-green-500" },
-        "yellow": { icon: "fa-solid fa-circle", color: "text-yellow-400" },
-        "sarı": { icon: "fa-solid fa-circle", color: "text-yellow-400" },
-        "gelb": { icon: "fa-solid fa-circle", color: "text-yellow-400" },
-        "black": { icon: "fa-solid fa-circle", color: "text-black" },
-        "siyah": { icon: "fa-solid fa-circle", color: "text-black" },
-        "schwarz": { icon: "fa-solid fa-circle", color: "text-black" },
-        "white": { icon: "fa-solid fa-circle", color: "text-white" },
-        "beyaz": { icon: "fa-solid fa-circle", color: "text-white" },
-        "weiß": { icon: "fa-solid fa-circle", color: "text-white" },
-        "weiss": { icon: "fa-solid fa-circle", color: "text-white" },
-        "orange": { icon: "fa-solid fa-circle", color: "text-orange-500" },
-        "turuncu": { icon: "fa-solid fa-circle", color: "text-orange-500" },
-        "purple": { icon: "fa-solid fa-circle", color: "text-purple-500" },
-        "mor": { icon: "fa-solid fa-circle", color: "text-purple-500" },
-        "lila": { icon: "fa-solid fa-circle", color: "text-purple-500" },
-        "pink": { icon: "fa-solid fa-circle", color: "text-pink-400" },
-        "pembe": { icon: "fa-solid fa-circle", color: "text-pink-400" },
-        "rosa": { icon: "fa-solid fa-circle", color: "text-pink-400" },
-        "grey": { icon: "fa-solid fa-circle", color: "text-gray-400" },
-        "gray": { icon: "fa-solid fa-circle", color: "text-gray-400" },
-        "gri": { icon: "fa-solid fa-circle", color: "text-gray-400" },
-        "grau": { icon: "fa-solid fa-circle", color: "text-gray-400" },
-        "gold": { icon: "fa-solid fa-award", color: "text-yellow-500" },
-        "altın": { icon: "fa-solid fa-award", color: "text-yellow-500" },
-        "silver": { icon: "fa-solid fa-medal", color: "text-slate-350" },
-        "gümüş": { icon: "fa-solid fa-medal", color: "text-slate-350" },
-        "silber": { icon: "fa-solid fa-medal", color: "text-slate-350" },
-        "beige": { icon: "fa-solid fa-circle", color: "text-yellow-100" },
-        "bej": { icon: "fa-solid fa-circle", color: "text-yellow-100" },
-        "turquoise": { icon: "fa-solid fa-circle", color: "text-cyan-400" },
-        "turkuaz": { icon: "fa-solid fa-circle", color: "text-cyan-400" },
-        "türkis": { icon: "fa-solid fa-circle", color: "text-cyan-400" },
-        "violet": { icon: "fa-solid fa-circle", color: "text-purple-600" },
-        "menekşe": { icon: "fa-solid fa-circle", color: "text-purple-600" },
-        "navy": { icon: "fa-solid fa-circle", color: "text-blue-900" },
-        "lacivert": { icon: "fa-solid fa-circle", color: "text-blue-900" },
-        "maroon": { icon: "fa-solid fa-circle", color: "text-rose-900" },
-        "bordo": { icon: "fa-solid fa-circle", color: "text-rose-900" },
-        "indigo": { icon: "fa-solid fa-circle", color: "text-indigo-650" },
-        "çivit": { icon: "fa-solid fa-circle", color: "text-indigo-650" },
-        "bronze": { icon: "fa-solid fa-award", color: "text-amber-600" },
-        "bronz": { icon: "fa-solid fa-award", color: "text-amber-600" },
+        // 1. Exact matching (look for exact keyword match in word or meaning)
+        for (const item of matches) {
+            if (item.keywords.some(kw => text1 === kw || text2 === kw)) {
+                return { icon: item.icon, color: item.color };
+            }
+        }
 
-        // Numbers
-        "zero": { icon: "fa-solid fa-0", color: "text-blue-400" },
-        "sıfır": { icon: "fa-solid fa-0", color: "text-blue-400" },
-        "null": { icon: "fa-solid fa-0", color: "text-blue-400" },
-        "one": { icon: "fa-solid fa-1", color: "text-blue-400" },
-        "bir": { icon: "fa-solid fa-1", color: "text-blue-400" },
-        "eins": { icon: "fa-solid fa-1", color: "text-blue-400" },
-        "two": { icon: "fa-solid fa-2", color: "text-blue-400" },
-        "iki": { icon: "fa-solid fa-2", color: "text-blue-400" },
-        "zwei": { icon: "fa-solid fa-2", color: "text-blue-400" },
-        "three": { icon: "fa-solid fa-3", color: "text-blue-400" },
-        "üç": { icon: "fa-solid fa-3", color: "text-blue-400" },
-        "drei": { icon: "fa-solid fa-3", color: "text-blue-400" },
-        "four": { icon: "fa-solid fa-4", color: "text-blue-400" },
-        "dört": { icon: "fa-solid fa-4", color: "text-blue-400" },
-        "vier": { icon: "fa-solid fa-4", color: "text-blue-400" },
-        "five": { icon: "fa-solid fa-5", color: "text-blue-400" },
-        "beş": { icon: "fa-solid fa-5", color: "text-blue-400" },
-        "fünf": { icon: "fa-solid fa-5", color: "text-blue-400" },
-        "six": { icon: "fa-solid fa-6", color: "text-blue-400" },
-        "altı": { icon: "fa-solid fa-6", color: "text-blue-400" },
-        "sechs": { icon: "fa-solid fa-6", color: "text-blue-400" },
-        "seven": { icon: "fa-solid fa-7", color: "text-blue-400" },
-        "yedi": { icon: "fa-solid fa-7", color: "text-blue-400" },
-        "sieben": { icon: "fa-solid fa-7", color: "text-blue-400" },
-        "eight": { icon: "fa-solid fa-8", color: "text-blue-400" },
-        "sekiz": { icon: "fa-solid fa-8", color: "text-blue-400" },
-        "acht": { icon: "fa-solid fa-8", color: "text-blue-400" },
-        "nine": { icon: "fa-solid fa-9", color: "text-blue-400" },
-        "dokuz": { icon: "fa-solid fa-9", color: "text-blue-400" },
-        "neun": { icon: "fa-solid fa-9", color: "text-blue-400" },
-        "ten": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "on": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "zehn": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "eleven": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "elf": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "twelve": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "zwölf": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "twenty": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "yirmi": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "zwanzig": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "thirty": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "otuz": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "dreißig": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "forty": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "kırk": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "vierzig": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "fifty": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "elli": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "fünfzig": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "sixty": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "altmış": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "sechzig": { icon: "fa-solid fa-hashtag", color: "text-purple-400" },
-        "hundred": { icon: "fa-solid fa-calculator", color: "text-teal-400" },
-        "yüz": { icon: "fa-solid fa-calculator", color: "text-teal-400" },
-        "hundert": { icon: "fa-solid fa-calculator", color: "text-teal-400" },
-        "thousand": { icon: "fa-solid fa-calculator", color: "text-teal-400" },
-        "bin": { icon: "fa-solid fa-calculator", color: "text-teal-400" },
-        "tausend": { icon: "fa-solid fa-calculator", color: "text-teal-400" },
+        // 2. Substring matching (look if word or meaning contains a keyword)
+        for (const item of matches) {
+            if (item.keywords.some(kw => text1.includes(kw) || text2.includes(kw))) {
+                return { icon: item.icon, color: item.color };
+            }
+        }
 
-        // Food & Drink / Everyday
-        "apple": { icon: "fa-solid fa-apple-whole", color: "text-red-500" },
-        "elma": { icon: "fa-solid fa-apple-whole", color: "text-red-500" },
-        "apfel": { icon: "fa-solid fa-apple-whole", color: "text-red-500" },
-        "carrot": { icon: "fa-solid fa-carrot", color: "text-orange-500" },
-        "havuç": { icon: "fa-solid fa-carrot", color: "text-orange-500" },
-        "karotte": { icon: "fa-solid fa-carrot", color: "text-orange-500" },
-        "banana": { icon: "fa-solid fa-lemon", color: "text-yellow-400" },
-        "muz": { icon: "fa-solid fa-lemon", color: "text-yellow-400" },
-        "milk": { icon: "fa-solid fa-glass-water", color: "text-zinc-200" },
-        "süt": { icon: "fa-solid fa-glass-water", color: "text-zinc-200" },
-        "milch": { icon: "fa-solid fa-glass-water", color: "text-zinc-200" },
-        "coffee": { icon: "fa-solid fa-mug-hot", color: "text-amber-800" },
-        "kahve": { icon: "fa-solid fa-mug-hot", color: "text-amber-800" },
-        "kaffee": { icon: "fa-solid fa-mug-hot", color: "text-amber-800" },
-        "tea": { icon: "fa-solid fa-mug-saucer", color: "text-teal-600" },
-        "çay": { icon: "fa-solid fa-mug-saucer", color: "text-teal-600" },
-        "tee": { icon: "fa-solid fa-mug-saucer", color: "text-teal-600" },
-        "book": { icon: "fa-solid fa-book", color: "text-indigo-400" },
-        "kitap": { icon: "fa-solid fa-book", color: "text-indigo-400" },
-        "buch": { icon: "fa-solid fa-book", color: "text-indigo-400" },
-        "desk": { icon: "fa-solid fa-table", color: "text-amber-700" },
-        "sıra": { icon: "fa-solid fa-table", color: "text-amber-700" },
-        "tisch": { icon: "fa-solid fa-table", color: "text-amber-700" },
-        "masa": { icon: "fa-solid fa-table", color: "text-amber-700" },
-        "house": { icon: "fa-solid fa-house", color: "text-emerald-400" },
-        "ev": { icon: "fa-solid fa-house", color: "text-emerald-400" },
-        "haus": { icon: "fa-solid fa-house", color: "text-emerald-400" },
-        "car": { icon: "fa-solid fa-car", color: "text-blue-500" },
-        "araba": { icon: "fa-solid fa-car", color: "text-blue-500" },
-        "auto": { icon: "fa-solid fa-car", color: "text-blue-500" },
-        "tree": { icon: "fa-solid fa-tree", color: "text-green-500" },
-        "ağaç": { icon: "fa-solid fa-tree", color: "text-green-500" },
-        "baum": { icon: "fa-solid fa-tree", color: "text-green-500" },
-        "door": { icon: "fa-solid fa-door-open", color: "text-yellow-700" },
-        "kapı": { icon: "fa-solid fa-door-open", color: "text-yellow-700" },
-        "tür": { icon: "fa-solid fa-door-open", color: "text-yellow-700" },
-        "key": { icon: "fa-solid fa-key", color: "text-amber-500" },
-        "anahtar": { icon: "fa-solid fa-key", color: "text-amber-500" },
-        "schlüssel": { icon: "fa-solid fa-key", color: "text-amber-500" },
-        "sofa": { icon: "fa-solid fa-couch", color: "text-zinc-400" },
-        "koltuk": { icon: "fa-solid fa-couch", color: "text-zinc-400" },
-        "couch": { icon: "fa-solid fa-couch", color: "text-zinc-400" },
-        "river": { icon: "fa-solid fa-water", color: "text-sky-500" },
-        "nehir": { icon: "fa-solid fa-water", color: "text-sky-500" },
-        "fluss": { icon: "fa-solid fa-water", color: "text-sky-500" },
-        "pond": { icon: "fa-solid fa-water", color: "text-cyan-500" },
-        "gölet": { icon: "fa-solid fa-water", color: "text-cyan-500" },
-        "teich": { icon: "fa-solid fa-water", color: "text-cyan-500" },
-        "school": { icon: "fa-solid fa-school", color: "text-rose-400" },
-        "okul": { icon: "fa-solid fa-school", color: "text-rose-400" },
-        "schule": { icon: "fa-solid fa-school", color: "text-rose-400" },
-        "clock": { icon: "fa-solid fa-clock", color: "text-slate-400" },
-        "saat": { icon: "fa-solid fa-clock", color: "text-slate-400" },
-        "uhr": { icon: "fa-solid fa-clock", color: "text-slate-400" },
-        "time": { icon: "fa-solid fa-clock", color: "text-slate-400" },
-        "zaman": { icon: "fa-solid fa-clock", color: "text-slate-400" },
-        "zeit": { icon: "fa-solid fa-clock", color: "text-slate-400" },
-        "friend": { icon: "fa-solid fa-user-group", color: "text-pink-400" },
-        "arkadaş": { icon: "fa-solid fa-user-group", color: "text-pink-400" },
-        "freund": { icon: "fa-solid fa-user-group", color: "text-pink-400" },
-        "water": { icon: "fa-solid fa-droplet", color: "text-blue-400" },
-        "su": { icon: "fa-solid fa-droplet", color: "text-blue-400" },
-        "wasser": { icon: "fa-solid fa-droplet", color: "text-blue-400" },
-        "sun": { icon: "fa-solid fa-sun", color: "text-yellow-500" },
-        "güneş": { icon: "fa-solid fa-sun", color: "text-yellow-500" },
-        "sonne": { icon: "fa-solid fa-sun", color: "text-yellow-500" },
+        // 3. Fallback stable selection based on string hashing code
+        const fallbacks = [
+            { icon: "far fa-star", color: "text-yellow-400" },
+            { icon: "far fa-heart", color: "text-rose-500" },
+            { icon: "far fa-lightbulb", color: "text-purple-400" },
+            { icon: "far fa-bookmark", color: "text-indigo-400" },
+            { icon: "far fa-comment", color: "text-fuchsia-400" },
+            { icon: "far fa-paper-plane", color: "text-pink-400" },
+            { icon: "far fa-compass", color: "text-emerald-400" },
+            { icon: "far fa-envelope", color: "text-sky-400" }
+        ];
 
-        "fallbacks": [
-            { icon: "fa-solid fa-star", color: "text-yellow-400" },
-            { icon: "fa-solid fa-heart", color: "text-rose-500" },
-            { icon: "fa-solid fa-bolt", color: "text-yellow-300" },
-            { icon: "fa-solid fa-gem", color: "text-cyan-400" },
-            { icon: "fa-solid fa-moon", color: "text-indigo-200" },
-            { icon: "fa-solid fa-sun", color: "text-orange-400" },
-            { icon: "fa-solid fa-cloud", color: "text-sky-300" },
-            { icon: "fa-solid fa-crown", color: "text-amber-400" }
-        ]
-    };
+        let hash = 0;
+        const combined = text1 + text2;
+        for (let i = 0; i < combined.length; i++) {
+            hash = combined.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash) % fallbacks.length;
+        return fallbacks[index];
+    }
 
     // Game variables
     let gameCards = []; // Array of 16 card instances
@@ -550,29 +421,8 @@
 
         // Map icons for each card in the subset
         const subsetIcons = {};
-        randomizedSubset.forEach((card, index) => {
-            let matched = null;
-            const searchTerms = [
-                card.word.toLowerCase(),
-                card.meaning.toLowerCase()
-            ];
-            
-            // Search for key match
-            for (const key in iconMapping) {
-                if (key === 'fallbacks') continue;
-                if (searchTerms.some(term => term.includes(key))) {
-                    matched = iconMapping[key];
-                    break;
-                }
-            }
-            
-            // Fallback selection if no match
-            if (!matched) {
-                const fallbackIndex = index % iconMapping.fallbacks.length;
-                matched = iconMapping.fallbacks[fallbackIndex];
-            }
-            
-            subsetIcons[card.id] = matched;
+        randomizedSubset.forEach((card) => {
+            subsetIcons[card.id] = getIconForCard(card.word, card.meaning);
         });
 
         // Build list of 16 card objects (8 word cards + 8 meaning cards)
@@ -618,14 +468,14 @@
             cardEl.innerHTML = `
                 <div class="card-inner w-full h-full relative preserve-3d transition-transform duration-500 ease-in-out">
                     <div class="card-front bg-zinc-900 border border-zinc-800/80 rounded-2xl flex flex-col items-center justify-center text-purple-400/70">
-                        <i class="fa-solid fa-graduation-cap text-2xl mb-1 opacity-70"></i>
+                        <i class="far fa-bookmark text-xl mb-1 opacity-70"></i>
                         <span class="text-[9px] font-bold tracking-widest uppercase opacity-60">LingoRose</span>
                     </div>
-                    <div class="card-back bg-zinc-900 border border-zinc-850 rounded-2xl p-3 flex flex-col items-center justify-center text-center gap-2">
-                        <div class="w-10 h-10 rounded-full bg-zinc-950 border border-zinc-800 flex items-center justify-center ${card.color} shadow-inner mb-1">
-                            <i class="${card.icon} text-lg"></i>
+                    <div class="card-back bg-zinc-900 border border-zinc-850 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-zinc-950/50 border border-zinc-850 flex items-center justify-center ${card.color} mb-1">
+                            <i class="${card.icon} text-sm"></i>
                         </div>
-                        <span class="text-xs font-bold text-zinc-150 tracking-wide break-words max-w-full leading-tight">
+                        <span class="text-xs font-semibold text-zinc-200 tracking-wide break-words max-w-full leading-tight">
                             ${card.text}
                         </span>
                     </div>
