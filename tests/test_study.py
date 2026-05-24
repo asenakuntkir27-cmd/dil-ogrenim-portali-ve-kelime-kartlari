@@ -168,5 +168,51 @@ class StudyTestCase(unittest.TestCase):
             self.assertIn(b'Apple', response.data)
             self.assertIn(b'Book', response.data)
 
+    def test_sentence_builder_route_requires_login(self):
+        response = self.client.get('/deck/1/sentence-builder')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('login', response.headers.get('Location', '').lower())
+
+    def test_sentence_builder_empty_deck_redirects(self):
+        u = User(username='test_sb_empty', email='test_sb_empty@example.com')
+        u.set_password('password')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'test_sb_empty', 'password': 'password'})
+            
+            d = Deck(name='Test Deck SB Empty', user=u)
+            db.session.add(d)
+            db.session.commit()
+
+            # Empty deck (no example sentence cards) should redirect
+            response = self.client.get(f'/deck/{d.id}/sentence-builder')
+            self.assertEqual(response.status_code, 302)
+            self.assertIn(f'/deck/{d.id}', response.headers.get('Location', ''))
+
+    def test_sentence_builder_valid_deck_with_cards(self):
+        u = User(username='test_sb_valid', email='test_sb_valid@example.com')
+        u.set_password('password')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'test_sb_valid', 'password': 'password'})
+            
+            d = Deck(name='Test Deck SB Valid', user=u)
+            db.session.add(d)
+            db.session.commit()
+
+            c1 = Card(word='Apple', meaning='Elma', example_sentence='I eat an apple.', deck=d)
+            c2 = Card(word='Book', meaning='Kitap', example_sentence='Read a book.', deck=d)
+            db.session.add_all([c1, c2])
+            db.session.commit()
+
+            response = self.client.get(f'/deck/{d.id}/sentence-builder')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Apple', response.data)
+            self.assertIn(b'Book', response.data)
+
 if __name__ == '__main__':
     unittest.main()

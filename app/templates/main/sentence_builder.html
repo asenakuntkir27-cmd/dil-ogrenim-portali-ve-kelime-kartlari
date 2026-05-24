@@ -1,0 +1,546 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Confetti library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+    /* Styling & Animations */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-6px); }
+        40%, 80% { transform: translateX(6px); }
+    }
+    .animate-shake {
+        animation: shake 0.4s ease-in-out;
+    }
+    
+    .workspace-area {
+        transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    .word-btn {
+        transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s;
+    }
+    .word-btn:active {
+        transform: scale(0.95);
+    }
+</style>
+
+<div class="max-w-4xl mx-auto py-4 sm:py-6 flex flex-col min-h-[80vh]">
+    <!-- Game Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+            <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-xs"></i> Oyundan Çık
+            </a>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">{{ deck.name.replace(current_language['name'] + ' - ', '') }}</h1>
+            <p class="text-xs sm:text-sm text-zinc-450 mt-1">Aşağıdaki karışık kelimeleri doğru sırayla seçerek cümleyi kurun.</p>
+        </div>
+        
+        <!-- Game Stats -->
+        <div class="flex items-center gap-3 self-start sm:self-center">
+            <!-- Progress Counter -->
+            <span id="progress-counter" class="text-xs sm:text-sm font-bold text-purple-400 bg-purple-950/30 border border-purple-900/30 px-3.5 py-2 rounded-xl shadow-inner">
+                Soru: 0 / 0
+            </span>
+            <!-- Score Counter -->
+            <span id="score-counter" class="text-xs sm:text-sm font-bold text-pink-400 bg-pink-950/30 border border-pink-900/30 px-3.5 py-2 rounded-xl shadow-inner">
+                Skor: 0
+            </span>
+        </div>
+    </div>
+
+    <!-- Main Game Board -->
+    <div id="game-container" class="flex-1 flex flex-col gap-6">
+        
+        <!-- 1. Clue Box (Türkçe Çeviri İpucu) -->
+        <div class="w-full bg-zinc-900/40 border border-zinc-800 rounded-2xl p-5 sm:p-6 text-center shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 left-0 h-[3px] w-24 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+            <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-2">Türkçe Çeviri İpucu</span>
+            <p id="clue-text" class="text-base sm:text-lg font-bold text-zinc-100 leading-relaxed">
+                <!-- Set via JS -->
+            </p>
+            <div id="keyword-hint" class="text-xs text-zinc-500 mt-2 font-medium">
+                <!-- Set via JS -->
+            </div>
+        </div>
+
+        <!-- 2. Workspace (Cümle Kurma Alanı) -->
+        <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between px-1">
+                <span class="text-xs font-semibold text-zinc-450 uppercase tracking-wider">Cümleniz</span>
+                <button onclick="resetWorkspace()" class="text-xs font-bold text-rose-450 hover:text-rose-400 flex items-center gap-1 transition-colors cursor-pointer">
+                    <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Temizle
+                </button>
+            </div>
+            
+            <div id="workspace" class="workspace-area min-h-[96px] w-full bg-zinc-950/40 border border-zinc-800 rounded-2xl p-4 flex flex-wrap gap-2 items-center justify-center shadow-inner text-center">
+                <!-- Reconstructed words will be placed here -->
+            </div>
+        </div>
+
+        <!-- 3. Word Pool (Kelime Havuzu) -->
+        <div class="flex flex-col gap-2">
+            <span class="text-xs font-semibold text-zinc-450 uppercase tracking-wider px-1">Kelime Havuzu</span>
+            <div id="word-pool" class="w-full bg-zinc-900/10 border border-zinc-850/80 rounded-2xl p-5 flex flex-wrap gap-2.5 items-center justify-center min-h-[80px]">
+                <!-- Shuffled word buttons -->
+            </div>
+        </div>
+
+        <!-- Success Feedback Area (Hidden by default, holds next button) -->
+        <div id="feedback-area" class="hidden flex items-center justify-center py-2 animate-fade-in">
+            <button onclick="loadNextCard()" class="py-3 px-8 font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-lg shadow-emerald-500/10 flex items-center gap-2">
+                Sonraki Soru <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Victory Screen (Hidden by default) -->
+    <div id="victory-area" class="hidden flex-1 flex flex-col items-center justify-center text-center py-12 px-6">
+        <div class="relative mb-6">
+            <!-- Glowing background ring -->
+            <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-600 blur opacity-30 animate-pulse"></div>
+            <div class="relative flex h-20 w-20 items-center justify-center rounded-full bg-zinc-900 border-2 border-purple-500/30 text-purple-400 shadow-xl">
+                <i class="fa-solid fa-trophy text-3xl"></i>
+            </div>
+        </div>
+
+        <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2">Tebrikler!</h2>
+        <p class="text-zinc-400 text-sm max-w-sm mb-8">Destedeki tüm cümleleri başarıyla sıraladınız ve oyunu tamamladınız!</p>
+
+        <!-- Stats Card -->
+        <div class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8 shadow-xl">
+            <div class="flex items-center justify-between border-b border-zinc-800/60 pb-3 mb-3">
+                <span class="text-xs font-semibold text-zinc-400">Deste Adı</span>
+                <span class="text-xs font-bold text-zinc-200">{{ deck.name.replace(current_language['name'] + ' - ', '') }}</span>
+            </div>
+            <div class="flex items-center justify-between border-b border-zinc-800/60 pb-3 mb-3">
+                <span class="text-xs font-semibold text-zinc-400">Toplam Puan</span>
+                <span id="victory-final-score" class="text-xs font-bold text-purple-400">0</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-zinc-400">Tamamlanan Cümle Sayısı</span>
+                <span id="victory-total-sentences" class="text-xs font-bold text-zinc-200">0</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 w-full max-w-xs sm:max-w-sm">
+            <button onclick="initGame()" class="w-full py-3.5 px-6 font-semibold text-white bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-850 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow">
+                <i class="fa-solid fa-arrows-rotate text-xs"></i> Yeniden Oyna
+            </button>
+            <a href="{{ url_for('main.deck_detail', deck_id=deck.id) }}" class="w-full py-3.5 px-6 font-semibold text-white bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:via-pink-500 hover:to-fuchsia-500 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-purple-500/10">
+                Desteye Dön <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Game data payload passed from Flask
+    const deckCards = [
+        {% for card in cards %}
+        {
+            id: {{ card.id }},
+            word: {{ card.word|tojson }},
+            meaning: {{ card.meaning|tojson }},
+            example_sentence: {{ card.example_sentence|tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    // Seeded sentences Turkish translation lookup dictionary
+    const translationDict = {
+        // İngilizce Cümleler (Numbers)
+        "Zero is a very important number in math.": "Matematikte sıfır çok önemli bir sayıdır.",
+        "I have only one sister.": "Sadece bir kız kardeşim var.",
+        "There are two cats under the table.": "Masanın altında iki kedi var.",
+        "We stayed in Paris for three days.": "Paris'te üç gün kaldık.",
+        "A square has four equal sides.": "Bir karenin dört eşit kenarı vardır.",
+        "He gave me five red apples.": "Bana beş kırmızı elma verdi.",
+        "She bought six boxes of milk.": "Altı kutu süt satın aldı.",
+        "There are seven days in a week.": "Bir haftada yedi gün vardır.",
+        "The library opens at eight in the morning.": "Kütüphane sabah saat sekizde açılır.",
+        "My little brother is nine years old.": "Küçük erkek kardeşim dokuz yaşında.",
+        "Ten people attended the meeting.": "Toplantıya on kişi katıldı.",
+        "Eleven players form a soccer team.": "On bir oyuncu bir futbol takımı oluşturur.",
+        "A year has twelve months.": "Bir yıl on iki aydır.",
+        "There are twenty students in our class.": "Sınıfımızda yirmi öğrenci var.",
+        "The temperature is thirty degrees Celsius.": "Sıcaklık otuz santigrat derecedir.",
+        "My father is forty years old.": "Babam kırk yaşında.",
+        "The speed limit is fifty kilometers per hour.": "Hız sınırı saatte elli kilometredir.",
+        "An hour consists of sixty minutes.": "Bir saat altmış dakikadan oluşur.",
+        "One hundred cents make one dollar.": "Yüz sent bir dolar eder.",
+        "A thousand meters is equal to one kilometer.": "Bin metre bir kilometreye eşittir.",
+        // İngilizce Cümleler (Animals)
+        "The cat is sleeping on the sofa.": "Kedi koltukta uyuyor.",
+        "The dog barked at the stranger.": "Köpek yabancıya havladı.",
+        "A blue bird is singing in the garden.": "Bahçede mavi bir kuş şarkı söylüyor.",
+        "The gold fish swims in the aquarium.": "Japon balığı akvaryumda yüzüyor.",
+        "She loves riding a horse on weekends.": "Hafta sonları ata binmeyi çok seviyor.",
+        "Cows give us fresh milk.": "İnekler bize taze süt verir.",
+        "The sheep are grazing in the field.": "Koyunlar merada otluyor.",
+        "The chicken laid a big egg today.": "Tavuk bugün büyük bir yumurta yumurtladı.",
+        "The lion is known as the king of the forest.": "Aslan ormanın kralı olarak bilinir.",
+        "The elephant is the largest land mammal.": "Fil en büyük kara memelisidir.",
+        "A monkey is eating bananas on the tree.": "Bir maymun ağaçta muz yiyor.",
+        "The brown bear catches fish from the river.": "Bozayı nehirden balık yakalıyor.",
+        "The cat chased the mouse away.": "Kedi fareyi kovalayıp uzaklaştırdı.",
+        "The white rabbit loves eating carrots.": "Beyaz tavşan havuç yemeyi çok sever.",
+        "The duck is swimming in the pond.": "Ördek gölette yüzüyor.",
+        "Bees make sweet honey.": "Arılar tatlı bal yapar.",
+        "A green frog jumped into the water.": "Yeşil bir kurbağa suya atladı.",
+        "A spider is making a web in the corner.": "Köşede bir örümcek ağ yapıyor.",
+        "Some snakes are very poisonous.": "Bazı yılanlar çok zehirlidir.",
+        "The butterfly has beautiful colorful wings.": "Kelebeğin güzel renkli kanatları var.",
+        // İngilizce Cümleler (Colors)
+        "He drove a shiny red car.": "Parlak kırmızı bir araba sürdü.",
+        "The sky is clear and blue today.": "Gökyüzü bugün açık ve mavidir.",
+        "The grass is always green in spring.": "İlkbaharda çimler her zaman yeşildir.",
+        "Sunflowers are bright yellow.": "Ayçiçekleri parlak sarıdır.",
+        "She wore a elegant black dress.": "Zarif siyah bir elbise giydi.",
+        "The peaks of the mountains are covered in white snow.": "Dağların zirveleri beyaz karla kaplıdır.",
+        "Oranges are orange in color.": "Portakallar turuncu renktedir.",
+        "Grapes can be purple or green.": "Üzümler mor veya yeşil olabilir.",
+        "Roses are often pink or red.": "Güller genellikle pembe veya kırmızıdır.",
+        "The wooden table is dark brown.": "Ahşap masa koyu kahverengidir.",
+        "The sky turned grey before the rain.": "Yağmurdan önce gökyüzü griye döndü.",
+        "She received a gold medal for her performance.": "Performansı için altın madalya aldı.",
+        "My grandfather has a silver pocket watch.": "Dedemin gümüş bir köstekli saati var.",
+        "The walls of the living room are painted beige.": "Oturma odasının duvarları bej rengine boyanmıştır.",
+        "The sea in the Maldives is turquoise.": "Maldivler'de deniz turkuaz renktedir.",
+        "Violets are violet, and roses are red.": "Menekşeler menekşe rengidir, güller ise kırmızı.",
+        "The school uniform is navy blue.": "Okul üniforması laciverttir.",
+        "His new jacket is maroon.": "Yeni ceketi bordo renktedir.",
+        "Indigo is one of the colors of the rainbow.": "Çivit mavisi gökkuşağının renklerinden biridir.",
+        "The statue is made of solid bronze.": "Heykel som bronzdan yapılmıştır.",
+
+        // Almanca Cümleler (German)
+        "Null ist die erste Zahl.": "Sıfır ilk sayıdır.",
+        "Ich habe nur eins Schwester.": "Sadece bir kız kardeşim var.",
+        "Da sind zwei Katzen unter dem Tisch.": "Masanın altında iki kedi var.",
+        "Wir blieben drei Tage in Paris.": "Paris'te üç gün kaldık.",
+        "Ein Auto hat vier Räder.": "Bir arabanın dört tekerleği vardır.",
+        "Er gab mir fünf rote Äpfel.": "Bana beş kırmızı elma verdi.",
+        "Sie kaufte sechs Packungen Milch.": "Altı paket süt satın aldı.",
+        "Die Woche hat sieben Tage.": "Haftanın yedi günü vardır.",
+        "Die Bibliothek öffnet um acht Uhr morgens.": "Kütüphane sabah saat sekizde açılır.",
+        "Mein kleiner Bruder ist neun Jahre alt.": "Küçük erkek kardeşim dokuz yaşında.",
+        "Zehn Personen nahmen an dem Treffen teil.": "Toplantıya on kişi katıldı.",
+        "Elf Spieler bilden eine Fußballmannschaft.": "On bir oyuncu bir futbol takımı oluşturur.",
+        "Ein Jahr hat zwölf Monate.": "Bir yıl on iki aydır.",
+        "Es sind zwanzig Schüler in unserer Klasse.": "Sınıfımızda yirmi öğrenci var.",
+        "Die Temperatur beträgt dreißig Grad.": "Sıcaklık otuz derecedir.",
+        "Mein Vater ist vierzig Jahre alt.": "Babam kırk yaşında.",
+        "Das Tempolimit beträgt fünfzig Kilometer pro Stunde.": "Hız sınırı saatte elli kilometredir.",
+        "Eine Stunde hat sechzig Minuten.": "Bir saat altmış dakikadır.",
+        "Einhundert Cent ergeben einen Euro.": "Yüz sent bir euro eder.",
+        "Ein Kilometer hat tausend Meter.": "Bir kilometre bin metredir.",
+        "Die Katze schläft auf dem Sofa.": "Die Katze schläft auf dem Sofa.",
+        "Der Hund bellt den Fremden an.": "Köpek yabancıya havlıyor.",
+        "Ein blauer Vogel singt im Garten.": "Bahçede mavi bir kuş şarkı söylüyor.",
+        "Der Goldfisch schwimmt im Aquarium.": "Japon balığı akvaryumda yüzüyor.",
+        "Sie reitet am Wochenende gerne ein Pferd.": "Hafta sonları ata binmeyi çok seviyor.",
+        "Kühe geben uns frische Milch.": "İnekler bize taze süt verir.",
+        "Die Schafe grasen auf der Wiese.": "Koyunlar çayırda otluyor.",
+        "Das Huhn hat heute ein großes Ei gelegt.": "Tavuk bugün büyük bir yumurta yumurtladı.",
+        "Der Löwe ist als König des Waldes bekannt.": "Aslan ormanın kralı olarak bilinir.",
+        "Der Elefant ist das größte Landsäugetier.": "Fil en büyük kara memelisidir.",
+        "Ein Affe frisst Bananen auf dem Baum.": "Bir maymun ağaçta muz yiyor.",
+        "Der Braunbär fängt Fische aus dem Fluss.": "Bozayı nehirden balık yakalıyor.",
+        "Die Katze jagte die Maus weg.": "Kedi fareyi kovalayıp uzaklaştırdı.",
+        "Das weiße Kaninchen frisst gerne Karotten.": "Beyaz tavşan havuç yemeyi çok sever.",
+        "Die Ente schwimmt im Teich.": "Ördek gölette yüzüyor.",
+        "Bienen machen süßen Honig.": "Arılar tatlı bal yapar.",
+        "Ein grüner Frosch sprang ins Wasser.": "Yeşil bir kurbağa suya atladı.",
+        "Eine Spinne baut ein Netz in der Ecke.": "Köşede bir örümcek ağ yapıyor.",
+        "Einige Schlangen sind sehr giftig.": "Bazı yılanlar çok zehirlidir.",
+        "Der Schmetterling hat wunderschöne bunte Flügel.": "Kelebeğin muhteşem renkli kanatları vardır.",
+        "Er fuhr ein glänzendes rotes Auto.": "Parlak kırmızı bir araba sürdü.",
+        "Der Himmel ist heute klar und blau.": "Gökyüzü bugün açık ve mavidir.",
+        "Das Gras ist im Frühling immer grün.": "İlkbaharda çimler her zaman yeşildir.",
+        "Sonnenblumen sind leuchtend gelb.": "Ayçiçekleri parlak sarıdır.",
+        "Sie trug ein elegantes schwarzes Kleid.": "Zarif siyah bir elbise giydi.",
+        "Die Gipfel der Berge sind mit weißem Schnee bedeckt.": "Dağların zirveleri beyaz karla kaplıdır.",
+        "Orangen sind orange gefärbt.": "Portakallar turuncu renktedir.",
+        "Weintrauben können lila oder grün sein.": "Üzümler mor veya yeşil olabilir.",
+        "Rosen sind oft rosa oder rot.": "Güller genellikle pembe veya kırmızıdır.",
+        "Der Holztisch ist dunkelbraun.": "Ahşap masa koyu kahverengidir.",
+        "Der Himmel wurde vor dem Regen grau.": "Yağmurdan önce gökyüzü griye döndü.",
+        "Sie erhielt eine Goldmedaille für ihre Leistung.": "Performansı için altın madalya aldı.",
+        "Mein Großvater hat eine silberne Taschenuhr.": "Dedemin gümüş bir köstekli saati var.",
+        "Die Wände des Wohnzimmers sind beige gestrichen.": "Oturma odasının duvarları bej rengine boyanmıştır.",
+        "Das Meer auf den Malediven ist türkis.": "Maldivler'de deniz turkuaz renktedir.",
+        "Veilchen sind violett und Rosen sind rot.": "Menekşeler menekşe rengidir, güller ise kırmızı.",
+        "Die Schuluniform ist dunkelblau.": "Okul üniforması koyu laciverttir.",
+        "Seine neue Jacke ist bordeauxrot.": "Yeni ceketi bordo kırmızıdır.",
+        "Indigo ist eine der Farben des Regenbogens.": "Çivit mavisi gökkuşağının renklerinden biridir.",
+        "Die Statue besteht aus massiver Bronze.": "Heykel som bronzdan yapılmıştır."
+    };
+
+    // Game state variables
+    let score = 0;
+    let currentCardIndex = 0;
+    let gameCards = [];
+    let currentOriginalWords = []; // Array of words in correct sequence
+    let currentWorkspaceWords = []; // Array of { text: string, originalIndex: number } representing chosen words
+
+    // Fisher-Yates shuffle helper
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // Initialize game on load
+    function initGame() {
+        score = 0;
+        currentCardIndex = 0;
+        
+        // Filter cards just in case
+        gameCards = deckCards.filter(c => c.example_sentence && c.example_sentence.trim().length > 0);
+        
+        // Randomize the order of questions
+        gameCards = shuffle([...gameCards]);
+
+        document.getElementById('victory-area').classList.add('hidden');
+        document.getElementById('game-container').classList.remove('hidden');
+
+        document.getElementById('score-counter').textContent = score;
+
+        if (gameCards.length > 0) {
+            loadCard(0);
+        }
+    }
+
+    // Load active card details
+    function loadCard(index) {
+        currentCardIndex = index;
+        currentWorkspaceWords = [];
+        
+        // Update stats UI
+        document.getElementById('progress-counter').textContent = `Soru: ${currentCardIndex + 1} / ${gameCards.length}`;
+        document.getElementById('feedback-area').classList.add('hidden');
+        
+        const card = gameCards[currentCardIndex];
+        
+        // Set translation clue
+        const rawSentence = card.example_sentence;
+        const translation = translationDict[rawSentence] || `"${card.meaning}" kelimesini içeren örnek bir cümle oluşturun.`;
+        document.getElementById('clue-text').textContent = translation;
+        document.getElementById('keyword-hint').innerHTML = `Anahtar Kelime: <span class="text-zinc-200 font-bold">${card.word}</span> (${card.meaning})`;
+
+        // Split sentence into words (ignoring extra white spaces)
+        currentOriginalWords = rawSentence.split(/\s+/).filter(w => w.trim().length > 0);
+
+        // Map words into objects with an ID to track instances in workspace
+        const poolItems = currentOriginalWords.map((word, idx) => ({
+            text: word,
+            id: idx
+        }));
+
+        // Shuffle words for pool
+        const shuffledPool = shuffle([...poolItems]);
+
+        // Render Word Pool
+        const poolEl = document.getElementById('word-pool');
+        poolEl.innerHTML = '';
+        
+        shuffledPool.forEach(item => {
+            const btn = document.createElement('button');
+            btn.id = `pool-word-${item.id}`;
+            btn.className = 'word-btn bg-zinc-900 border border-zinc-800 text-zinc-200 hover:border-purple-500 hover:text-white rounded-xl py-2.5 px-4 transition-all duration-200 cursor-pointer font-semibold shadow';
+            btn.textContent = item.text;
+            btn.addEventListener('click', () => selectWord(item));
+            poolEl.appendChild(btn);
+        });
+
+        // Render Workspace
+        renderWorkspace();
+    }
+
+    // Move word from pool to workspace
+    function selectWord(item) {
+        // Disable in pool
+        const poolBtn = document.getElementById(`pool-word-${item.id}`);
+        poolBtn.classList.add('opacity-0', 'pointer-events-none');
+        
+        // Add to workspace words
+        currentWorkspaceWords.push(item);
+        
+        renderWorkspace();
+        checkSentenceStatus();
+    }
+
+    // Remove word from workspace and put it back in pool
+    function deselectWord(workspaceIndex) {
+        const item = currentWorkspaceWords[workspaceIndex];
+        
+        // Remove from workspace array
+        currentWorkspaceWords.splice(workspaceIndex, 1);
+        
+        // Re-enable in pool
+        const poolBtn = document.getElementById(`pool-word-${item.id}`);
+        if (poolBtn) {
+            poolBtn.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        renderWorkspace();
+        checkSentenceStatus();
+    }
+
+    // Reset workspace completely
+    function resetWorkspace() {
+        currentWorkspaceWords = [];
+        
+        // Re-enable all buttons in pool
+        const buttons = document.querySelectorAll('#word-pool button');
+        buttons.forEach(btn => {
+            btn.classList.remove('opacity-0', 'pointer-events-none');
+        });
+
+        renderWorkspace();
+        
+        // Reset workspace borders
+        const wsEl = document.getElementById('workspace');
+        wsEl.className = 'workspace-area min-h-[96px] w-full bg-zinc-950/40 border border-zinc-800 rounded-2xl p-4 flex flex-wrap gap-2 items-center justify-center shadow-inner text-center';
+    }
+
+    // Render workspace words
+    function renderWorkspace() {
+        const wsEl = document.getElementById('workspace');
+        wsEl.innerHTML = '';
+
+        if (currentWorkspaceWords.length === 0) {
+            wsEl.innerHTML = '<span class="text-xs sm:text-sm text-zinc-550 select-none">Kelimeleri sıralamak için aşağıdaki butonlara tıklayın...</span>';
+            return;
+        }
+
+        currentWorkspaceWords.forEach((item, idx) => {
+            const badge = document.createElement('div');
+            badge.className = 'word-btn bg-purple-950/30 border border-purple-900/40 text-purple-300 rounded-xl px-4 py-2 text-sm sm:text-base font-bold shadow flex items-center gap-1.5 cursor-pointer hover:border-rose-500/55 hover:text-rose-400 select-none';
+            badge.innerHTML = `${item.text} <i class="fa-solid fa-xmark text-[10px] opacity-60"></i>`;
+            badge.addEventListener('click', () => deselectWord(idx));
+            wsEl.appendChild(badge);
+        });
+    }
+
+    // Normalizes text strings to ignore punctuation, capitalization and whitespaces
+    function cleanText(text) {
+        return text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").toLowerCase().trim();
+    }
+
+    // Check if the current workspace sentence is correct
+    function checkSentenceStatus() {
+        const wsEl = document.getElementById('workspace');
+        
+        // If workspace is not fully populated, do not trigger auto-verification
+        if (currentWorkspaceWords.length < currentOriginalWords.length) {
+            // Reset styles to default
+            wsEl.className = 'workspace-area min-h-[96px] w-full bg-zinc-950/40 border border-zinc-800 rounded-2xl p-4 flex flex-wrap gap-2 items-center justify-center shadow-inner text-center';
+            return;
+        }
+
+        // Compare reconstructed sentence to original
+        const reconstructedSentence = currentWorkspaceWords.map(w => w.text).join(' ');
+        
+        const cleanReconstructed = cleanText(reconstructedSentence);
+        const cleanOriginal = cleanText(gameCards[currentCardIndex].example_sentence);
+
+        if (cleanReconstructed === cleanOriginal) {
+            // CORRECT!
+            wsEl.className = 'workspace-area min-h-[96px] w-full bg-emerald-950/20 border-emerald-500 text-emerald-400 rounded-2xl p-4 flex flex-wrap gap-2 items-center justify-center shadow-inner text-center font-bold';
+            
+            // Disable workspace click interaction on success
+            const badges = wsEl.querySelectorAll('.word-btn');
+            badges.forEach(b => b.className = 'bg-emerald-950/40 border border-emerald-800/60 text-emerald-450 rounded-xl px-4 py-2 text-sm sm:text-base font-bold shadow flex items-center gap-1.5 select-none pointer-events-none');
+            
+            // Disable word pool just in case
+            const poolEl = document.getElementById('word-pool');
+            poolEl.classList.add('pointer-events-none', 'opacity-50');
+
+            // Show feedback (next button)
+            document.getElementById('feedback-area').classList.remove('hidden');
+
+            // Play small confetti wave
+            confetti({
+                particleCount: 20,
+                spread: 50,
+                origin: { y: 0.8 },
+                colors: ['#a855f7', '#ec4899', '#f43f5e']
+            });
+
+            // Increment score
+            score += 15;
+            document.getElementById('score-counter').textContent = score;
+
+        } else {
+            // WRONG! (Sentence fully populated but wrong order)
+            wsEl.className = 'workspace-area min-h-[96px] w-full bg-rose-950/25 border-rose-500 text-rose-400 rounded-2xl p-4 flex flex-wrap gap-2 items-center justify-center shadow-inner text-center font-bold animate-shake';
+            
+            // Re-apply shake class after delay to allow re-shakes on wrong clicks
+            setTimeout(() => {
+                wsEl.classList.remove('animate-shake');
+            }, 500);
+        }
+    }
+
+    // Proceed to next card or victory screen
+    function loadNextCard() {
+        // Re-enable pool click interaction
+        const poolEl = document.getElementById('word-pool');
+        poolEl.classList.remove('pointer-events-none', 'opacity-50');
+
+        if (currentCardIndex + 1 < gameCards.length) {
+            loadCard(currentCardIndex + 1);
+        } else {
+            showVictory();
+        }
+    }
+
+    // Handle game completion
+    function showVictory() {
+        document.getElementById('game-container').classList.add('hidden');
+        document.getElementById('victory-final-score').textContent = score;
+        document.getElementById('victory-total-sentences').textContent = gameCards.length;
+        document.getElementById('victory-area').classList.remove('hidden');
+
+        // Confetti blowout!
+        const duration = 3.5 * 1000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.85 },
+                colors: ['#a855f7', '#ec4899', '#f43f5e']
+            });
+            confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.85 },
+                colors: ['#a855f7', '#ec4899', '#f43f5e']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+    }
+
+    // Initialize game on content load
+    window.addEventListener('DOMContentLoaded', () => {
+        if (deckCards && deckCards.length > 0) {
+            initGame();
+        }
+    });
+</script>
+{% endblock %}
