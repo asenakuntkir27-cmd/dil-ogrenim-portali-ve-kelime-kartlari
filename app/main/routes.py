@@ -233,6 +233,35 @@ def sentence_builder(deck_id):
     return render_template('main/sentence_builder.html', title=f'{clean_name} - Cümle Kurma', deck=deck, cards=valid_cards)
 
 
+@main.route('/deck/<int:deck_id>/memory-flip')
+@login_required
+def memory_flip(deck_id):
+    deck = db.session.get(Deck, deck_id)
+    if deck is None or deck.user_id != current_user.id:
+        abort(404)
+        
+    cards = db.session.scalars(
+        sa.select(Card).where(Card.deck_id == deck.id)
+    ).all()
+    
+    if not cards:
+        flash('Bu destede oyun oynamak için kart bulunmuyor. Lütfen önce kart ekleyin.', 'warning')
+        return redirect(url_for('main.deck_detail', deck_id=deck.id))
+        
+    languages = {
+        'en': 'İngilizce',
+        'de': 'Almanca',
+        'es': 'İspanyolca',
+        'fr': 'Fransızca',
+        'it': 'İtalyanca'
+    }
+    lang_code = session.get('learning_language', 'en')
+    lang_name = languages.get(lang_code, 'İngilizce')
+    clean_name = deck.name.replace(f"{lang_name} - ", "")
+    
+    return render_template('main/memory_flip.html', title=f'{clean_name} - Hafıza Kartları', deck=deck, cards=cards)
+
+
 @main.app_context_processor
 def inject_learning_language():
     languages = {
