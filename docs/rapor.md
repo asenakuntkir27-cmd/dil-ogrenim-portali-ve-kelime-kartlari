@@ -94,8 +94,6 @@ dil-ogrenim-portali-ve-kelime-kartlari/
 7. **İnteraktif Avatar Güncelleme (`/update-avatar`):** Profil resmine tıklanarak açılan buzlu cam efektli modal üzerinden yeni bir avatar seçildiğinde, CSRF token korumalı Fetch API isteği tetiklenir. Sunucu tarafında `User.avatar_url` güncellenirken, kullanıcı arayüzü (navbar ve profil sayfası) sayfa yenilenmeden dinamik olarak güncellenir.
 8. **İlerleme ve İstatistik Analiz Paneli (`/analytics`):** Chart.js entegrasyonu sayesinde kullanıcının dil öğrenme aktiviteleri Line, Bar ve Doughnut grafik modelleriyle görselleştirilir. Grafik verileri, kullanıcının veritabanındaki kelime ve destelerinden anlık hesaplanır. Panel ayrıca kullanıcıya akıllı çalışma önerileri sunan özel bir algoritma barındırır.
 
-  ![Mor/Pembe Neon Grafiklerle Analiz Paneli](img/oturum16_analiz_paneli.png)
-
 ---
 
 ## 3. Vibe Coding Deneyimi: Ne İşe Yaradı, Nerede Zorlandık?
@@ -174,8 +172,6 @@ Ran 40 tests in 18.769s
 
 OK
 ```
-
-![Birim Testleri Başarı Çıktısı (40 Test OK)](img/oturum16_basarili_test.png)
 Tüm test suitinin başarıyla (OK) geçmesi, uygulamanın kritik bileşenlerinin hatasız çalıştığını ve yeni eklenecek özellikler için regresyon riskinin en aza indirildiğini garanti etmektedir.
 
 ---

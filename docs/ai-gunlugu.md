@@ -302,12 +302,8 @@ Kullanıcı performanslarını takip edecek Chart.js tabanlı şık bir analiz p
 ### Yapılanlar
 - **İstatistik Rotası (`/analytics`):** Kullanıcının destelerindeki kart sayılarını ve çalışma istatistiklerini hesaplayıp template'e gönderen rota eklendi.
 - **Chart.js Entegrasyonu:** Haftalık kelime/oyun performansını (Line), aylık ilerleme trendini (Bar) ve destelerin kelime hacmi dağılımlarını (Doughnut) mor/pembe neon gradyanlarla görselleştiren grafik yapısı kuruldu.
-
-  ![Mor/Pembe Neon Grafiklerle Analiz Paneli](img/oturum16_analiz_paneli.png)
 - **Emoji Temizliği:** Arayüzdeki mor kutulu FontAwesome ikonlarıyla çakışan yeşil yapboz (🧩) emojileri oyun kartlarının başlıklarından tamamen silindi.
 - **Doğrulama ve Testler:** Analiz rotası yetkilendirme ve veri yükleme testleri yazılarak toplam test sayısı 40 başarılı teste (OK) ulaştı.
-
-  ![Birim Testleri Başarı Çıktısı (40 Test OK)](img/oturum16_basarili_test.png)
 
 ### Sonraki Adımlar
 - Sistemi canlı ortama (Docker) aktarmak ve son sunumu gerçekleştirmek.
