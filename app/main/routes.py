@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, abort, request, session
+from flask import render_template, flash, redirect, url_for, abort, request, session, jsonify
 from flask_login import current_user, login_required
 import sqlalchemy as sa
 from urllib.parse import urlsplit
@@ -498,3 +498,30 @@ def analytics():
                            daily_games=daily_games,
                            monthly_labels=monthly_labels,
                            monthly_words=monthly_words)
+
+
+@main.route('/search')
+@login_required
+def search():
+    query_str = request.args.get('q', '').strip()
+    if not query_str or len(query_str) < 2:
+        return jsonify([])
+
+    stmt = (
+        sa.select(Card)
+        .join(Deck)
+        .where(Deck.user_id == current_user.id)
+        .where(Card.word.ilike(f"%{query_str}%"))
+        .limit(8)
+    )
+    results = db.session.scalars(stmt).all()
+
+    return jsonify([
+        {
+            'word': card.word,
+            'meaning': card.meaning,
+            'example_sentence': card.example_sentence or "",
+            'example_meaning': ""
+        }
+        for card in results
+    ])

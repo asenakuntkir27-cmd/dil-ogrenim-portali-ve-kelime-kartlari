@@ -10,6 +10,31 @@
             </p>
         </div>
         
+        <!-- Kelime Arama Motoru Bölümü -->
+        <div class="max-w-2xl mx-auto mb-10 relative z-30">
+            <div class="relative group">
+                <!-- Glowing background effect on hover/focus -->
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl opacity-10 group-hover:opacity-20 group-focus-within:opacity-30 blur transition duration-300"></div>
+                <div class="relative flex items-center">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-zinc-400 group-focus-within:text-pink-400 transition-colors">
+                        <i class="fa-solid fa-magnifying-glass text-base"></i>
+                    </span>
+                    <input type="text" id="vocab-search-input" placeholder="Destelerinizde kelime arayın..." 
+                           class="w-full pl-11 pr-10 py-3.5 bg-zinc-900/60 border border-zinc-800 rounded-2xl text-sm text-zinc-100 placeholder-zinc-500 outline-none transition-all duration-300 focus:border-pink-500/80 focus:bg-zinc-950/80 focus:ring-1 focus:ring-pink-500/20 backdrop-blur-md">
+                    <span id="search-clear-btn" class="absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-500 hover:text-zinc-300 cursor-pointer hidden">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Arama Sonuçları Dropdown -->
+            <div id="search-results-dropdown" class="absolute left-0 right-0 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-purple-500/40 bg-zinc-950/85 backdrop-blur-xl shadow-2xl shadow-purple-500/10 hidden z-50 divide-y divide-zinc-900/60 scrollbar-thin">
+                <div class="p-4 text-center text-xs text-zinc-500">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>Aranıyor...
+                </div>
+            </div>
+        </div>
+
         <!-- Üç Ana Modül Kutusu (Module Selector Cards) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <!-- Kelime Destelerim Modülü -->
@@ -590,6 +615,117 @@
             if (scroll) {
                 optionsList.scrollIntoView({ behavior: 'smooth' });
             }
+        }
+
+        // Arama Motoru İşlevselliği
+        let searchDebounceTimer;
+        const searchInput = document.getElementById('vocab-search-input');
+        const resultsDropdown = document.getElementById('search-results-dropdown');
+        const searchClearBtn = document.getElementById('search-clear-btn');
+
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        async function performSearch(query) {
+            resultsDropdown.innerHTML = `
+                <div class="p-4 text-center text-xs text-zinc-500">
+                    <i class="fa-solid fa-spinner fa-spin mr-2 text-pink-400"></i>Aranıyor...
+                </div>
+            `;
+            resultsDropdown.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Search request failed');
+                const results = await response.json();
+
+                if (results.length === 0) {
+                    resultsDropdown.innerHTML = `
+                        <div class="p-4 text-center text-xs text-zinc-500">
+                            <i class="fa-solid fa-circle-info mr-2 text-purple-400"></i>Sonuç bulunamadı.
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                results.forEach(item => {
+                    html += `
+                        <div class="p-3.5 hover:bg-white/5 transition-all duration-200 flex flex-col gap-1 border-b border-zinc-900/50 last:border-0">
+                            <div class="flex items-baseline justify-between">
+                                <span class="font-bold text-base text-pink-400">${escapeHtml(item.word)}</span>
+                            </div>
+                            <div class="text-sm font-medium text-zinc-200">${escapeHtml(item.meaning)}</div>
+                            ${item.example_sentence ? `
+                                <div class="text-xs text-zinc-400 italic mt-0.5 border-l-2 border-purple-500/50 pl-2">
+                                    "${escapeHtml(item.example_sentence)}"
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+                resultsDropdown.innerHTML = html;
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsDropdown.innerHTML = `
+                    <div class="p-4 text-center text-xs text-rose-400">
+                        <i class="fa-solid fa-circle-exclamation mr-2"></i>Arama sırasında bir hata oluştu.
+                    </div>
+                `;
+            }
+        }
+
+        if (searchInput && resultsDropdown) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+
+                if (query.length > 0) {
+                    searchClearBtn.classList.remove('hidden');
+                } else {
+                    searchClearBtn.classList.add('hidden');
+                }
+
+                clearTimeout(searchDebounceTimer);
+
+                if (query.length < 2) {
+                    resultsDropdown.innerHTML = '';
+                    resultsDropdown.classList.add('hidden');
+                    return;
+                }
+
+                searchDebounceTimer = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) {
+                    resultsDropdown.classList.remove('hidden');
+                }
+            });
+
+            if (searchClearBtn) {
+                searchClearBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    searchClearBtn.classList.add('hidden');
+                    resultsDropdown.innerHTML = '';
+                    resultsDropdown.classList.add('hidden');
+                    searchInput.focus();
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !resultsDropdown.contains(e.target) && (!searchClearBtn || !searchClearBtn.contains(e.target))) {
+                    resultsDropdown.classList.add('hidden');
+                }
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
