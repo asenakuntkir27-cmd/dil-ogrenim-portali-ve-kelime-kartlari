@@ -466,66 +466,208 @@
         {% endif %}
         
     {% else %}
+        <style>
+            /* 3D Perspective and Stand */
+            .perspective-container {
+                perspective: 1200px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+            
+            /* Stand (Podium) shadow & glow */
+            .podium-stand {
+                background: linear-gradient(90deg, #1f1f23 0%, #27272a 50%, #1f1f23 100%);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(236, 72, 153, 0.15);
+            }
+            
+            /* Card 3D Setup */
+            .css-3d-card {
+                transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.03);
+            }
+            
+            .css-3d-card-left {
+                transform: rotateY(25deg) rotateX(8deg) translateZ(10px);
+            }
+            
+            .css-3d-card-right {
+                transform: rotateY(-25deg) rotateX(8deg) translateZ(10px);
+                border-color: rgba(236, 72, 153, 0.25);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(236, 72, 153, 0.05), inset 0 0 15px rgba(236, 72, 153, 0.05);
+            }
+            
+            /* Hover interactions for cards */
+            .css-3d-card-left:hover {
+                transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.06);
+                z-index: 30;
+                border-color: rgba(168, 85, 247, 0.5);
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.2);
+            }
+            
+            .css-3d-card-right:hover {
+                transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.06);
+                z-index: 30;
+                border-color: rgba(236, 72, 153, 0.6);
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(236, 72, 153, 0.3);
+            }
+            
+            /* Glowing texts */
+            .neon-text-title {
+                text-shadow: 0 0 20px rgba(236, 72, 153, 0.45), 0 0 40px rgba(236, 72, 153, 0.2);
+            }
+            
+            /* Floating animations */
+            .float-anim {
+                animation: cardFloat 5s ease-in-out infinite;
+            }
+            
+            @keyframes cardFloat {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+
+            /* Responsive scaling for mobile devices to prevent overflow */
+            @media (max-width: 640px) {
+                .perspective-container {
+                    transform: scale(0.85);
+                }
+            }
+            @media (max-width: 480px) {
+                .perspective-container {
+                    transform: scale(0.7);
+                    height: 180px;
+                    margin-top: 1.5rem;
+                    margin-bottom: 1.5rem;
+                }
+            }
+            @media (max-width: 380px) {
+                .perspective-container {
+                    transform: scale(0.65);
+                    height: 160px;
+                }
+            }
+
+            /* Pulse blink and slide animation for the redirect arrow */
+            .blink-arrow {
+                animation: blinkArrow 1.5s infinite;
+            }
+            @keyframes blinkArrow {
+                0%, 100% { opacity: 0.4; transform: translateX(0); }
+                50% { opacity: 1; transform: translateX(4px); }
+            }
+        </style>
+
         <!-- Hero Section -->
-        <div class="relative isolate overflow-hidden">
-            <div class="mx-auto max-w-3xl py-16 sm:py-20 lg:py-24 text-center">
+        <div class="relative isolate overflow-hidden min-h-[75vh] flex flex-col justify-center">
+            <!-- Background glow -->
+            <div class="absolute inset-0 bg-radial-gradient from-purple-950/15 via-transparent to-transparent opacity-70 pointer-events-none"></div>
+
+            <div class="mx-auto max-w-3xl py-12 text-center relative z-10">
                 <!-- Promo Badge -->
-                <div class="mb-8 flex justify-center">
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-pink-500/10 px-3 py-1 text-xs font-medium text-pink-400 ring-1 ring-inset ring-pink-500/20">
-                        <span class="flex h-1.5 w-1.5 rounded-full bg-pink-400 animate-pulse"></span>
-                        İnteraktif Dil Öğrenme
+                <div class="mb-6 flex justify-center">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-pink-500/10 px-3.5 py-1 text-xs font-semibold text-pink-400 ring-1 ring-inset ring-pink-500/20 shadow-inner">
+                        <span class="flex h-1.5 w-1.5 rounded-full bg-pink-400 animate-ping"></span>
+                        Dil Öğrenimini Oyunlaştırın 🚀
                     </span>
                 </div>
 
                 <!-- Main Heading -->
-                <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-6xl bg-gradient-to-b from-white via-zinc-200 to-zinc-650 bg-clip-text text-transparent">
+                <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-6xl mb-6 bg-gradient-to-r from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent neon-text-title">
                     Kelimeleri Kalıcı Olarak Öğrenin
                 </h1>
                 
                 <!-- Description -->
-                <p class="mt-6 text-lg leading-8 text-zinc-400">
+                <p class="mt-4 text-base sm:text-lg leading-relaxed text-zinc-400 max-w-xl mx-auto">
                     LingoRose ile kendi kelime destelerinizi oluşturun, 3D interaktif kart çevirme (flip card) modu ile kendinizi test edin ve dil öğrenme sürecinizi keyifli hale getirin.
                 </p>
 
+                <!-- Aesthetic 3D Card Display Stand -->
+                <div class="relative w-full max-w-lg h-60 mx-auto my-10 perspective-container">
+                    <!-- The Stand (Podium) -->
+                    <div class="absolute bottom-0 w-80 h-4 rounded-full podium-stand z-10 flex items-center justify-center">
+                        <div class="w-72 h-1.5 bg-gradient-to-r from-pink-500/30 to-purple-500/30 blur-sm rounded-full"></div>
+                    </div>
+                    
+                    <!-- Left English Word Card -->
+                    <div class="css-3d-card css-3d-card-left absolute left-10 bottom-4 w-36 h-48 rounded-2xl bg-zinc-900 border border-zinc-800 p-4 flex flex-col justify-between cursor-pointer group/wcard select-none">
+                        <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-transparent opacity-50 pointer-events-none"></div>
+                        <div class="relative flex justify-between items-center">
+                            <span class="text-[9px] text-purple-400 font-bold uppercase tracking-wider">Word</span>
+                            <i class="fa-solid fa-volume-high text-[10px] text-zinc-500 group-hover/wcard:text-purple-400 transition-colors"></i>
+                        </div>
+                        <div class="relative flex flex-col items-center justify-center my-auto">
+                            <span class="text-xl font-black text-white tracking-wide">Apple</span>
+                            <span class="text-[9px] text-zinc-500 mt-0.5">/ˈæp.əl/</span>
+                        </div>
+                        <div class="relative flex justify-between items-center text-[8px] text-zinc-500 border-t border-zinc-850 pt-2">
+                            <span>EN</span>
+                            <span class="bg-zinc-800 px-1.5 py-0.5 rounded text-[8px] text-zinc-400">Noun</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Turkish Meaning Card -->
+                    <div class="css-3d-card css-3d-card-right absolute right-10 bottom-4 w-36 h-48 rounded-2xl bg-zinc-900 border p-4 flex flex-col justify-between cursor-pointer group/mcard select-none">
+                        <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-500/10 to-transparent opacity-40 pointer-events-none"></div>
+                        <div class="relative flex justify-between items-center">
+                            <span class="text-[9px] text-pink-400 font-bold uppercase tracking-wider">Meaning</span>
+                            <i class="fa-solid fa-star text-[10px] text-pink-500 animate-pulse"></i>
+                        </div>
+                        <div class="relative flex flex-col items-center justify-center my-auto">
+                            <i class="fa-solid fa-apple-whole text-4xl text-pink-500 mb-2 filter drop-shadow-[0_0_8px_rgba(236,72,153,0.45)]"></i>
+                            <span class="text-lg font-black text-white">Elma</span>
+                        </div>
+                        <div class="relative flex justify-between items-center text-[8px] text-zinc-500 border-t border-zinc-850 pt-2">
+                            <span>TR</span>
+                            <span class="bg-pink-500/10 text-pink-400 border border-pink-500/20 px-1.5 py-0.5 rounded text-[8px]">Correct</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Call to Actions -->
-                <div class="mt-10 flex items-center justify-center gap-x-6">
-                    <a href="{{ url_for('auth.register') }}" class="rounded-xl bg-gradient-to-r from-pink-600 to-fuchsia-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-pink-500/10 hover:shadow-pink-500/25 hover:from-pink-500 hover:to-fuchsia-500 transition-all duration-200 active:scale-[0.98]">
-                        Hemen Ücretsiz Kayıt Ol
+                <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-5">
+                    <a href="{{ url_for('auth.register') }}" class="group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-gradient-to-r from-pink-600 via-fuchsia-650 to-purple-600 rounded-xl transition-all duration-300 hover:scale-105 active:scale-[0.98] border border-pink-500/30 overflow-hidden" style="box-shadow: 0 0 25px rgba(236, 72, 153, 0.45);">
+                        <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <span class="relative flex items-center gap-2">
+                            Hemen Ücretsiz Kayıt Ol 🚀
+                        </span>
                     </a>
-                    <a href="{{ url_for('auth.login') }}" class="text-base font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 transition-colors">
-                        Giriş Yap <i class="fa-solid fa-arrow-right text-xs"></i>
+                    <a href="{{ url_for('auth.login') }}" class="text-sm font-extrabold text-zinc-300 hover:text-white flex items-center gap-2 transition-all hover:translate-x-1 group">
+                        Giriş Yap <i class="fa-solid fa-arrow-right text-xs text-pink-400 blink-arrow"></i>
                     </a>
                 </div>
             </div>
 
             <!-- Features Grid -->
-            <div class="mx-auto mt-8 max-w-5xl border-t border-zinc-900 pt-16">
-                <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
+            <div class="mx-auto mt-10 max-w-5xl border-t border-zinc-900 pt-14">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <!-- Feature 1 -->
-                    <div class="rounded-2xl border border-zinc-900 bg-zinc-900/20 p-6">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mb-4">
+                    <div class="rounded-2xl border border-zinc-900/60 bg-zinc-900/10 hover:border-zinc-800 p-6 transition-all duration-300">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mb-4 shadow-lg shadow-pink-500/5">
                             <i class="fa-solid fa-folder-open text-base"></i>
                         </div>
-                        <h3 class="text-base font-bold text-zinc-200">Kişiselleştirilmiş Desteler</h3>
-                        <p class="mt-2 text-sm text-zinc-500">Öğrenmek istediğiniz dillere veya konulara göre sınırsız sayıda kelime destesi oluşturun.</p>
+                        <h3 class="text-sm font-bold text-zinc-200">Kişiselleştirilmiş Desteler</h3>
+                        <p class="mt-2 text-xs text-zinc-500 leading-relaxed">Öğrenmek istediğiniz dillere veya konulara göre sınırsız sayıda kelime destesi oluşturun.</p>
                     </div>
 
                     <!-- Feature 2 -->
-                    <div class="rounded-2xl border border-zinc-900 bg-zinc-900/20 p-6">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mb-4">
+                    <div class="rounded-2xl border border-zinc-900/60 bg-zinc-900/10 hover:border-zinc-800 p-6 transition-all duration-300">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-950/40 border border-purple-900/30 text-purple-400 mb-4 shadow-lg shadow-purple-500/5">
                             <i class="fa-solid fa-arrows-rotate text-base"></i>
                         </div>
-                        <h3 class="text-base font-bold text-zinc-200">3D Kart Çevirme (Flip)</h3>
-                        <p class="mt-2 text-sm text-zinc-500">Gelişmiş 3D animasyonlu kart çevirme modülü sayesinde yabancı kelimeleri interaktif test edin.</p>
+                        <h3 class="text-sm font-bold text-zinc-200">3D Kart Çevirme (Flip)</h3>
+                        <p class="mt-2 text-xs text-zinc-500 leading-relaxed">Gelişmiş 3D animasyonlu kart çevirme modülü sayesinde yabancı kelimeleri interaktif test edin.</p>
                     </div>
 
                     <!-- Feature 3 -->
-                    <div class="rounded-2xl border border-zinc-900 bg-zinc-900/20 p-6">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mb-4">
+                    <div class="rounded-2xl border border-zinc-900/60 bg-zinc-900/10 hover:border-zinc-800 p-6 transition-all duration-300">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mb-4 shadow-lg shadow-pink-500/5">
                             <i class="fa-solid fa-mobile-screen-button text-base"></i>
                         </div>
-                        <h3 class="text-base font-bold text-zinc-200">Mobil Uyumlu Tasarım</h3>
-                        <p class="mt-2 text-sm text-zinc-500">Yolculukta, okulda veya dilediğiniz her yerde tüm cihazlardan rahatça çalışın.</p>
+                        <h3 class="text-sm font-bold text-zinc-200">Mobil Uyumlu Tasarım</h3>
+                        <p class="mt-2 text-xs text-zinc-500 leading-relaxed">Yolculukta, okulda veya dilediğiniz her yerde tüm cihazlardan rahatça çalışın.</p>
                     </div>
                 </div>
             </div>

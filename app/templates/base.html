@@ -80,6 +80,24 @@
             --zinc-900: #ffffff;
             --zinc-950: #f8fafc;
         }
+        /* Custom premium styles */
+        body {
+            background: radial-gradient(circle at 50% -20%, #1e112a 0%, #09090b 60%) no-repeat fixed !important;
+            transition: background 0.3s ease;
+        }
+        [data-theme="light"] body {
+            background: radial-gradient(circle at 50% -20%, #fce7f3 0%, #f8fafc 60%) no-repeat fixed !important;
+        }
+        .glass-nav {
+            background: rgba(9, 9, 11, 0.75) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+        [data-theme="light"] .glass-nav {
+            background: rgba(248, 250, 252, 0.75) !important;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.05) !important;
+        }
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -114,13 +132,13 @@
 <body class="h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-pink-600 selection:text-white">
 
     <!-- Header / Navbar -->
-    <header class="sticky top-0 z-40 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md">
+    <header class="sticky top-0 z-40 w-full glass-nav">
         <div class="mx-auto w-full max-w-none px-4 sm:px-8 lg:px-12">
             <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
                     <a href="{{ url_for('main.index') }}" class="flex items-center gap-2.5 group">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-pink-500 to-fuchsia-600 text-white shadow-lg shadow-pink-500/20 group-hover:scale-105 transition-transform duration-300">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-pink-500 to-fuchsia-650 text-white shadow-lg shadow-pink-500/20 group-hover:scale-105 transition-transform duration-300">
                             <i class="fa-solid fa-graduation-cap text-lg"></i>
                         </div>
                         <span class="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">LingoRose</span>
@@ -138,6 +156,10 @@
                         <i class="fa-solid fa-trophy mr-1.5 text-yellow-500"></i>Liderlik Tablosu
                     </a>
                     {% endif %}
+
+                    <a href="{{ url_for('main.profile') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-all duration-200 {% if request.path == url_for('main.profile') %}text-pink-400{% endif %}" title="Ayarlar">
+                        <i class="fa-solid fa-gear"></i>
+                    </a>
                     
                     <div class="h-4 w-px bg-zinc-800"></div>
 
@@ -175,7 +197,7 @@
 
                     {% if current_user.is_anonymous %}
                         <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">Giriş Yap</a>
-                        <a href="{{ url_for('auth.register') }}" class="relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-650 rounded-xl hover:from-pink-500 hover:to-fuchsia-550 transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]">
+                        <a href="{{ url_for('auth.register') }}" class="relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-650 rounded-xl hover:from-pink-500 hover:to-fuchsia-550 transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]" style="box-shadow: 0 0 15px rgba(236, 72, 153, 0.45);">
                             Kayıt Ol
                         </a>
                     {% else %}
@@ -235,11 +257,20 @@
     <!-- Footer -->
     <footer class="w-full border-t border-zinc-900 bg-zinc-950 py-6">
         <div class="mx-auto w-full max-w-none px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-            <p>&copy; 2026 LingoRose. Tüm hakları saklıdır.</p>
-            <div class="flex items-center gap-4">
-                <span>Kelime Kartları ile Dil Öğrenim Portalı</span>
-                <span class="text-zinc-700">|</span>
-                <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-pink-500"></i> ile tasarlandı</span>
+            <!-- Left Side Links -->
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2">
+                <a href="#" class="hover:text-zinc-300 transition-colors">Hakkımızda</a>
+                <span class="text-zinc-800">|</span>
+                <a href="#" class="hover:text-zinc-300 transition-colors">İletişim</a>
+                <span class="text-zinc-800">|</span>
+                <a href="#" class="hover:text-zinc-300 transition-colors">Şartlar</a>
+                <span class="text-zinc-800">|</span>
+                <a href="#" class="hover:text-zinc-300 transition-colors">Gizlilik</a>
+            </div>
+            <!-- Right Side Copyright with Glowing Star -->
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-star text-pink-500 animate-pulse filter drop-shadow-[0_0_6px_rgba(236,72,153,0.6)]"></i>
+                <span>&copy; LingoRose 2026</span>
             </div>
         </div>
     </footer>
