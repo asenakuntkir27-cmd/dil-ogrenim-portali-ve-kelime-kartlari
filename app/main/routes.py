@@ -593,3 +593,9 @@ def get_leaderboard():
         ]
 
     return jsonify(leaderboard)
+
+
+@main.route('/leaderboard')
+@login_required
+def leaderboard():
+    return render_template('main/leaderboard.html', title='Liderlik Tablosu')

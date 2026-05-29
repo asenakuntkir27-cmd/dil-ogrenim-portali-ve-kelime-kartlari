@@ -63,6 +63,12 @@
                         <i class="fa-solid fa-house mr-1.5"></i>Ana Sayfa
                     </a>
                     
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.leaderboard') }}" class="text-sm font-medium transition-all duration-200 {% if request.path == url_for('main.leaderboard') %}text-pink-400 border-b-2 border-pink-500/80 pb-1{% else %}text-zinc-400 hover:text-white{% endif %}">
+                        <i class="fa-solid fa-trophy mr-1.5 text-yellow-500"></i>Liderlik Tablosu
+                    </a>
+                    {% endif %}
+                    
                     <div class="h-4 w-px bg-zinc-800"></div>
 
                     <!-- Language Selector Dropdown -->

@@ -116,5 +116,17 @@ class LeaderboardTestCase(unittest.TestCase):
         # Check empty game lists in leaderboard
         self.assertEqual(data.get('Kelime Tetrisi'), [])
 
+    def test_leaderboard_page_requires_login(self):
+        # Without login
+        response = self.client.get('/leaderboard')
+        self.assertEqual(response.status_code, 302)
+
+        # With login
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'player1', 'password': 'pass'})
+            response = self.client.get('/leaderboard')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'En Y\xc3\xbcksek Skorlar', response.data)
+
 if __name__ == '__main__':
     unittest.main()
