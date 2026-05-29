@@ -622,3 +622,18 @@ def complete_study():
     current_user.record_activity(cards_count)
     db.session.commit()
     return jsonify({'success': True, 'message': 'Çalışma aktivitesi kaydedildi!'})
+
+
+@main.route('/deck/<int:deck_id>/delete', methods=['POST'])
+@main.route('/decks/<int:deck_id>/delete', methods=['POST'])
+@login_required
+def delete_deck(deck_id):
+    deck = db.session.get(Deck, deck_id)
+    if deck is None or deck.user_id != current_user.id:
+        abort(404)
+        
+    db.session.delete(deck)
+    db.session.commit()
+    
+    flash('Deste ve içindeki tüm kelime kartları başarıyla silindi.', 'pink')
+    return redirect(url_for('main.index'))

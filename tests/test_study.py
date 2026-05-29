@@ -336,5 +336,65 @@ class StudyTestCase(unittest.TestCase):
             self.assertIn(b'Ayl\xc4\xb1k \xc4\xb0lerleme', response.data) # Aylık İlerleme in utf-8
             self.assertIn(b'Destelere G\xc3\xb6re Da\xc4\x9f\xc4\xb1l\xc4\xb1m', response.data) # Destelere Göre Dağılım in utf-8
 
+    def test_delete_deck_requires_login(self):
+        # Accessing delete deck route unauthenticated should redirect to login page
+        response = self.client.post('/deck/1/delete')
+        self.assertEqual(response.status_code, 302)
+
+    def test_delete_deck_owner_check(self):
+        # Create two users
+        u1 = User(username='user1', email='u1@example.com')
+        u1.set_password('password')
+        u2 = User(username='user2', email='u2@example.com')
+        u2.set_password('password')
+        db.session.add_all([u1, u2])
+        db.session.commit()
+
+        # u1 creates a deck
+        d = Deck(name='User 1 Deck', user=u1)
+        db.session.add(d)
+        db.session.commit()
+
+        # u2 logs in and tries to delete u1's deck
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'user2', 'password': 'password'})
+            response = self.client.post(f'/deck/{d.id}/delete')
+            # Should raise 404
+            self.assertEqual(response.status_code, 404)
+            # Verify deck is NOT deleted
+            self.assertIsNotNone(db.session.get(Deck, d.id))
+
+    def test_delete_deck_cascades_cards(self):
+        # Create user, login, deck, cards
+        u = User(username='user_delete', email='ud@example.com')
+        u.set_password('password')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'user_delete', 'password': 'password'})
+            d = Deck(name='Deletable Deck', user=u)
+            db.session.add(d)
+            db.session.commit()
+
+            c1 = Card(word='Elma', meaning='Apple', deck=d)
+            c2 = Card(word='Armut', meaning='Pear', deck=d)
+            db.session.add_all([c1, c2])
+            db.session.commit()
+
+            # Verify deck and cards are in db
+            self.assertIsNotNone(db.session.get(Deck, d.id))
+            self.assertIsNotNone(db.session.get(Card, c1.id))
+            self.assertIsNotNone(db.session.get(Card, c2.id))
+
+            # Delete the deck
+            response = self.client.post(f'/deck/{d.id}/delete')
+            self.assertEqual(response.status_code, 302) # Redirects to index
+
+            # Verify deck and cards are deleted (cascade)
+            self.assertIsNone(db.session.get(Deck, d.id))
+            self.assertIsNone(db.session.get(Card, c1.id))
+            self.assertIsNone(db.session.get(Card, c2.id))
+
 if __name__ == '__main__':
     unittest.main()
