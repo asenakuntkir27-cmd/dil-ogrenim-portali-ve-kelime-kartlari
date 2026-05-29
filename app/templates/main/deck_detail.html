@@ -9,7 +9,7 @@
                 font-size: 11pt !important;
             }
             /* Hide non-printable elements */
-            header, footer, nav, .no-print, .mb-6, .bg-gradient-to-br, .mb-4, .grid, .flex, #lang-dropdown-btn, #theme-toggle-btn {
+            header, footer, nav, .no-print {
                 display: none !important;
             }
             /* Reset body padding/margins for print */
@@ -24,12 +24,16 @@
                 margin-bottom: 25px;
                 border-bottom: 2px solid #000000;
                 padding-bottom: 10px;
+                opacity: 1 !important;
+                visibility: visible !important;
             }
             .print-dictionary {
                 display: table !important;
                 width: 100% !important;
                 border-collapse: collapse !important;
                 margin-top: 15px;
+                opacity: 1 !important;
+                visibility: visible !important;
             }
             .print-dictionary-row {
                 display: table-row !important;
@@ -42,6 +46,9 @@
                 vertical-align: top !important;
                 color: #000000 !important;
                 background-color: transparent !important;
+            }
+            .print-dictionary-cell * {
+                color: #000000 !important;
             }
             .print-dictionary-cell.header-cell {
                 background-color: #f1f5f9 !important;
@@ -73,7 +80,7 @@
     </div>
 
     <!-- Deck Header Card -->
-    <div class="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-lg shadow-black/30 mb-8">
+    <div class="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-lg shadow-black/30 mb-8 no-print">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
                 <div class="flex items-center gap-3">
@@ -110,14 +117,14 @@
     </div>
 
     <!-- Kelime Kartları List -->
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-4 flex items-center justify-between no-print">
         <h2 class="text-xl font-bold text-white flex items-center gap-2">
             <i class="fa-solid fa-rectangle-list text-zinc-500 text-sm"></i> Kelime Kartları
         </h2>
     </div>
 
     {% if cards %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
             {% for card in cards %}
             <div class="group relative bg-zinc-900/30 border border-zinc-800/80 rounded-2xl p-6 hover:bg-zinc-900/60 hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between min-h-[160px]">
                 <div>
@@ -150,7 +157,7 @@
         </div>
     {% else %}
         <!-- Empty State -->
-        <div class="flex flex-col items-center justify-center text-center py-16 px-4 bg-zinc-900/20 border border-dashed border-zinc-800 rounded-2xl">
+        <div class="flex flex-col items-center justify-center text-center py-16 px-4 bg-zinc-900/20 border border-dashed border-zinc-800 rounded-2xl no-print">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 text-zinc-650 mb-3 border border-zinc-800">
                 <i class="fa-regular fa-rectangle-list text-lg"></i>
             </div>
