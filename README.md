@@ -13,6 +13,7 @@ LingoRose; kullanıcıların yeni diller öğrenmesine, kelime dağarcığını 
 - **Modüler Profil Yönetimi:** AJAX Fetch API destekli profil günleme, şifre değiştirme, `localStorage` uyumlu gizlilik ayarları ve anlık güncellenen interaktif avatar modalı.
 - **📄 PDF / Sözlük Çıktı Al Özelliği:** `@media print` CSS kuralları ile optimize edilmiş, A4 boyutunda iki kolonlu temiz yazdırma ve PDF kaydetme mekanizması.
 - **🔔 Tarayıcı Bildirimleri ve Hatırlatıcı:** Günlük hedeflerini tamamlamamış kullanıcıları uyaran tarayıcı bildirimleri, `sessionStorage` optimizasyonu ve tarayıcı engelleri için **Neon Toast** yedek arayüzü.
+- **🎨 Premium Arayüz ve Çift Mod Tasarımı:** Karanlık modda mor/pembe neon & glassmorphism şıklığı; aydınlık modda gözü yormayan pastel pembe/gül kurusu gradyan arka planı, yüksek kontrastlı gül kurusu başlık metinleri (#4A2834), fildişi beyazı kelime kartları ve marka uyumlu mat gül kırmızısı (#C85A7E) buton tasarımları. Beyaz arka planda kirlilik yaratan neon parlamaların sıfırlanması.
 
 ---
 
@@ -87,7 +88,7 @@ python -m unittest discover -s tests
 
 *Tüm testlerin başarı çıktısı:*
 ```text
-Ran 67 tests in 42.860s
+Ran 67 tests in 32.724s
 
 OK
 ```

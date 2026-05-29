@@ -359,3 +359,29 @@ Profil sayfasına oyunlaştırma mimarisini tamamlayacak dinamik başarı madaly
 - **Test Kapsamı:** 
   - Hata yakalayıcının ve başarımların kilitli/açık durumlarını doğrulamak için `test_achievements.py` yazıldı ve `test_errors_and_pagination.py` güncellendi.
   - Toplam birim test sayısı **67 test** seviyesine ulaştı ve tüm test paketi hatasız bir şekilde tamamlandı (`Ran 67 tests. OK`).
+
+---
+
+## Oturum 20: Giriş Sayfası Modernizasyonu ve Aydınlık Mod (Light Mode) Optimizasyonu
+**Tarih:** 29 Mayıs 2026
+
+### Hedef
+LingoRose giriş sayfasını (misafir karşılama ekranını) ve navigasyon barı ile alt bilgi (footer) alanlarını tamamen modernize etmek; hem karanlık modda premium neon/glassmorphism şıklığı sunmak hem de aydınlık modda (Light Mode) gözü yormayan yüksek kontrastlı, okunaklı bir tasarım dili kurmak.
+
+### Yapılanlar
+- **Karanlık Mod & Giriş Sayfası Modernizasyonu:**
+  - `base.html` ve `index.html` dosyalarına mor/pembe neon ışıltılı koyu arka plan gradyanları entegre edildi.
+  - `base.html` navigasyon barı `backdrop-filter: blur(10px)` efektli yarı şeffaf `.glass-nav` yapısına geçirilerek modernleştirildi; sağ tarafa "Ayarlar (Dişli çark)" ikonu eklendi, Kayıt Ol butonuna ise neon gölgesi uygulandı.
+  - `index.html` karşılama sayfasına, podyum üzerinde duran, birbirine dönük 3D CSS döndürülmüş kelime kartları ("Apple" / "Elma") eklendi. Kartlar hover durumunda düzleşip büyüyecek şekilde animasyonlandırıldı.
+  - Mobil cihazlarda podyumun ve kartların taşma yapmadan düzgün görüntülenmesi için `@media` kuralları ile responsive ölçekleme (`transform: scale(...)`) entegrasyonu tamamlandı.
+  - Giriş Yap ve Kayıt Ol aksiyon butonlarının tasarımları yenilendi; Giriş Yap butonu yanına yanıp sönen ve hafifçe sağa kayan (`blink-arrow`) bir yönlendirme oku eklendi.
+  - Alt bilgi (Footer) bölümüne "Hakkımızda", "İletişim", "Şartlar", "Gizlilik" linkleri yan yana yerleştirildi; sağ köşeye parıldayan pembe yıldız simgesiyle telif metni eklendi.
+- **Aydınlık Mod (Light Mode) Okunabilirlik Optimizasyonu:**
+  - Aydınlık tema seçicisi (`[data-theme="light"]`) altındaki tüm neon parlamaları, gölgeler ve kirlilik yaratan ışımalar tamamen kaldırıldı.
+  - Arka plan yumuşak pastel gül kurusu gradyanına (`linear-gradient(135deg, #FFF5F7 0%, #FCECEF 100%)`) geçirildi.
+  - "Kelimeleri Kalıcı Olarak Öğrenin" ana başlığı aydınlık modda mat koyu gül kurusu (#4A2834) rengine dönüştürüldü ve arkasına hafif bir gölge verilerek netleştirildi. Alt açıklama füme (#5A4B51) yapıldı.
+  - 3D kelime kartlarının arka planı mat fildişi beyazı yapıldı; içindeki metinler, telaffuzlar ve elma ikonu koyu gül kurusu tonlarına çekilerek kart altına yumuşak gri bir gölge verildi.
+  - Kayıt Ol ve aksiyon butonları marka kimliğine uygun mat gül kırmızısına (`#C85A7E`) ve üzerindeki yazılar beyaz renge çekilerek netleştirildi.
+- **Doğrulama ve Kararlılık:**
+  - Güncelleme sonrasında çalıştırılan test paketiyle 67 birim testinin tamamının (OK) başarıyla tamamlandığı doğrulandı.
+
