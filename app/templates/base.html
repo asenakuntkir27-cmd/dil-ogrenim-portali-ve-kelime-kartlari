@@ -14,9 +14,36 @@
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
                     },
+                    colors: {
+                        zinc: {
+                            50: 'var(--zinc-50)',
+                            100: 'var(--zinc-100)',
+                            200: 'var(--zinc-200)',
+                            300: 'var(--zinc-300)',
+                            400: 'var(--zinc-400)',
+                            500: 'var(--zinc-500)',
+                            600: 'var(--zinc-600)',
+                            700: 'var(--zinc-700)',
+                            800: 'var(--zinc-800)',
+                            850: 'var(--zinc-850)',
+                            900: 'var(--zinc-900)',
+                            950: 'var(--zinc-950)',
+                        }
+                    }
                 }
             }
         }
+    </script>
+    <script>
+        // Sync theme immediately to prevent flashing
+        (function() {
+            var savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        })();
     </script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,19 +52,47 @@
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --zinc-50: #fafafa;
+            --zinc-100: #f4f4f5;
+            --zinc-200: #e4e4e7;
+            --zinc-300: #d4d4d8;
+            --zinc-400: #a1a1aa;
+            --zinc-500: #71717a;
+            --zinc-600: #52525b;
+            --zinc-700: #3f3f46;
+            --zinc-800: #27272a;
+            --zinc-850: #1f1f23;
+            --zinc-900: #18181b;
+            --zinc-950: #09090b;
+        }
+        [data-theme="light"] {
+            --zinc-50: #0f172a;
+            --zinc-100: #0f172a;
+            --zinc-200: #1e293b;
+            --zinc-300: #334155;
+            --zinc-400: #64748b;
+            --zinc-500: #94a3b8;
+            --zinc-600: #cbd5e1;
+            --zinc-700: #e2e8f0;
+            --zinc-800: #cbd5e1;
+            --zinc-850: #f1f5f9;
+            --zinc-900: #ffffff;
+            --zinc-950: #f8fafc;
+        }
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #09090b;
+            background: var(--zinc-950);
         }
         ::-webkit-scrollbar-thumb {
-            background: #27272a;
+            background: var(--zinc-800);
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #3f3f46;
+            background: var(--zinc-500);
         }
     </style>
 </head>
@@ -69,6 +124,13 @@
                     </a>
                     {% endif %}
                     
+                    <div class="h-4 w-px bg-zinc-800"></div>
+
+                    <!-- Theme Switcher Button -->
+                    <button id="theme-toggle-btn" class="inline-flex items-center justify-center h-9 w-9 rounded-xl border border-zinc-850 hover:border-pink-500/30 bg-zinc-900/35 hover:bg-pink-500/10 text-zinc-400 hover:text-pink-400 transition-all duration-200 cursor-pointer select-none" title="Temayı Değiştir">
+                        <i id="theme-toggle-icon" class="fa-solid fa-sun text-sm"></i>
+                    </button>
+
                     <div class="h-4 w-px bg-zinc-800"></div>
 
                     <!-- Language Selector Dropdown -->
@@ -191,6 +253,37 @@
                             arrow.classList.remove('rotate-180');
                         }
                     }
+                });
+            }
+
+            // Theme Switcher Logic
+            var themeBtn = document.getElementById('theme-toggle-btn');
+            var themeIcon = document.getElementById('theme-toggle-icon');
+            
+            function applyTheme(theme) {
+                if (theme === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    if (themeIcon) {
+                        themeIcon.className = 'fa-solid fa-moon text-sm';
+                    }
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    if (themeIcon) {
+                        themeIcon.className = 'fa-solid fa-sun text-sm';
+                    }
+                }
+            }
+
+            // Sync icon state on load
+            var currentTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(currentTheme);
+
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                    var newTheme = isLight ? 'dark' : 'light';
+                    localStorage.setItem('theme', newTheme);
+                    applyTheme(newTheme);
                 });
             }
         });
