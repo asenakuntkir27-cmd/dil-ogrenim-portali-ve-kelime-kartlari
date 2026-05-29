@@ -25,8 +25,9 @@ class ErrorsAndPaginationTestCase(unittest.TestCase):
         # Accessing an invalid route should return 404 and render our custom template
         response = self.client.get('/invalid-route-that-does-not-exist')
         self.assertEqual(response.status_code, 404)
-        self.assertIn(b'404 - Sayfa Bulunamad', response.data)
-        self.assertIn(b'Ana Sayfaya D', response.data)
+        self.assertIn(b'Arad\xc4\xb1\xc4\x9f\xc4\xb1n Yol S\xc3\xb6zl\xc3\xbckten Silinmi\xc5\x9f', response.data)
+        self.assertIn(b'Rastgele Kelime', response.data)
+        self.assertIn(b'Bu kelimenin do\xc4\x9fru T\xc3\xbcrk\xc3\xa7e kar\xc5\x9f\xc4\xb1l\xc4\xb1\xc4\x9f\xc4\xb1 nedir?', response.data)
 
     def test_deck_pagination(self):
         # Create a user
@@ -72,6 +73,32 @@ class ErrorsAndPaginationTestCase(unittest.TestCase):
         self.assertIn(b'Deste 02', response_page2.data)
         self.assertIn(b'Deste 01', response_page2.data)
         self.assertNotIn(b'Deste 12', response_page2.data)
+
+    def test_custom_404_page_with_db_cards(self):
+        from app.models import Card, Deck
+        # Create a deck and some cards
+        d = Deck(name="Test Deck", user_id=1)
+        db.session.add(d)
+        db.session.commit()
+        
+        c1 = Card(word="Ubiquitous", meaning="Her yerde bulunan", deck_id=d.id)
+        c2 = Card(word="Ponder", meaning="Derin derin düşünmek", deck_id=d.id)
+        c3 = Card(word="Meticulous", meaning="Kili kirk yaran", deck_id=d.id)
+        db.session.add_all([c1, c2, c3])
+        db.session.commit()
+        
+        # Access 404 page - it should render one of the db cards
+        response = self.client.get('/invalid-route-that-does-not-exist')
+        self.assertEqual(response.status_code, 404)
+        
+        # At least one of our test words must appear as the question word
+        data_str = response.data.decode('utf-8')
+        has_card_word = any(w in data_str for w in ["Ubiquitous", "Ponder", "Meticulous"])
+        self.assertTrue(has_card_word)
+        
+        # The meanings should also be present in the options
+        has_card_meaning = any(m in data_str for m in ["Her yerde bulunan", "Derin derin düşünmek", "Kili kirk yaran"])
+        self.assertTrue(has_card_meaning)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,28 +1,318 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="flex flex-col items-center justify-center text-center py-20 px-4">
-    <!-- Pulsing glow icon container -->
-    <div class="relative mb-8">
-        <div class="absolute inset-0 bg-pink-500/20 blur-xl rounded-full animate-pulse"></div>
-        <div class="relative flex h-24 w-24 items-center justify-center rounded-3xl bg-zinc-900 border border-zinc-800 text-pink-505 text-pink-500 shadow-inner">
-            <i class="fa-solid fa-face-frown text-5xl animate-bounce"></i>
+<style>
+    /* Full-screen background neon atmosphere */
+    .neon-404-bg {
+        position: relative;
+        background: radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.08) 0%, rgba(9, 9, 11, 1) 100%);
+    }
+
+    /* Glassmorphism card container */
+    .game-glass-card {
+        background: rgba(24, 24, 27, 0.4);
+        border: 1px solid rgba(236, 72, 153, 0.15);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 0 25px rgba(236, 72, 153, 0.05), inset 0 0 15px rgba(236, 72, 153, 0.05);
+    }
+    
+    /* Neon glows */
+    .neon-glow-pink {
+        text-shadow: 0 0 10px rgba(236, 72, 153, 0.6), 0 0 20px rgba(236, 72, 153, 0.3);
+    }
+    
+    .neon-glow-purple {
+        text-shadow: 0 0 10px rgba(168, 85, 247, 0.6), 0 0 20px rgba(168, 85, 247, 0.3);
+    }
+
+    /* Word Box */
+    .word-box {
+        background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, rgba(24, 24, 27, 0.8) 100%);
+        border: 2px solid rgba(168, 85, 247, 0.3);
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.15), inset 0 0 15px rgba(168, 85, 247, 0.1);
+    }
+
+    /* Shuffled option buttons */
+    .option-btn {
+        background: rgba(24, 24, 27, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    .option-btn:hover:not(:disabled) {
+        border-color: rgba(236, 72, 153, 0.5);
+        background: rgba(236, 72, 153, 0.05);
+        box-shadow: 0 0 15px rgba(236, 72, 153, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* Success animation & correct/incorrect styles */
+    .option-btn.correct-choice {
+        border-color: rgba(16, 185, 129, 0.8) !important;
+        background: rgba(16, 185, 129, 0.12) !important;
+        color: #10b981 !important;
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.45), inset 0 0 10px rgba(16, 185, 129, 0.2) !important;
+    }
+
+    .option-btn.incorrect-choice {
+        border-color: rgba(239, 68, 68, 0.8) !important;
+        background: rgba(239, 68, 68, 0.12) !important;
+        color: #ef4444 !important;
+        box-shadow: 0 0 25px rgba(239, 68, 68, 0.45), inset 0 0 10px rgba(239, 68, 68, 0.2) !important;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    /* CSS shake animation */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-8px); }
+        40%, 80% { transform: translateX(8px); }
+    }
+
+    /* Floating particles background effect */
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(236, 72, 153, 0.2);
+        border-radius: 50%;
+        animation: floatUp 8s infinite linear;
+        pointer-events: none;
+    }
+
+    @keyframes floatUp {
+        0% {
+            transform: translateY(100vh) scale(1);
+            opacity: 0;
+        }
+        50% {
+            opacity: 0.6;
+        }
+        100% {
+            transform: translateY(-10vh) scale(1.5);
+            opacity: 0;
+        }
+    }
+</style>
+
+<div class="neon-404-bg min-h-[75vh] flex flex-col items-center justify-center py-12 px-4 relative overflow-hidden">
+    <!-- Ambient floating particles -->
+    <div class="particle" style="left: 10%; animation-delay: 0s; animation-duration: 12s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 2s; animation-duration: 9s;"></div>
+    <div class="particle" style="left: 55%; animation-delay: 5s; animation-duration: 14s;"></div>
+    <div class="particle" style="left: 80%; animation-delay: 1s; animation-duration: 10s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 3s; animation-duration: 11s;"></div>
+
+    <div class="max-w-2xl w-full game-glass-card rounded-3xl p-8 sm:p-10 text-center relative z-10">
+        <!-- Floating compass/navigation icon representing being lost -->
+        <div class="relative mx-auto mb-6 h-20 w-20 flex items-center justify-center rounded-2xl bg-zinc-900/60 border border-zinc-800 text-pink-500 shadow-lg">
+            <div class="absolute inset-0 bg-pink-500/15 blur-lg rounded-2xl animate-pulse"></div>
+            <i class="fa-solid fa-compass-drafting text-4xl animate-spin" style="animation-duration: 8s;"></i>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white mb-3">
+            <span class="neon-glow-pink text-pink-500">404</span> - Aradığın Yol Sözlükten Silinmiş!
+        </h1>
+        
+        <p class="text-zinc-400 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed mb-8">
+            Görünüşe göre yanlış yola saptın. Ama buraya kadar gelmişken streak'ini korumak ve kaybolmanın acısını çıkarmak için şu mini kelimeyi tahmin etmeye ne dersin?
+        </p>
+
+        <!-- Mini Word Guessing Game Container -->
+        <div class="my-6 max-w-md mx-auto">
+            <!-- Word Display -->
+            <div class="word-box rounded-2xl py-5 px-6 mb-6 text-center">
+                <span class="text-zinc-500 uppercase tracking-wider text-[10px] font-bold block mb-1">Rastgele Kelime</span>
+                <span class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide neon-glow-purple">{{ question_word }}</span>
+            </div>
+
+            <!-- Hint Description / Meanings list -->
+            <div class="text-left mb-6">
+                <span class="text-zinc-400 text-xs font-semibold block mb-3 text-center sm:text-left"><i class="fa-solid fa-circle-question text-purple-400 mr-1.5"></i>Bu kelimenin doğru Türkçe karşılığı nedir?</span>
+                
+                <div class="space-y-3" id="choices-container">
+                    {% for choice in choices %}
+                    <button onclick="checkAnswer(this, '{{ choice }}')" 
+                            class="option-btn w-full text-left px-5 py-3.5 rounded-xl text-sm text-zinc-300 font-medium hover:text-white flex items-center justify-between select-none">
+                        <span>{{ choice }}</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-zinc-600 transition-transform"></i>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Feedback Alert area -->
+            <div id="feedback-alert" class="hidden rounded-xl p-4 text-xs font-semibold text-center mb-6 animate-in fade-in zoom-in-95 duration-200">
+                <p id="feedback-text"></p>
+            </div>
+
+            <!-- Dashboard redirection block (Hidden initially) -->
+            <div id="action-block" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <a href="{{ url_for('main.index') }}" 
+                   class="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/25 transition-all duration-200 active:scale-[0.98]">
+                    <i class="fa-solid fa-house"></i> Güvenli Bölgeye Dön (Dashboard)
+                </a>
+            </div>
         </div>
     </div>
-
-    <!-- Error title and explanation -->
-    <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-        404 - Sayfa Bulunamadı
-    </h1>
-    <p class="mt-4 text-base text-zinc-400 max-w-md mx-auto leading-relaxed">
-        Aradığınız sayfa kaldırılmış, adı değiştirilmiş veya geçici olarak kullanım dışı kalmış olabilir.
-    </p>
-
-    <!-- Go Back Button -->
-    <div class="mt-10">
-        <a href="{{ url_for('main.index') }}" class="inline-flex items-center gap-2 px-6 py-3.5 text-base font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-600 hover:from-pink-500 hover:to-fuchsia-500 rounded-xl shadow-lg shadow-pink-500/10 hover:shadow-pink-500/25 transition-all duration-200 active:scale-[0.98]">
-            <i class="fa-solid fa-house text-sm"></i> Ana Sayfaya Dön
-        </a>
-    </div>
 </div>
+
+<!-- Confetti library via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    const correctMeaning = {{ correct_meaning|tojson }};
+    let answered = false;
+
+    function checkAnswer(btnElement, selectedChoice) {
+        if (answered) return;
+
+        // Reset any temporary shake styles
+        btnElement.classList.remove('incorrect-choice');
+
+        if (selectedChoice === correctMeaning) {
+            // Correct Answer!
+            answered = true;
+            btnElement.classList.add('correct-choice');
+            
+            // Show checkmark icon
+            const icon = btnElement.querySelector('i');
+            if (icon) {
+                icon.className = 'fa-solid fa-circle-check text-emerald-400 text-sm';
+            }
+
+            // Disable all other choices
+            disableAllButtons();
+
+            // Success feedback message
+            const feedbackAlert = document.getElementById('feedback-alert');
+            const feedbackText = document.getElementById('feedback-text');
+            feedbackAlert.className = 'rounded-xl p-4 text-xs font-bold text-center mb-6 bg-emerald-950/20 border border-emerald-500/30 text-emerald-400 block';
+            feedbackText.innerHTML = '<i class="fa-solid fa-circle-check mr-1.5"></i>Harikasın! Kelimeyi bildin. Şimdi seni güvenli bölgeye geri götürelim!';
+
+            // Smooth fade-in redirect action
+            const actionBlock = document.getElementById('action-block');
+            actionBlock.classList.remove('hidden');
+
+            // Fire confetti
+            triggerConfetti();
+        } else {
+            // Wrong Answer!
+            btnElement.classList.add('incorrect-choice');
+            const icon = btnElement.querySelector('i');
+            if (icon) {
+                icon.className = 'fa-solid fa-circle-xmark text-rose-400 text-sm';
+            }
+            
+            // Temporarily disable this button to avoid multi-clicking the same wrong choice
+            btnElement.disabled = true;
+
+            // Incorrect feedback message
+            const feedbackAlert = document.getElementById('feedback-alert');
+            const feedbackText = document.getElementById('feedback-text');
+            feedbackAlert.className = 'rounded-xl p-4 text-xs font-bold text-center mb-6 bg-rose-950/20 border border-rose-500/30 text-rose-400 block';
+            feedbackText.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1.5"></i>Hadi ama, bunu yapabilirsin! Tekrar dene!';
+            
+            // Reset shake animation after it ends so it can shake again
+            setTimeout(() => {
+                btnElement.classList.remove('incorrect-choice');
+            }, 600);
+        }
+    }
+
+    function disableAllButtons() {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            if (!btn.classList.contains('correct-choice')) {
+                btn.style.opacity = '0.3';
+                btn.style.cursor = 'default';
+                const icon = btn.querySelector('i');
+                if (icon && !btn.classList.contains('incorrect-choice')) {
+                    icon.className = 'fa-solid fa-lock text-[9px] text-zinc-700';
+                }
+            }
+        });
+    }
+
+    function triggerConfetti() {
+        // Fallback checks for the canvas-confetti library
+        if (typeof confetti === 'function') {
+            const duration = 2.5 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.8 },
+                    colors: ['#ec4899', '#a855f7', '#3b82f6']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.8 },
+                    colors: ['#ec4899', '#a855f7', '#3b82f6']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        } else {
+            // Local fallback simple confetti if offline or blocked CDN
+            const confettiContainer = document.createElement('div');
+            confettiContainer.style.position = 'fixed';
+            confettiContainer.style.inset = '0';
+            confettiContainer.style.pointerEvents = 'none';
+            confettiContainer.style.zIndex = '999';
+            document.body.appendChild(confettiContainer);
+
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                const colors = ['#ec4899', '#a855f7', '#10b981', '#3b82f6'];
+                particle.style.position = 'absolute';
+                particle.style.width = Math.random() * 8 + 6 + 'px';
+                particle.style.height = Math.random() * 8 + 6 + 'px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = '-20px';
+                particle.style.opacity = Math.random();
+                confettiContainer.appendChild(particle);
+
+                // Simple fall animation
+                let y = -20;
+                let xVel = (Math.random() - 0.5) * 3;
+                let yVel = Math.random() * 5 + 3;
+                let rotation = Math.random() * 360;
+                let rotVel = (Math.random() - 0.5) * 10;
+                
+                function fall() {
+                    y += yVel;
+                    const curX = parseFloat(particle.style.left) || 50;
+                    particle.style.left = curX + xVel + 'px';
+                    particle.style.top = y + 'px';
+                    rotation += rotVel;
+                    particle.style.transform = `rotate(${rotation}deg)`;
+                    
+                    if (y < window.innerHeight) {
+                        requestAnimationFrame(fall);
+                    } else {
+                        particle.remove();
+                    }
+                }
+                requestAnimationFrame(fall);
+            }
+
+            setTimeout(() => {
+                confettiContainer.remove();
+            }, 3000);
+        }
+    }
+</script>
 {% endblock %}

@@ -139,7 +139,50 @@ def study_deck(deck_id):
 
 @main.app_errorhandler(404)
 def not_found_error(error):
-    return render_template('errors/404.html'), 404
+    import random
+    from app.models import Card
+    
+    try:
+        # Rastgele 1 kart seç (doğru kelime)
+        stmt_correct = sa.select(Card).order_by(sa.func.random()).limit(1)
+        correct_card = db.session.scalar(stmt_correct)
+        
+        if correct_card:
+            # Doğru kelime hariç rastgele 2 kart seç
+            stmt_wrong = sa.select(Card).where(Card.id != correct_card.id).order_by(sa.func.random()).limit(2)
+            wrong_cards = db.session.scalars(stmt_wrong).all()
+        else:
+            wrong_cards = []
+    except Exception:
+        correct_card = None
+        wrong_cards = []
+
+    # Eğer veritabanında yeterli kart yoksa veya hata oluştuysa yedek kelimeleri kullan
+    if not correct_card or len(wrong_cards) < 2:
+        fallback_words = [
+            {"word": "Serendipity", "meaning": "Mutlu tesadüf"},
+            {"word": "Ephemeral", "meaning": "Geçici, ölümlü"},
+            {"word": "Eloquence", "meaning": "Güzel ve etkili konuşma sanatı"},
+            {"word": "Oblivion", "meaning": "Unutulma, kayıp"},
+            {"word": "Resilience", "meaning": "Zorluklara karşı dirençlilik"},
+            {"word": "Petrichor", "meaning": "Yağmur sonrası toprak kokusu"}
+        ]
+        # Rastgele 3 kelime seç
+        shuffled_fallbacks = random.sample(fallback_words, 3)
+        question_word = shuffled_fallbacks[0]["word"]
+        correct_meaning = shuffled_fallbacks[0]["meaning"]
+        choices = [item["meaning"] for item in shuffled_fallbacks]
+    else:
+        question_word = correct_card.word
+        correct_meaning = correct_card.meaning
+        choices = [correct_card.meaning] + [c.meaning for c in wrong_cards]
+    
+    random.shuffle(choices)
+    
+    return render_template('errors/404.html',
+                           question_word=question_word,
+                           correct_meaning=correct_meaning,
+                           choices=choices), 404
 
 
 @main.app_errorhandler(500)
