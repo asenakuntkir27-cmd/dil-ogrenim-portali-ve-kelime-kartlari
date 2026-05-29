@@ -234,10 +234,28 @@
         }
     }
 
+    function submitScore(gameName, scoreValue) {
+        fetch('/api/v1/scores/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                game_name: gameName,
+                score: scoreValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log('Score submitted:', data))
+        .catch(err => console.error('Score submission error:', err));
+    }
+
     function showVictory() {
         document.getElementById('game-container').classList.add('hidden');
         document.getElementById('victory-total-words').textContent = totalPairs;
         document.getElementById('victory-area').classList.remove('hidden');
+
+        submitScore('Kelime Eşleştirme', totalPairs * 10);
 
         // Confetti!
         var duration = 3 * 1000;

@@ -608,12 +608,29 @@
         }
     }
 
+    function submitScore(gameName, scoreValue) {
+        fetch('/api/v1/scores/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                game_name: gameName,
+                score: scoreValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log('Score submitted:', data))
+        .catch(err => console.error('Score submission error:', err));
+    }
+
     // Display loss overlay
     function showGameOver() {
         isGameOver = true;
         clearInterval(timerInterval);
         document.getElementById('gameover-final-score').textContent = score;
         document.getElementById('gameover-overlay').classList.remove('hidden');
+        submitScore('Boşluk Doldurma', score);
     }
 
     // Display victory overlay
@@ -623,6 +640,7 @@
         document.getElementById('victory-final-score').textContent = score;
         document.getElementById('victory-total-questions').textContent = gameCards.length;
         document.getElementById('victory-overlay').classList.remove('hidden');
+        submitScore('Boşluk Doldurma', score);
 
         // Confetti celebration!
         const duration = 3.5 * 1000;

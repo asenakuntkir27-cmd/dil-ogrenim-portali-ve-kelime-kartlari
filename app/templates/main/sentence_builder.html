@@ -503,12 +503,30 @@
         }
     }
 
+    function submitScore(gameName, scoreValue) {
+        fetch('/api/v1/scores/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                game_name: gameName,
+                score: scoreValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log('Score submitted:', data))
+        .catch(err => console.error('Score submission error:', err));
+    }
+
     // Handle game completion
     function showVictory() {
         document.getElementById('game-container').classList.add('hidden');
         document.getElementById('victory-final-score').textContent = score;
         document.getElementById('victory-total-sentences').textContent = gameCards.length;
         document.getElementById('victory-area').classList.remove('hidden');
+
+        submitScore('Cümle Kurma', score);
 
         // Confetti blowout!
         const duration = 3.5 * 1000;

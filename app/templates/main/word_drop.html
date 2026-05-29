@@ -520,11 +520,28 @@
         }
     }
 
+    function submitScore(gameName, scoreValue) {
+        fetch('/api/v1/scores/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                game_name: gameName,
+                score: scoreValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log('Score submitted:', data))
+        .catch(err => console.error('Score submission error:', err));
+    }
+
     // Screen display handlers
     function showGameOver() {
         isGameOver = true;
         document.getElementById('gameover-final-score').textContent = score;
         document.getElementById('gameover-overlay').classList.remove('hidden');
+        submitScore('Kelime Tetrisi', score);
     }
 
     function showVictory() {
@@ -532,6 +549,7 @@
         document.getElementById('victory-final-score').textContent = score;
         document.getElementById('victory-total-words').textContent = deckCards.length;
         document.getElementById('victory-overlay').classList.remove('hidden');
+        submitScore('Kelime Tetrisi', score);
 
         // Confetti celebration!
         const duration = 4 * 1000;

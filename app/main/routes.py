@@ -5,7 +5,7 @@ from urllib.parse import urlsplit
 from app import db
 from app.main import main
 from app.main.forms import DeckForm, CardForm
-from app.models import Deck, Card
+from app.models import User, Deck, Card, Score
 
 @main.route('/')
 @main.route('/index')
@@ -525,3 +525,71 @@ def search():
         }
         for card in results
     ])
+
+
+@main.route('/api/v1/scores/submit', methods=['POST'])
+@login_required
+def submit_score():
+    data = request.get_json() or {}
+    game_name = data.get('game_name')
+    score_val = data.get('score')
+
+    valid_games = [
+        "Kelime Eşleştirme",
+        "Kelime Tetrisi",
+        "Cümle Kurma",
+        "Hafıza Kartları",
+        "Boşluk Doldurma"
+    ]
+
+    if not game_name or game_name not in valid_games:
+        return jsonify({'success': False, 'message': 'Geçersiz oyun adı.'}), 400
+
+    try:
+        score_val = int(score_val)
+        if score_val < 0:
+            raise ValueError()
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Geçersiz skor değeri.'}), 400
+
+    new_score = Score(
+        user_id=current_user.id,
+        game_name=game_name,
+        score=score_val
+    )
+    db.session.add(new_score)
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'Skor başarıyla kaydedildi!'})
+
+
+@main.route('/api/v1/scores/leaderboard', methods=['GET'])
+def get_leaderboard():
+    valid_games = [
+        "Kelime Eşleştirme",
+        "Kelime Tetrisi",
+        "Cümle Kurma",
+        "Hafıza Kartları",
+        "Boşluk Doldurma"
+    ]
+
+    leaderboard = {}
+    for game in valid_games:
+        stmt = (
+            sa.select(Score)
+            .join(User)
+            .where(Score.game_name == game)
+            .order_by(Score.score.desc(), Score.created_at.desc())
+            .limit(5)
+        )
+        scores = db.session.scalars(stmt).all()
+        leaderboard[game] = [
+            {
+                'username': s.user.username,
+                'score': s.score,
+                'date': s.created_at.strftime('%d.%m.%Y %H:%M')
+            }
+            for s in scores
+        ]
+
+    return jsonify(leaderboard)

@@ -595,6 +595,22 @@
         }
     }
 
+    function submitScore(gameName, scoreValue) {
+        fetch('/api/v1/scores/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                game_name: gameName,
+                score: scoreValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log('Score submitted:', data))
+        .catch(err => console.error('Score submission error:', err));
+    }
+
     // Display loss overlay
     function showTimeOver() {
         // Flip all cards to show answers on game over
@@ -603,6 +619,7 @@
         
         document.getElementById('timeover-final-score').textContent = score;
         document.getElementById('timeover-overlay').classList.remove('hidden');
+        submitScore('Hafıza Kartları', score);
     }
 
     // Display victory overlay
@@ -610,6 +627,7 @@
         document.getElementById('victory-final-score').textContent = score;
         document.getElementById('victory-final-time').textContent = `${Math.ceil(timeLeft)} sn`;
         document.getElementById('victory-overlay').classList.remove('hidden');
+        submitScore('Hafıza Kartları', score);
 
         // Confetti celebration!
         const duration = 4.5 * 1000;

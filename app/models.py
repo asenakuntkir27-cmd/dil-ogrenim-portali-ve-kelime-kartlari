@@ -20,6 +20,7 @@ class User(UserMixin, db.Model):
     avatar_url: Mapped[Optional[str]] = mapped_column(String(64), default='fa-user', server_default='fa-user')
 
     decks: Mapped[List["Deck"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    scores: Mapped[List["Score"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
@@ -56,3 +57,16 @@ class Card(db.Model):
 
     def __repr__(self) -> str:
         return f"<Card {self.word}>"
+
+
+class Score(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    game_name: Mapped[str] = mapped_column(String(64))
+    score: Mapped[int] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+
+    user: Mapped["User"] = relationship(back_populates="scores")
+
+    def __repr__(self) -> str:
+        return f"<Score {self.game_name}: {self.score} by User {self.user_id}>"
