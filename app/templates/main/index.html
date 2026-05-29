@@ -558,6 +558,92 @@
                 0%, 100% { opacity: 0.4; transform: translateX(0); }
                 50% { opacity: 1; transform: translateX(4px); }
             }
+
+            /* Light mode styles */
+            [data-theme="light"] .neon-text-title {
+                background: none !important;
+                -webkit-text-fill-color: #4A2834 !important;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1) !important;
+            }
+
+            [data-theme="light"] .hero-description {
+                color: #5A4B51 !important;
+            }
+
+            [data-theme="light"] .podium-stand {
+                background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%) !important;
+                border: 1px solid rgba(0, 0, 0, 0.08) !important;
+                box-shadow: 0 10px 25px rgba(74, 40, 52, 0.08) !important;
+            }
+
+            [data-theme="light"] .css-3d-card {
+                background: #FFFFFF !important;
+                border-color: rgba(74, 40, 52, 0.12) !important;
+                box-shadow: 0 8px 24px rgba(74, 40, 52, 0.08) !important;
+            }
+
+            [data-theme="light"] .css-3d-card span,
+            [data-theme="light"] .css-3d-card i {
+                color: #4A2834 !important;
+            }
+
+            [data-theme="light"] .css-3d-card-left span.text-purple-400 {
+                color: #C85A7E !important;
+            }
+            [data-theme="light"] .css-3d-card-left i.fa-volume-high {
+                color: #8C7A82 !important;
+            }
+            [data-theme="light"] .css-3d-card-left span.text-zinc-500 {
+                color: #5A4B51 !important;
+            }
+            [data-theme="light"] .css-3d-card-left span.bg-zinc-800 {
+                background: #FFF5F7 !important;
+                color: #C85A7E !important;
+                border: 1px solid rgba(200, 90, 126, 0.15) !important;
+            }
+
+            [data-theme="light"] .css-3d-card-right {
+                border-color: rgba(200, 90, 126, 0.25) !important;
+                box-shadow: 0 8px 24px rgba(200, 90, 126, 0.08) !important;
+            }
+            [data-theme="light"] .css-3d-card-right span.text-pink-400 {
+                color: #C85A7E !important;
+            }
+            [data-theme="light"] .css-3d-card-right i.fa-apple-whole {
+                color: #C85A7E !important;
+                filter: drop-shadow(0 0 4px rgba(200, 90, 126, 0.25)) !important;
+            }
+            [data-theme="light"] .css-3d-card-right span.bg-pink-500\/10 {
+                background: rgba(200, 90, 126, 0.1) !important;
+                color: #C85A7E !important;
+                border: 1px solid rgba(200, 90, 126, 0.2) !important;
+            }
+
+            [data-theme="light"] .css-3d-card-left:hover {
+                border-color: #C85A7E !important;
+                box-shadow: 0 15px 35px rgba(200, 90, 126, 0.15) !important;
+            }
+            [data-theme="light"] .css-3d-card-right:hover {
+                border-color: #C85A7E !important;
+                box-shadow: 0 15px 35px rgba(200, 90, 126, 0.18) !important;
+            }
+
+            [data-theme="light"] .hero-register-btn {
+                background: #C85A7E !important;
+                color: #FFFFFF !important;
+                border-color: rgba(200, 90, 126, 0.2) !important;
+                box-shadow: none !important;
+            }
+            [data-theme="light"] .hero-register-btn:hover {
+                background: #B3466A !important;
+            }
+
+            [data-theme="light"] .hero-login-link {
+                color: #5A4B51 !important;
+            }
+            [data-theme="light"] .hero-login-link:hover {
+                color: #4A2834 !important;
+            }
         </style>
 
         <!-- Hero Section -->
@@ -580,7 +666,7 @@
                 </h1>
                 
                 <!-- Description -->
-                <p class="mt-4 text-base sm:text-lg leading-relaxed text-zinc-400 max-w-xl mx-auto">
+                <p class="hero-description mt-4 text-base sm:text-lg leading-relaxed text-zinc-400 max-w-xl mx-auto">
                     LingoRose ile kendi kelime destelerinizi oluşturun, 3D interaktif kart çevirme (flip card) modu ile kendinizi test edin ve dil öğrenme sürecinizi keyifli hale getirin.
                 </p>
 
@@ -628,13 +714,13 @@
 
                 <!-- Call to Actions -->
                 <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-5">
-                    <a href="{{ url_for('auth.register') }}" class="group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-gradient-to-r from-pink-600 via-fuchsia-650 to-purple-600 rounded-xl transition-all duration-300 hover:scale-105 active:scale-[0.98] border border-pink-500/30 overflow-hidden" style="box-shadow: 0 0 25px rgba(236, 72, 153, 0.45);">
+                    <a href="{{ url_for('auth.register') }}" class="hero-register-btn group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-gradient-to-r from-pink-600 via-fuchsia-650 to-purple-600 rounded-xl transition-all duration-300 hover:scale-105 active:scale-[0.98] border border-pink-500/30 overflow-hidden" style="box-shadow: 0 0 25px rgba(236, 72, 153, 0.45);">
                         <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <span class="relative flex items-center gap-2">
                             Hemen Ücretsiz Kayıt Ol 🚀
                         </span>
                     </a>
-                    <a href="{{ url_for('auth.login') }}" class="text-sm font-extrabold text-zinc-300 hover:text-white flex items-center gap-2 transition-all hover:translate-x-1 group">
+                    <a href="{{ url_for('auth.login') }}" class="hero-login-link text-sm font-extrabold text-zinc-300 hover:text-white flex items-center gap-2 transition-all hover:translate-x-1 group">
                         Giriş Yap <i class="fa-solid fa-arrow-right text-xs text-pink-400 blink-arrow"></i>
                     </a>
                 </div>

@@ -86,7 +86,15 @@
             transition: background 0.3s ease;
         }
         [data-theme="light"] body {
-            background: radial-gradient(circle at 50% -20%, #fce7f3 0%, #f8fafc 60%) no-repeat fixed !important;
+            background: linear-gradient(135deg, #FFF5F7 0%, #FCECEF 100%) no-repeat fixed !important;
+        }
+        [data-theme="light"] .nav-register-btn {
+            box-shadow: none !important;
+            background: #C85A7E !important;
+            color: #FFFFFF !important;
+        }
+        [data-theme="light"] .nav-register-btn:hover {
+            background: #B3466A !important;
         }
         .glass-nav {
             background: rgba(9, 9, 11, 0.75) !important;
@@ -197,7 +205,7 @@
 
                     {% if current_user.is_anonymous %}
                         <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">Giriş Yap</a>
-                        <a href="{{ url_for('auth.register') }}" class="relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-650 rounded-xl hover:from-pink-500 hover:to-fuchsia-550 transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]" style="box-shadow: 0 0 15px rgba(236, 72, 153, 0.45);">
+                        <a href="{{ url_for('auth.register') }}" class="nav-register-btn relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-650 rounded-xl hover:from-pink-500 hover:to-fuchsia-550 transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]" style="box-shadow: 0 0 15px rgba(236, 72, 153, 0.45);">
                             Kayıt Ol
                         </a>
                     {% else %}
