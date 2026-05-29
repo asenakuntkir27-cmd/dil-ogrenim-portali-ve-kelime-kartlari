@@ -327,3 +327,45 @@ LingoRose platformunun tüm modüllerinin (oyunlar, analiz ve profil) tamamlanma
 
 ### Sonraki Adımlar
 - Projenin canlıya alınması veya yeni sürüm planlamalarının yapılması.
+
+---
+
+## Oturum 18: PDF/Sözlük Yazdırma ve Kelime Hatırlatıcı Bildirim Entegrasyonu
+**Tarih:** 29 Mayıs 2026
+
+### Hedef
+Kullanıcıların destelerini ve kelimelerini PDF olarak çıktı alabilmesini sağlayan bir yazdırma mekanizması kurmak, ayrıca günlük hedeflerini tamamlamaları için tarayıcı bildirimleri ve Neon Toast yedek arayüzü ile desteklenen bir hatırlatıcı entegre etmek.
+
+### Yapılanlar
+- **PDF / Sözlük Çıktı Al Özelliği:** 
+  - Deste detay sayfalarında `@media print` CSS kuralları kullanılarak temiz, A4 boyutunda iki kolonlu bir yazdırma şablonu geliştirildi. Yazdırma anında gereksiz navbar, butonlar ve footer gizlenerek sadece kelimelerin ve anlamlarının yer aldığı temiz bir çıktı sunuldu.
+  - Sayfa üzerinde "Çıktı Al / PDF Kaydet" butonu ve tetikleyici olarak `window.print()` JavaScript çağrısı eklendi.
+- **Kelime Hatırlatıcı Bildirim Sistemi:**
+  - `/api/user-status` rotası üzerinden kullanıcının günlük tamamladığı kelime sayısını, hedefini ve kalan kelimelerini dönen JSON API yazıldı.
+  - Kullanıcı giriş yaptığında çalışan JavaScript motoru, tarayıcıdan bildirim izni (`Notification.requestPermission()`) isteyerek hedefine ulaşamayan kullanıcılara sistem bildirimi gönderir.
+  - Bildirimlerin her sayfa geçişinde tekrarlanmasını önlemek amacıyla `sessionStorage` optimizasyonu uygulandı.
+  - Tarayıcı bildirimlerinin engellenmesi veya desteklenmemesi durumunda devreye giren şık, mor/pembe gradyan temalı, 8 saniye sonra otomatik kapanan **Neon Toast Fallback UI** yedek arayüzü entegre edildi.
+
+---
+
+## Oturum 19: Profil Başarı Madalyaları ve İnteraktif 404 Bulmaca Oyunu Entegrasyonu
+**Tarih:** 29 Mayıs 2026
+
+### Hedef
+Profil sayfasına oyunlaştırma mimarisini tamamlayacak dinamik başarı madalyaları eklemek ve yanlış yönlendirmelerde kullanıcıları karşılayacak interaktif bir mini 404 kelime tahmin oyunu geliştirmek.
+
+### Yapılanlar
+- **Profil Sayfası Başarı Madalyaları (Achievements):**
+  - `/profile` rotasında kullanıcının veritabanı kayıtları incelenerek 3 başarı durumu hesaplandı ve template'e aktarıldı:
+    * `badge_first_spark`: Kullanıcının streak verisi (`current_streak`) >= 3 ise aktif.
+    * `badge_word_pro`: `Score` tablosunda kullanıcının en yüksek skoru >= 100 ise aktif.
+    * `badge_deck_collector`: Toplam deste sayısı (`decks` uzunluğu) >= 5 ise aktif.
+  - `profile.html` sayfasına sol sidebar menüsünün altına yerleştirilen şık bir başarı kartı eklendi.
+  - Kilitli rozetler gri tonlamalı (`filter: grayscale(100%)`, `opacity: 0.4`) ve kilit ikonuyla (`fa-lock`) gösterilirken; kazanılmış rozetler pembe/mor neon parıltısıyla (`box-shadow`), hover büyütme geçişiyle ve detaylı ilerleme istatistiği sunan **Tooltip** katmanlarıyla donatıldı.
+- **İnteraktif 404 Hata Sayfası Oyunu:**
+  - `@main.app_errorhandler(404)` rotası güncellenerek veritabanından rastgele 1 doğru kelime ve 2 yanlış çeldirici kelime çekilmesi, şıkların karıştırılarak `404.html` şablonuna gönderilmesi sağlandı. Veritabanının boş olması durumunda çalışacak premium fallback İngilizce kelimeler dizisi entegre edildi.
+  - Şık interaktif oyun arayüzü tasarlanarak doğru şık tıklandığında butonun yeşil parıldaması, `canvas-confetti` kütüphanesi yardımıyla ekranı kaplayan konfetiler patlatılması ve "Güvenli Bölgeye Dön (Dashboard)" butonunun smooth fade-in ile belirmesi sağlandı.
+  - Yanlış şık tıklandığında kırmızı parıltı ve titreme (shake) efekti tetiklendi.
+- **Test Kapsamı:** 
+  - Hata yakalayıcının ve başarımların kilitli/açık durumlarını doğrulamak için `test_achievements.py` yazıldı ve `test_errors_and_pagination.py` güncellendi.
+  - Toplam birim test sayısı **67 test** seviyesine ulaştı ve tüm test paketi hatasız bir şekilde tamamlandı (`Ran 67 tests. OK`).
