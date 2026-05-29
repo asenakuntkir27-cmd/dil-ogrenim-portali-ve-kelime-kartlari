@@ -13,6 +13,10 @@ def index():
     if not current_user.is_authenticated:
         return render_template('main/index.html', title='Ana Sayfa')
     
+    # Giriş yapmış kullanıcının streak durumunu güncelle
+    current_user.record_activity(0)
+    db.session.commit()
+    
     # Kullanıcı giriş yaptıysa kendi destelerini sayfalayarak getir
     lang_code = session.get('learning_language', 'en')
     languages = {
@@ -97,6 +101,7 @@ def create_card(deck_id):
             deck=deck
         )
         db.session.add(card)
+        current_user.record_activity(1)
         db.session.commit()
         flash('Yeni kelime kartı eklendi!', 'success')
         return redirect(url_for('main.deck_detail', deck_id=deck.id))
@@ -558,6 +563,7 @@ def submit_score():
         score=score_val
     )
     db.session.add(new_score)
+    current_user.record_activity(5)
     db.session.commit()
 
     return jsonify({'success': True, 'message': 'Skor başarıyla kaydedildi!'})
@@ -599,3 +605,20 @@ def get_leaderboard():
 @login_required
 def leaderboard():
     return render_template('main/leaderboard.html', title='Liderlik Tablosu')
+
+
+@main.route('/api/v1/study/complete', methods=['POST'])
+@login_required
+def complete_study():
+    data = request.get_json() or {}
+    cards_count = data.get('cards_count', 0)
+    try:
+        cards_count = int(cards_count)
+        if cards_count < 0:
+            raise ValueError()
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Geçersiz kart sayısı.'}), 400
+
+    current_user.record_activity(cards_count)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Çalışma aktivitesi kaydedildi!'})

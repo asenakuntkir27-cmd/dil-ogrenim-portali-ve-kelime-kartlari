@@ -3,11 +3,49 @@
 {% block content %}
     {% if current_user.is_authenticated %}
         <!-- Karşılama ve Amaç Bölümü -->
-        <div class="mb-10 text-center sm:text-left">
-            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">Ana Sayfa</h1>
-            <p class="mt-3 text-base sm:text-lg leading-relaxed text-zinc-400 max-w-3xl">
-                LingoRose ile dil öğrenim serüveninizi hızlandırın! Kelime dağarcığınızı zenginleştirmek için 3D kelime kartlarıyla pratik yapın veya öğrendiklerinizi eğlenceli oyunlarla pekiştirin.
-            </p>
+        <div class="mb-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div class="text-center sm:text-left flex-1">
+                <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">Ana Sayfa</h1>
+                <p class="mt-3 text-base sm:text-lg leading-relaxed text-zinc-400 max-w-2xl">
+                    LingoRose ile dil öğrenim serüveninizi hızlandırın! Kelime dağarcığınızı zenginleştirmek için 3D kelime kartlarıyla pratik yapın veya öğrendiklerinizi eğlenceli oyunlarla pekiştirin.
+                </p>
+            </div>
+            
+            <!-- Streak & Daily Target Widget -->
+            <div class="w-full sm:w-80 shrink-0 bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 relative overflow-hidden group shadow-lg shadow-pink-500/5 hover:border-pink-500/20 transition-all duration-300">
+                <!-- Glowing background effect -->
+                <div class="absolute -inset-px bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-300 blur-sm pointer-events-none"></div>
+                
+                <div class="relative flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-950/40 border border-orange-900/30 text-orange-500 shadow-lg shadow-orange-500/20 animate-pulse">
+                            <i class="fa-solid fa-fire text-lg"></i>
+                        </div>
+                        <span class="text-sm font-extrabold text-orange-400 tracking-tight">{{ current_user.streak }} Günlük Seri!</span>
+                    </div>
+                    {% if current_user.get_daily_progress() >= current_user.daily_target %}
+                    <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-950/40 border border-emerald-900/30 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                        <i class="fa-solid fa-circle-check"></i> Hedef Tamam!
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="relative">
+                    {% set progress_val = current_user.get_daily_progress() %}
+                    {% set target_val = current_user.daily_target %}
+                    {% set percent = (progress_val / target_val * 100) | int if target_val > 0 else 0 %}
+                    {% if percent > 100 %}{% set percent = 100 %}{% endif %}
+                    
+                    <div class="flex justify-between text-xs mb-1.5 font-medium">
+                        <span class="text-zinc-400">Bugünkü Hedefin: <strong class="text-zinc-200 font-semibold">{{ progress_val }} / {{ target_val }} Kelime</strong></span>
+                        <span class="text-pink-400 font-bold">{{ percent }}%</span>
+                    </div>
+                    <!-- Custom Styled Progress Bar -->
+                    <div class="w-full bg-zinc-950 border border-zinc-850 rounded-full h-2.5 overflow-hidden">
+                        <div class="bg-gradient-to-r from-pink-500 to-purple-650 h-full rounded-full transition-all duration-500" style="width: {{ percent }}%;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Kelime Arama Motoru Bölümü -->

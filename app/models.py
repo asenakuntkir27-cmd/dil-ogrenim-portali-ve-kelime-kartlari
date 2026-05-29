@@ -1,7 +1,7 @@
 from typing import Optional, List
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import String, Text, ForeignKey
+from sqlalchemy import String, Text, ForeignKey, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_login import UserMixin
 
@@ -18,9 +18,48 @@ class User(UserMixin, db.Model):
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
     avatar_url: Mapped[Optional[str]] = mapped_column(String(64), default='fa-user', server_default='fa-user')
+    
+    current_streak: Mapped[int] = mapped_column(default=0, server_default='0')
+    last_activity_date: Mapped[Optional[date]] = mapped_column(Date, default=None, nullable=True)
+    daily_target: Mapped[int] = mapped_column(default=10, server_default='10')
+    daily_progress: Mapped[int] = mapped_column(default=0, server_default='0')
 
     decks: Mapped[List["Deck"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     scores: Mapped[List["Score"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+
+    def record_activity(self, points: int):
+        from datetime import date as dt_date, timedelta
+        today = dt_date.today()
+        
+        if self.last_activity_date is None:
+            self.current_streak = 1
+            self.daily_progress = points
+        elif self.last_activity_date == today:
+            self.daily_progress += points
+        elif self.last_activity_date == today - timedelta(days=1):
+            self.current_streak += 1
+            self.daily_progress = points
+        else:
+            self.current_streak = 1
+            self.daily_progress = points
+            
+        self.last_activity_date = today
+
+    def get_daily_progress(self) -> int:
+        from datetime import date as dt_date
+        if self.last_activity_date != dt_date.today():
+            return 0
+        return self.daily_progress
+
+    @property
+    def streak(self) -> int:
+        from datetime import date as dt_date, timedelta
+        if self.last_activity_date is None:
+            return 0
+        today = dt_date.today()
+        if self.last_activity_date == today or self.last_activity_date == today - timedelta(days=1):
+            return self.current_streak
+        return 0
 
     def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)

@@ -19,6 +19,10 @@ def login():
             return redirect(url_for('auth.login'))
         login_user(user, remember=form.remember_me.data)
         
+        # Giriş yapıldığında kullanıcının streak durumunu tetikle
+        user.record_activity(0)
+        db.session.commit()
+        
         # Ensure user has the decks for the current learning language
         lang_code = session.get('learning_language', 'en')
         from app.seeds import seed_language_decks_for_user
