@@ -1,6 +1,94 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* Neon Badge Styles */
+    .achievement-card {
+        background: rgba(24, 24, 27, 0.4);
+        border: 1px solid rgba(39, 39, 42, 0.8);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .badge-item {
+        position: relative;
+        width: 3.75rem; /* 60px */
+        height: 3.75rem; /* 60px */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+    }
+    
+    /* Unlocked badge glow and styles */
+    .badge-item.unlocked {
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(24, 24, 27, 0.9) 100%);
+        border: 2px solid rgba(236, 72, 153, 0.55);
+        box-shadow: 0 0 15px rgba(236, 72, 153, 0.25), inset 0 0 10px rgba(236, 72, 153, 0.15);
+        cursor: pointer;
+    }
+    
+    .badge-item.unlocked:hover {
+        transform: scale(1.08);
+        border-color: rgba(236, 72, 153, 0.9);
+        box-shadow: 0 0 25px rgba(236, 72, 153, 0.6), inset 0 0 12px rgba(236, 72, 153, 0.3);
+    }
+    
+    /* Locked badge greyed out and styles */
+    .badge-item.locked {
+        filter: grayscale(100%);
+        opacity: 0.4;
+        background: rgba(24, 24, 27, 0.6);
+        border: 2px dashed rgba(161, 161, 170, 0.25);
+    }
+    
+    /* Tooltip styles */
+    .badge-tooltip {
+        position: absolute;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 11rem; /* 176px */
+        background: rgba(9, 9, 11, 0.96);
+        border: 1px solid rgba(39, 39, 42, 0.9);
+        color: #d4d4d8;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        font-size: 0.7rem;
+        text-align: center;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        z-index: 50;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    /* Arrow for tooltip */
+    .badge-tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(9, 9, 11, 0.96) transparent transparent transparent;
+    }
+    
+    /* Show tooltip on hover */
+    .badge-container:hover .badge-tooltip {
+        opacity: 1;
+        visibility: visible;
+        bottom: 125%;
+    }
+</style>
+
 <div class="mx-auto max-w-6xl">
     <!-- Header -->
     <div class="mb-8">
@@ -44,6 +132,79 @@
                     <i class="fa-solid fa-user-shield text-base shrink-0"></i>
                     <span>Gizlilik ve Tercihler</span>
                 </button>
+            </div>
+
+            <!-- Achievements Card -->
+            <div class="achievement-card mt-6 group">
+                <div class="absolute -right-12 -top-12 h-24 w-24 rounded-full bg-pink-500/5 blur-xl group-hover:bg-pink-500/10 transition-all duration-500"></div>
+                <h4 class="text-sm font-bold text-zinc-200 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-yellow-500"></i> Başarı Madalyaları
+                </h4>
+                
+                <div class="flex justify-between items-center gap-2">
+                    <!-- Badge 1: İlk Kıvılcım -->
+                    <div class="relative flex flex-col items-center badge-container">
+                        <div class="badge-item {% if badge_first_spark %}unlocked{% else %}locked{% endif %}">
+                            <span class="text-2xl">🔥</span>
+                            {% if not badge_first_spark %}
+                                <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-zinc-950 border border-zinc-800 flex items-center justify-center text-[10px] text-zinc-400">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="badge-tooltip">
+                            <span class="font-bold text-white block text-xs mb-1">🔥 İlk Kıvılcım</span>
+                            3 Günlük Streak Başarısı
+                            {% if badge_first_spark %}
+                                <span class="text-emerald-400 font-semibold block mt-1.5"><i class="fa-solid fa-circle-check"></i> Kazanıldı</span>
+                            {% else %}
+                                <span class="text-zinc-500 block mt-1.5"><i class="fa-solid fa-lock"></i> Kilitli (Streak: {{ current_user.current_streak }}/3)</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Badge 2: Kelime Profesörü -->
+                    <div class="relative flex flex-col items-center badge-container">
+                        <div class="badge-item {% if badge_word_pro %}unlocked{% else %}locked{% endif %}">
+                            <span class="text-2xl">🧠</span>
+                            {% if not badge_word_pro %}
+                                <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-zinc-950 border border-zinc-800 flex items-center justify-center text-[10px] text-zinc-400">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="badge-tooltip">
+                            <span class="font-bold text-white block text-xs mb-1">🧠 Kelime Profesörü</span>
+                            Herhangi bir oyunda 100+ Puan Başarısı
+                            {% if badge_word_pro %}
+                                <span class="text-emerald-400 font-semibold block mt-1.5"><i class="fa-solid fa-circle-check"></i> Kazanıldı</span>
+                            {% else %}
+                                <span class="text-zinc-500 block mt-1.5"><i class="fa-solid fa-lock"></i> Kilitli (Hedef: 100+ Puan)</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Badge 3: Deste Koleksiyoncusu -->
+                    <div class="relative flex flex-col items-center badge-container">
+                        <div class="badge-item {% if badge_deck_collector %}unlocked{% else %}locked{% endif %}">
+                            <span class="text-2xl">📚</span>
+                            {% if not badge_deck_collector %}
+                                <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-zinc-950 border border-zinc-800 flex items-center justify-center text-[10px] text-zinc-400">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="badge-tooltip">
+                            <span class="font-bold text-white block text-xs mb-1">📚 Deste Koleksiyoncusu</span>
+                            5+ Deste Sahibi Olma Başarısı
+                            {% if badge_deck_collector %}
+                                <span class="text-emerald-400 font-semibold block mt-1.5"><i class="fa-solid fa-circle-check"></i> Kazanıldı</span>
+                            {% else %}
+                                <span class="text-zinc-500 block mt-1.5"><i class="fa-solid fa-lock"></i> Kilitli (Deste: {{ current_user.decks|length }}/5)</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

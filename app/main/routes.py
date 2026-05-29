@@ -374,11 +374,26 @@ def profile():
         profile_form.username.data = current_user.username
         profile_form.email.data = current_user.email
         
+    # Başarı Başarımları (Achievements / Badges) kontrolleri
+    badge_first_spark = current_user.current_streak >= 3
+    
+    badge_word_pro = db.session.scalar(
+        sa.select(Score).where(
+            Score.user_id == current_user.id,
+            Score.score >= 100
+        ).limit(1)
+    ) is not None
+    
+    badge_deck_collector = len(current_user.decks) >= 5
+        
     return render_template('auth/profile.html', 
                            title='Profil Ayarları',
                            profile_form=profile_form,
                            password_form=password_form,
-                           active_tab=active_tab)
+                           active_tab=active_tab,
+                           badge_first_spark=badge_first_spark,
+                           badge_word_pro=badge_word_pro,
+                           badge_deck_collector=badge_deck_collector)
 
 
 @main.route('/update-avatar', methods=['POST'])
