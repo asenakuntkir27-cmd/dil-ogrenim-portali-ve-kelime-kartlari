@@ -637,3 +637,20 @@ def delete_deck(deck_id):
     
     flash('Deste ve içindeki tüm kelime kartları başarıyla silindi.', 'pink')
     return redirect(url_for('main.index'))
+
+
+@main.route('/api/user-status')
+@login_required
+def user_status():
+    today_count = current_user.get_daily_progress()
+    daily_target = current_user.daily_target
+    remaining = max(0, daily_target - today_count)
+    current_streak = current_user.streak
+    return jsonify({
+        'username': current_user.username,
+        'today_count': today_count,
+        'daily_target': daily_target,
+        'remaining': remaining,
+        'current_streak': current_streak
+    })
+

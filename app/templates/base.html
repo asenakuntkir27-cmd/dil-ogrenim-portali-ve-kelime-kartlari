@@ -94,6 +94,21 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--zinc-500);
         }
+        /* Neon toast custom styling */
+        #neon-reminder-toast {
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.25), inset 0 0 12px rgba(236, 72, 153, 0.1);
+            border-color: rgba(236, 72, 153, 0.45);
+        }
+        [data-theme="light"] #neon-reminder-toast {
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.15), inset 0 0 12px rgba(236, 72, 153, 0.05);
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+        [data-theme="light"] #neon-reminder-toast h4 {
+            color: #1e1b4b !important;
+        }
+        [data-theme="light"] #neon-reminder-toast p {
+            color: #312e81 !important;
+        }
     </style>
 </head>
 <body class="h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-pink-600 selection:text-white">
@@ -288,5 +303,109 @@
             }
         });
     </script>
+
+    <!-- Neon Toast Notification Popup -->
+    <div id="neon-reminder-toast" class="fixed top-20 right-4 z-50 transform translate-x-full opacity-0 pointer-events-none transition-all duration-500 max-w-sm w-full bg-zinc-950/80 backdrop-blur-md border border-pink-500/30 rounded-2xl p-4 flex gap-3">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-pink-500 to-fuchsia-600 text-white shadow-lg shadow-pink-500/20">
+            <i class="fa-solid fa-bullhorn text-lg"></i>
+        </div>
+        <div class="flex-1">
+            <div class="flex items-center justify-between">
+                <h4 class="text-sm font-semibold text-white">LingoRose Hatırlatıcı 📯</h4>
+                <button id="close-neon-toast" class="text-zinc-400 hover:text-white transition-colors duration-150 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <p id="neon-toast-message" class="text-xs text-zinc-300 mt-1 leading-relaxed"></p>
+        </div>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session storage to avoid spamming the user on every page load
+            if (sessionStorage.getItem('lingorose_reminder_shown')) {
+                return;
+            }
+
+            fetch('/api/user-status')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Not logged in or network error');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const remaining = data.remaining;
+                    const username = data.username;
+
+                    if (remaining > 0) {
+                        // Mark as shown for the current session
+                        sessionStorage.setItem('lingorose_reminder_shown', 'true');
+
+                        const title = "LingoRose Hatırlatıcı 📯";
+                        const body = `${username}, bugünkü kelime hedefini tamamlamana sadece ${remaining} kelime kaldı! Ateşini (🔥) söndürme!`;
+
+                        // Fallback UI (Neon Toast/Popup)
+                        function showNeonToast() {
+                            setTimeout(function() {
+                                const toast = document.getElementById('neon-reminder-toast');
+                                const toastMsg = document.getElementById('neon-toast-message');
+                                const closeBtn = document.getElementById('close-neon-toast');
+
+                                if (toast && toastMsg) {
+                                    toastMsg.textContent = body;
+                                    toast.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
+                                    toast.classList.add('translate-x-0', 'opacity-100');
+
+                                    const closeHandler = function() {
+                                        toast.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none');
+                                        toast.classList.remove('translate-x-0', 'opacity-100');
+                                    };
+
+                                    if (closeBtn) {
+                                        closeBtn.addEventListener('click', closeHandler);
+                                    }
+
+                                    // Auto-dismiss after 8 seconds
+                                    setTimeout(closeHandler, 8000);
+                                }
+                            }, 2000);
+                        }
+
+                        // Try Browser Notifications
+                        if ('Notification' in window) {
+                            if (Notification.permission === 'granted') {
+                                try {
+                                    new Notification(title, { body: body });
+                                } catch (e) {
+                                    showNeonToast();
+                                }
+                            } else if (Notification.permission !== 'denied') {
+                                Notification.requestPermission().then(permission => {
+                                    if (permission === 'granted') {
+                                        try {
+                                            new Notification(title, { body: body });
+                                        } catch (e) {
+                                            showNeonToast();
+                                        }
+                                    } else {
+                                        showNeonToast();
+                                    }
+                                });
+                            } else {
+                                showNeonToast();
+                            }
+                        } else {
+                            showNeonToast();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user status:', error);
+                });
+        });
+    </script>
+    {% endif %}
 </body>
 </html>
