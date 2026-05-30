@@ -34,6 +34,15 @@ LingoRose öğrenim sürecini eğlenceli hale getirmek için gelişmiş oyun mod
 
 ---
 
+## 🛡️ Güvenilirlik ve Kendi Kendini İyileştirme (Robustness & Self-Healing)
+
+LingoRose, yeni klonlanan ortamlarda veya farklı bilgisayarlarda hiçbir manuel veritabanı kurulum adımı gerektirmeyen **"Plug-and-Play" (Tak-Çalıştır)** yapısına sahiptir:
+
+- **Çoklu Tablo Denetimi (Multi-Table Verification):** Uygulama her başladığında SQLAlchemy Inspector kullanarak model şemasındaki tüm tabloların ('user', 'deck', 'card', 'score') veritabanında kurulu olup olmadığını denetler.
+- **Hata Kurtarma (Auto-Recovery):** Tabloların eksik, bozuk olması veya şema uyumsuzluğu halinde veritabanı kilitlenmelerini önlemek adına scoped session temizlenir (`db.session.remove()`), ardından `db.drop_all()` ve `db.create_all()` komutları sırasıyla çalıştırılarak veritabanı şeması otomatik olarak sıfırdan yeniden oluşturulur ve default 1500 kelimelik veri setiyle otomatik tohumlanır (`seed_db()`).
+
+---
+
 ## 🛠️ Teknik Kurulum ve Çalıştırma Adımları
 
 ### 1. Ortam Kurulumu ve Bağımlılıklar
