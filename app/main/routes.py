@@ -712,3 +712,87 @@ def user_status():
         'current_streak': current_streak
     })
 
+
+def is_turkish(text):
+    turkish_chars = set("çğıöşüzÇĞİÖŞÜ")
+    if any(char in turkish_chars for char in text):
+        return True
+    common_tr = {"ve", "bir", "bu", "ne", "da", "de", "için", "gibi", "daha", "çok", "her", "o", "en", "ama", "ya", "ile"}
+    words = set(text.lower().split())
+    if words.intersection(common_tr):
+        return True
+    return False
+
+
+def translate_text(text, learning_lang):
+    import urllib.request
+    import urllib.parse
+    import json
+    
+    is_tr = is_turkish(text)
+    source_lang = "tr" if is_tr else learning_lang
+    target_lang = learning_lang if is_tr else "tr"
+    
+    # 1. Try MyMemory API
+    try:
+        url = "https://api.mymemory.translated.net/get?" + urllib.parse.urlencode({
+            "q": text,
+            "langpair": f"{source_lang}|{target_lang}"
+        })
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        )
+        with urllib.request.urlopen(req, timeout=5) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                translated = data.get("responseData", {}).get("translatedText")
+                if translated:
+                    return translated
+    except Exception as e:
+        print(f"MyMemory translation error: {e}")
+        
+    # 2. Try Lingva API (fallback)
+    try:
+        encoded_text = urllib.parse.quote(text)
+        url = f"https://lingva.ml/api/v1/{source_lang}/{target_lang}/{encoded_text}"
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        )
+        with urllib.request.urlopen(req, timeout=5) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                translated = data.get("translation")
+                if translated:
+                    return translated
+    except Exception as e:
+        print(f"Lingva translation error: {e}")
+        
+    raise Exception("Çeviri servisine şu anda ulaşılamıyor.")
+
+
+@main.route('/main/inline-translate', methods=['POST'])
+@login_required
+def inline_translate():
+    data = request.get_json() or {}
+    text = data.get('text', '').strip()
+    if not text:
+        return jsonify({'success': False, 'message': 'Çevrilecek metin boş olamaz.'}), 400
+        
+    learning_lang = session.get('learning_language', 'en')
+    
+    try:
+        translated = translate_text(text, learning_lang)
+        return jsonify({
+            'success': True,
+            'original_text': text,
+            'translated_text': translated
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+

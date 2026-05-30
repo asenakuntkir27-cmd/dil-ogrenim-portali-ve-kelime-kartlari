@@ -185,6 +185,60 @@
         [data-theme="light"] #vocab-search-input::placeholder {
             color: #334155 !important;
         }
+        
+        /* Inline Translation Tooltip Styling */
+        #inline-translator-tooltip {
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #inline-translate-trigger {
+            background: rgba(9, 9, 11, 0.9) !important;
+            border-color: rgba(236, 72, 153, 0.4) !important;
+            color: #f1f5f9 !important;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.15) !important;
+            transition: all 0.2s ease;
+        }
+        #inline-translate-trigger:hover {
+            background: rgba(236, 72, 153, 0.2) !important;
+            border-color: #ec4899 !important;
+            transform: scale(1.05);
+        }
+        #inline-translate-result-box {
+            background: rgba(9, 9, 11, 0.95) !important;
+            border-color: rgba(168, 85, 247, 0.45) !important;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15) !important;
+        }
+        #inline-translate-result-text {
+            color: #ffffff !important;
+        }
+
+        /* Light Mode Overrides */
+        [data-theme="light"] #inline-translate-trigger {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(200, 90, 126, 0.3) !important;
+            color: #C85A7E !important;
+            box-shadow: 0 4px 15px rgba(200, 90, 126, 0.1) !important;
+        }
+        [data-theme="light"] #inline-translate-trigger:hover {
+            background: #FFF5F7 !important;
+            border-color: #C85A7E !important;
+        }
+        [data-theme="light"] #inline-translate-result-box {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-color: rgba(200, 90, 126, 0.2) !important;
+            box-shadow: 0 10px 25px rgba(200, 90, 126, 0.08) !important;
+        }
+        [data-theme="light"] #inline-translate-result-text {
+            color: #334155 !important;
+        }
+        [data-theme="light"] #inline-translate-original-text {
+            color: #8C7A82 !important;
+        }
+        [data-theme="light"] #inline-translate-result-box #close-inline-translate {
+            color: #8C7A82 !important;
+        }
+        [data-theme="light"] #inline-translate-result-box #close-inline-translate:hover {
+            color: #4A2834 !important;
+        }
     </style>
 </head>
 <body class="h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-pink-600 selection:text-white">
@@ -496,5 +550,163 @@
         });
     </script>
     {% endif %}
+
+    <!-- Inline Translation Tooltip -->
+    <div id="inline-translator-tooltip" class="fixed hidden z-50 pointer-events-auto opacity-0 scale-95 origin-bottom transition-all duration-200">
+        <!-- Translate Button -->
+        <button id="inline-translate-trigger" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border cursor-pointer select-none active:scale-[0.98]">
+            <i class="fa-solid fa-language text-sm"></i>
+            <span>Çevir</span>
+        </button>
+        <!-- Result Box -->
+        <div id="inline-translate-result-box" class="hidden mt-2 p-3.5 rounded-2xl border backdrop-blur-xl max-w-xs w-72">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[9px] font-extrabold uppercase tracking-wider text-pink-400">Çeviri Sonucu 📯</span>
+                <button id="close-inline-translate" class="text-zinc-400 hover:text-white transition-colors cursor-pointer p-0.5">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <p id="inline-translate-original-text" class="text-[10px] text-zinc-400 italic mb-1.5 break-words line-clamp-2 border-l-2 border-zinc-800 pl-2"></p>
+            <p id="inline-translate-result-text" class="text-xs leading-relaxed font-semibold break-words"></p>
+        </div>
+    </div>
+
+    <!-- Inline Translation Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltip = document.getElementById('inline-translator-tooltip');
+            const triggerBtn = document.getElementById('inline-translate-trigger');
+            const resultBox = document.getElementById('inline-translate-result-box');
+            const originalTextEl = document.getElementById('inline-translate-original-text');
+            const textEl = document.getElementById('inline-translate-result-text');
+            const closeBtn = document.getElementById('close-inline-translate');
+            
+            let currentSelectedText = "";
+            let selectionTimeout;
+
+            function hideTooltip() {
+                tooltip.classList.remove('opacity-100', 'scale-100');
+                tooltip.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    tooltip.classList.add('hidden');
+                    resultBox.classList.add('hidden');
+                    triggerBtn.classList.remove('hidden');
+                }, 200);
+            }
+
+            function positionTooltip(rect) {
+                const tooltipWidth = tooltip.offsetWidth || 80;
+                const tooltipHeight = tooltip.offsetHeight || 36;
+                
+                let top = window.scrollY + rect.top - tooltipHeight - 10;
+                let left = window.scrollX + rect.left + rect.width / 2 - tooltipWidth / 2;
+                
+                if (rect.top - tooltipHeight - 10 < 10) {
+                    top = window.scrollY + rect.bottom + 10;
+                }
+                if (left < 10) left = 10;
+                if (left + tooltipWidth > window.innerWidth - 10) {
+                    left = window.innerWidth - tooltipWidth - 10;
+                }
+                
+                tooltip.style.top = `${top}px`;
+                tooltip.style.left = `${left}px`;
+            }
+
+            document.addEventListener('mouseup', function(e) {
+                if (tooltip.contains(e.target)) return;
+
+                clearTimeout(selectionTimeout);
+                selectionTimeout = setTimeout(() => {
+                    const selection = window.getSelection();
+                    const text = selection.toString().trim();
+
+                    if (text.length > 0 && text.length < 500) {
+                        currentSelectedText = text;
+                        const range = selection.getRangeAt(0);
+                        const rect = range.getBoundingClientRect();
+                        
+                        tooltip.classList.remove('hidden');
+                        resultBox.classList.add('hidden');
+                        triggerBtn.classList.remove('hidden');
+                        
+                        positionTooltip(rect);
+                        
+                        tooltip.classList.remove('opacity-0', 'scale-95');
+                        tooltip.classList.add('opacity-100', 'scale-100');
+                    } else {
+                        hideTooltip();
+                    }
+                }, 80);
+            });
+
+            document.addEventListener('mousedown', function(e) {
+                if (!tooltip.contains(e.target)) {
+                    const selection = window.getSelection();
+                    if (selection.toString().trim() === "") {
+                        hideTooltip();
+                    }
+                }
+            });
+
+            triggerBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (!currentSelectedText) return;
+
+                triggerBtn.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+                
+                originalTextEl.textContent = `"${currentSelectedText}"`;
+                textEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Çevriliyor...';
+
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const rect = selection.getRangeAt(0).getBoundingClientRect();
+                    positionTooltip(rect);
+                }
+
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                const csrfTokenEl = document.querySelector('input[name="csrf_token"]') || document.querySelector('meta[name="csrf-token"]');
+                if (csrfTokenEl) {
+                    headers['X-CSRFToken'] = csrfTokenEl.value || csrfTokenEl.getAttribute('content');
+                }
+
+                fetch('/main/inline-translate', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ text: currentSelectedText })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('API hatası veya yetkisiz erişim.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        textEl.textContent = data.translated_text;
+                    } else {
+                        textEl.textContent = data.message || "Çeviri başarısız.";
+                    }
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        const rect = selection.getRangeAt(0).getBoundingClientRect();
+                        positionTooltip(rect);
+                    }
+                })
+                .catch(err => {
+                    textEl.textContent = "Hata: Çeviri yapılamadı.";
+                    console.error(err);
+                });
+            });
+
+            closeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                hideTooltip();
+            });
+        });
+    </script>
 </body>
 </html>

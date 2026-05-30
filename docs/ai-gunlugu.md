@@ -418,3 +418,22 @@ Aydınlık ve karanlık temalarda kelime arama çubuğunun (Search Input) yazı 
   - `app/templates/main/index.html` dosyasındaki girdi alanında renk çakışmasına sebep olan `text-zinc-100` ve `placeholder-zinc-500` Tailwind sınıfları kaldırılarak kontrol tamamen global CSS kurallarına devredildi.
 - **Doğrulama:**
   - Yapılan değişikliklerin ardından test suite çalıştırılarak 79 birim testinin tamamının başarıyla tamamlandığı teyit edildi.
+
+## Oturum 23: Satır İçi Çeviri Araç İpucu (Inline Translation Tooltip) Geliştirmesi
+**Tarih:** 30 Mayıs 2026
+
+### Hedef
+Kullanıcıların platformdaki herhangi bir kelimeyi veya cümleyi imleçle seçerek (highlight), temayla %100 uyumlu, neon sınırları olan glassmorphic bir tooltip aracılığıyla anında hedef dile çevirmesini sağlamak.
+
+### Yapılanlar
+- **Arka Plan Rotaları ve API Yardımları:**
+  - `app/main/routes.py` içine metnin Türkçe olup olmadığını belirleyen `is_turkish` algoritması eklendi.
+  - Python standard library (`urllib.request`) kullanan, MyMemory API (öncelikli) ve Lingva API (yedek) aracılığıyla hedef dile/Türkçeye çeviri yapan robust bir `translate_text` yardımcısı kuruldu.
+  - `@login_required` ile korunan `/main/inline-translate` POST JSON API rotası eklendi.
+- **Ön Yüz Tooltip Tasarımı ve Etkileşim:**
+  - `app/templates/base.html` style bloğuna aydınlık ve karanlık moda uyumlu, geçiş efektli glassmorphism CSS kuralları eklendi.
+  - Tooltip HTML iskeleti ve `window.getSelection()` bounding rect koordinatlarına göre dinamik konumlanan, tıklama dışı eylemlerde animasyonla kapanan etkileşimli JS scripti eklendi.
+- **Birim Testleri ve Güvenlik:**
+  - `tests/test_inline_translate.py` altında yetkisiz erişim, boş/geçersiz girdi, mocklanmış başarılı MyMemory çeviri yanıtı ve API hata durumlarını denetleyen 4 yeni test eklendi.
+  - Testlerin dış ağ bağımlılığını kesmek amacıyla `urlopen` çağrısı mocklandı. 83 birim testinin tamamının başarıyla (`OK`) geçtiği doğrulandı.
+
