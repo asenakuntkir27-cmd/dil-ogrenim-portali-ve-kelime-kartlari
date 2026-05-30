@@ -81,22 +81,85 @@
             --zinc-950: #f8fafc;
         }
         /* Dynamic Theme Text Color Polish */
-        body {
-            color: #f1f5f9 !important;
+        body, p, li, label, td, th, option {
+            color: #F1F5F9 !important;
         }
-        [data-theme="light"] body {
-            color: #334155 !important;
+        [data-theme="light"] body,
+        [data-theme="light"] p,
+        [data-theme="light"] li,
+        [data-theme="light"] label,
+        [data-theme="light"] td,
+        [data-theme="light"] th,
+        [data-theme="light"] option {
+            color: #1E293B !important;
         }
-        h1, h2, h3, h4, h5, h6 {
-            color: #ffffff;
+        
+        h1, h2, h3, h4, h5, h6, strong:not(button *, a *, .btn *, .nav-register-btn *), b:not(button *, a *, .btn *, .nav-register-btn *) {
+            color: #FFFFFF !important;
         }
         [data-theme="light"] h1,
         [data-theme="light"] h2,
         [data-theme="light"] h3,
         [data-theme="light"] h4,
         [data-theme="light"] h5,
-        [data-theme="light"] h6 {
-            color: #2d3748 !important;
+        [data-theme="light"] h6,
+        [data-theme="light"] strong:not(button *, a *, .btn *, .nav-register-btn *),
+        [data-theme="light"] b:not(button *, a *, .btn *, .nav-register-btn *) {
+            color: #0F172A !important;
+        }
+
+        /* Form Inputs, Textareas, Selects & Tooltip text styling */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="search"],
+        textarea,
+        select,
+        #vocab-search-input,
+        #inline-translate-result-text,
+        #inline-translate-original-text {
+            color: #FFFFFF !important;
+        }
+        
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder,
+        input[type="search"]::placeholder,
+        textarea::placeholder,
+        #vocab-search-input::placeholder {
+            color: #E2E8F0 !important;
+        }
+
+        [data-theme="light"] input[type="text"],
+        [data-theme="light"] input[type="email"],
+        [data-theme="light"] input[type="password"],
+        [data-theme="light"] input[type="search"],
+        [data-theme="light"] textarea,
+        [data-theme="light"] select,
+        [data-theme="light"] #vocab-search-input,
+        [data-theme="light"] #inline-translate-result-text,
+        [data-theme="light"] #inline-translate-original-text {
+            color: #334155 !important;
+        }
+        
+        [data-theme="light"] input[type="text"]::placeholder,
+        [data-theme="light"] input[type="email"]::placeholder,
+        [data-theme="light"] input[type="password"]::placeholder,
+        [data-theme="light"] input[type="search"]::placeholder,
+        [data-theme="light"] textarea::placeholder,
+        [data-theme="light"] #vocab-search-input::placeholder {
+            color: #334155 !important;
+        }
+
+        /* Protect buttons, links and their children from important overrides */
+        button, button *, 
+        a, a *, 
+        .btn, .btn *, 
+        input[type="submit"], 
+        input[type="button"],
+        .nav-register-btn,
+        .nav-register-btn * {
+            color: inherit;
         }
         /* Custom premium styles */
         body {
@@ -171,21 +234,7 @@
         [data-theme="light"] #neon-reminder-toast p {
             color: #312e81 !important;
         }
-        
-        /* Search Input theme overrides */
-        #vocab-search-input {
-            color: #F1F5F9 !important;
-        }
-        #vocab-search-input::placeholder {
-            color: #a0aec0 !important;
-        }
-        [data-theme="light"] #vocab-search-input {
-            color: #334155 !important;
-        }
-        [data-theme="light"] #vocab-search-input::placeholder {
-            color: #334155 !important;
-        }
-        
+
         /* Inline Translation Tooltip Styling */
         #inline-translator-tooltip {
             transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
