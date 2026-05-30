@@ -151,6 +151,55 @@
             color: #334155 !important;
         }
 
+        /* Specific Search Input Background & Border Overrides */
+        #vocab-search-input {
+            background: rgba(9, 9, 11, 0.7) !important;
+            border-color: rgba(63, 63, 70, 0.4) !important;
+        }
+        #vocab-search-input:focus {
+            background: rgba(9, 9, 11, 0.9) !important;
+            border-color: rgba(236, 72, 153, 0.8) !important;
+        }
+        [data-theme="light"] #vocab-search-input {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(200, 90, 126, 0.25) !important;
+        }
+        [data-theme="light"] #vocab-search-input:focus {
+            background: #FFFFFF !important;
+            border-color: rgba(200, 90, 126, 0.8) !important;
+        }
+
+        /* Search Results Dropdown Text & Informational styling */
+        #search-results-dropdown div {
+            color: #F1F5F9 !important;
+        }
+        #search-results-dropdown span.text-pink-400 {
+            color: #ec4899 !important;
+        }
+        #search-results-dropdown .text-zinc-200 {
+            color: #E2E8F0 !important;
+        }
+        #search-results-dropdown .text-zinc-400 {
+            color: #CBD5E1 !important;
+        }
+        #search-results-dropdown .text-zinc-500 {
+            color: #F1F5F9 !important;
+        }
+
+        [data-theme="light"] #search-results-dropdown div,
+        [data-theme="light"] #search-results-dropdown .text-zinc-500 {
+            color: #1E293B !important;
+        }
+        [data-theme="light"] #search-results-dropdown span.text-pink-400 {
+            color: #C85A7E !important;
+        }
+        [data-theme="light"] #search-results-dropdown .text-zinc-200 {
+            color: #2D3748 !important;
+        }
+        [data-theme="light"] #search-results-dropdown .text-zinc-400 {
+            color: #4A5568 !important;
+        }
+
         /* Protect buttons, links and their children from important overrides */
         button, button *, 
         a, a *, 
