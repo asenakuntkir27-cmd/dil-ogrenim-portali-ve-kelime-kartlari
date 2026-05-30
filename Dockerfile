@@ -1,10 +1,11 @@
 # Use an official Python runtime as a parent image
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=run.py
+ENV FLASK_DEBUG=0
 
 # Set the working directory in the container
 WORKDIR /app

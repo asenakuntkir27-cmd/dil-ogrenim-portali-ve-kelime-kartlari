@@ -27,5 +27,13 @@ services:
       timeout: 5s
       retries: 5
 
+  tests:
+    build: .
+    environment:
+      - SECRET_KEY=test-secret-key-lingorose-12345
+      - TESTING=True
+      - FLASK_DEBUG=0
+    command: python -m unittest discover -s tests
+
 volumes:
   postgres_data:
