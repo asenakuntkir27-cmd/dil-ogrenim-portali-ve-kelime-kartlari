@@ -40,6 +40,7 @@ def create_app(config_class=Config):
     # Automatic database seeding on startup if not in testing mode
     if not app.config.get('TESTING'):
         with app.app_context():
+            db.create_all()
             from app.seeds import seed_db
             seed_db()
 
