@@ -4,8 +4,22 @@ from urllib.parse import urlsplit
 import sqlalchemy as sa
 from app import db
 from app.auth import auth
-from app.auth.forms import LoginForm, RegistrationForm
+from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
 from app.models import User
+from itsdangerous import URLSafeTimedSerializer
+from flask import current_app
+
+def generate_reset_token(email):
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    return serializer.dumps(email, salt='password-reset-salt')
+
+def verify_reset_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(token, salt='password-reset-salt', max_age=expiration)
+        return email
+    except Exception:
+        return None
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -57,3 +71,41 @@ def register():
         flash('Tebrikler, başarıyla kayıt oldunuz! Şimdi giriş yapabilirsiniz.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Kayıt Ol', form=form)
+
+@auth.route('/reset-password-request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = db.session.scalar(sa.select(User).where(User.email == form.email.data))
+        if user:
+            token = generate_reset_token(user.email)
+            reset_url = url_for('auth.reset_password', token=token, _external=True)
+            return render_template('auth/reset_password_requested.html', reset_url=reset_url, email=user.email, title='Bağlantı Oluşturuldu')
+        else:
+            flash('Bu e-posta adresine kayıtlı bir kullanıcı bulunamadı.', 'danger')
+            return redirect(url_for('auth.reset_password_request'))
+    return render_template('auth/reset_password_request.html', title='Şifre Sıfırlama Talebi', form=form)
+
+@auth.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    email = verify_reset_token(token)
+    if not email:
+        flash('Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.', 'danger')
+        return redirect(url_for('auth.login'))
+    
+    user = db.session.scalar(sa.select(User).where(User.email == email))
+    if not user:
+        flash('Kullanıcı bulunamadı.', 'danger')
+        return redirect(url_for('auth.login'))
+        
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Şifreniz başarıyla güncellendi! Yeni şifrenizle giriş yapabilirsiniz.', 'success')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/reset_password.html', title='Şifreyi Sıfırla', form=form)

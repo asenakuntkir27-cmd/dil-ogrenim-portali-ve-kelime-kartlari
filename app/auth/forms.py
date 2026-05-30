@@ -59,3 +59,14 @@ class ChangePasswordForm(FlaskForm):
         DataRequired(), EqualTo('new_password', message='Yeni şifreler eşleşmiyor.')
     ])
     submit_password = SubmitField('Şifreyi Güncelle')
+
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('E-Posta Adresi', validators=[DataRequired(), Email(), Length(max=120)])
+    submit = SubmitField('Sıfırlama Bağlantısı Gönder')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Yeni Şifre', validators=[DataRequired(), Length(min=6)])
+    password_confirm = PasswordField('Yeni Şifre Tekrar', validators=[
+        DataRequired(), EqualTo('password', message='Şifreler eşleşmiyor.')
+    ])
+    submit = SubmitField('Şifreyi Sıfırla')

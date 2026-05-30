@@ -246,3 +246,72 @@ class AuthTestCase(unittest.TestCase):
             # Check DB is still default
             db_user = db.session.get(User, u.id)
             self.assertEqual(db_user.avatar_url, 'fa-user')
+
+    def test_reset_password_request_success(self):
+        # Create user
+        u = User(username='resetuser', email='reset@example.com')
+        u.set_password('password123')
+        db.session.add(u)
+        db.session.commit()
+
+        # Request reset link
+        response = self.client.post('/auth/reset-password-request', data={
+            'email': 'reset@example.com'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Bağlantı Oluşturuldu!'.encode('utf-8'), response.data)
+        self.assertIn(b'/auth/reset-password/', response.data)
+
+    def test_reset_password_request_fail_invalid_email(self):
+        # Request reset link with unregistered email
+        response = self.client.post('/auth/reset-password-request', data={
+            'email': 'notregistered@example.com'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'kay\xc4\xb1tl\xc4\xb1 bir kullan\xc4\xb1c\xc4\xb1 bulunamad\xc4\xb1', response.data)
+
+    def test_reset_password_success(self):
+        # Create user
+        u = User(username='resetuser', email='reset@example.com')
+        u.set_password('password123')
+        db.session.add(u)
+        db.session.commit()
+
+        # Generate valid token
+        from app.auth.routes import generate_reset_token
+        token = generate_reset_token('reset@example.com')
+
+        # Reset password
+        response = self.client.post(f'/auth/reset-password/{token}', data={
+            'password': 'newpassword123',
+            'password_confirm': 'newpassword123'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'ba\xc5\x9far\xc4\xb1yla g\xc3\xbcncellendi', response.data)
+
+        # Check DB
+        db_user = db.session.get(User, u.id)
+        self.assertTrue(db_user.check_password('newpassword123'))
+
+    def test_reset_password_fail_invalid_token(self):
+        # Try resetting with corrupt token
+        response = self.client.post('/auth/reset-password/invalid-token-string', data={
+            'password': 'newpassword123',
+            'password_confirm': 'newpassword123'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'ge\xc3\xa7ersiz veya s\xc3\xbcresi dolmu\xc5\x9f', response.data)
+
+    def test_reset_password_fail_nonexistent_user(self):
+        # Generate token for unregistered email
+        from app.auth.routes import generate_reset_token
+        token = generate_reset_token('missing@example.com')
+
+        # Try resetting password
+        response = self.client.post(f'/auth/reset-password/{token}', data={
+            'password': 'newpassword123',
+            'password_confirm': 'newpassword123'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Kullan\xc4\xb1c\xc4\xb1 bulunamad\xc4\xb1', response.data)
+
