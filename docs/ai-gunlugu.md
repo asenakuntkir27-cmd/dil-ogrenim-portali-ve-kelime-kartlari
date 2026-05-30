@@ -403,4 +403,18 @@ Uygulamayı yeni klonlayan veya yerel geliştirme ortamlarında bozuk, eksik ya 
 - **Test ve Kararlılık Doğrulaması:**
   - Eklenen denetim mekanizmasının test suite üzerinde herhangi bir olumsuz etki yaratmadığı teyit edildi. 67 birim testinin tamamı başarıyla (`OK`) geçti.
 
+## Oturum 22: Kelime Arama Çubuğu Tema ve Renk Optimizasyonu
+**Tarih:** 30 Mayıs 2026
 
+### Hedef
+Aydınlık ve karanlık temalarda kelime arama çubuğunun (Search Input) yazı rengi ve placeholder rengini temalarımıza göre optimize etmek ve renk çakışmalarını tamamen ortadan kaldırmak.
+
+### Yapılanlar
+- **Tema Bazlı CSS Kuralları:**
+  - Global `base.html` style bloğuna `#vocab-search-input` ve `#vocab-search-input::placeholder` seçicileri eklenerek `!important` ile renk değerleri bağlandı.
+  - Aydınlık modda (`data-theme="light"`) yazı rengi ve placeholder rengi net bir koyu gri (`#334155`) olarak ayarlandı.
+  - Karanlık modda (varsayılan) yazı rengi parlak açık gri (`#F1F5F9`) ve placeholder rengi (`#a0aec0`) olarak ayarlandı.
+- **Tailwind Sınıflarının Temizlenmesi:**
+  - `app/templates/main/index.html` dosyasındaki girdi alanında renk çakışmasına sebep olan `text-zinc-100` ve `placeholder-zinc-500` Tailwind sınıfları kaldırılarak kontrol tamamen global CSS kurallarına devredildi.
+- **Doğrulama:**
+  - Yapılan değişikliklerin ardından test suite çalıştırılarak 79 birim testinin tamamının başarıyla tamamlandığı teyit edildi.
