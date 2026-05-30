@@ -40,10 +40,20 @@ def create_app(config_class=Config):
     # Automatic database setup and seeding on startup (if not in testing mode)
     if not app.config.get('TESTING'):
         with app.app_context():
-            import sqlalchemy as sa
-            from app.models import User
+            from sqlalchemy import inspect
             try:
-                # Veritabanının sağlıklı olup olmadığını anlamak için deneme sorgusu çek
+                # Veritabanında olması gereken ve mevcut tabloları doğrula
+                inspector = inspect(db.engine)
+                existing_tables = inspector.get_table_names()
+                expected_tables = list(db.metadata.tables.keys())
+                
+                missing_tables = [table for table in expected_tables if table not in existing_tables]
+                if missing_tables:
+                    raise Exception(f"Eksik tablolar tespit edildi: {missing_tables}")
+                
+                # Tablolar mevcutsa temel bir sorgu çekmeyi dene (bütünlük testi)
+                import sqlalchemy as sa
+                from app.models import User
                 db.session.scalar(sa.select(User.id).limit(1))
                 
                 # Şema sağlamsa doğrudan tohumlama/eksik kontrolü yap
@@ -51,8 +61,8 @@ def create_app(config_class=Config):
                 seed_db()
             except Exception as e:
                 # Tablolar eksik, bozuk veya eski migrasyonlardan kalma uyumsuzluk var
-                db.session.rollback()
-                print(f"Database check failed: {e}. Attempting auto-recovery...")
+                db.session.remove()  # Scoped session'ı tamamen kaldır
+                print(f"Database verification failed: {e}. Attempting clean auto-recovery...")
                 try:
                     db.drop_all()
                     db.create_all()
