@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex min-h-[70vh] flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 class="text-center text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">Onay Bağlantısı Oluşturuldu!</h2>
+        <p class="mt-2 text-center text-sm text-zinc-400">
+            E-posta Değişikliği Doğrulama Akışı
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-zinc-900 border border-zinc-800 px-6 py-8 shadow-xl shadow-black/40 rounded-2xl sm:px-10 space-y-6">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-950/40 border border-pink-900/30 text-pink-400 mx-auto shadow-lg shadow-pink-500/10">
+                <i class="fa-solid fa-paper-plane text-xl animate-pulse"></i>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-sm text-zinc-300">
+                    Yeni e-posta adresiniz olan <strong class="text-white">{{ email }}</strong> için doğrulama talebi oluşturuldu.
+                </p>
+                <p class="text-xs text-zinc-500 mt-3 leading-relaxed">
+                    E-posta gönderimi yerel simülasyon modunda olduğundan, e-posta adresinizi onaylamak ve değişikliği tamamlamak için aşağıdaki butonu kullanabilirsiniz.
+                </p>
+            </div>
+
+            <div class="pt-4 border-t border-zinc-800/60">
+                <a href="{{ confirm_url }}" class="w-full flex justify-center py-3.5 px-4 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-fuchsia-650 hover:from-pink-500 hover:to-fuchsia-550 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-pink-500/15 text-center">
+                    E-posta Adresini Onayla ✉️
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

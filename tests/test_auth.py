@@ -315,3 +315,122 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Kullan\xc4\xb1c\xc4\xb1 bulunamad\xc4\xb1', response.data)
 
+    def test_change_email_request_requires_login(self):
+        response = self.client.get('/auth/change-email-request')
+        self.assertEqual(response.status_code, 302)
+
+    def test_change_email_request_success(self):
+        u = User(username='emailuser', email='emailuser@example.com')
+        u.set_password('password123')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'emailuser', 'password': 'password123'})
+            
+            response = self.client.post('/auth/change-email-request', data={
+                'new_email': 'newemail@example.com',
+                'password': 'password123'
+            })
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Onay Bağlantısı Oluşturuldu!'.encode('utf-8'), response.data)
+            self.assertIn(b'/auth/confirm-email-change/', response.data)
+
+    def test_change_email_request_wrong_password(self):
+        u = User(username='emailuser', email='emailuser@example.com')
+        u.set_password('password123')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'emailuser', 'password': 'password123'})
+            
+            response = self.client.post('/auth/change-email-request', data={
+                'new_email': 'newemail@example.com',
+                'password': 'wrongpassword'
+            }, follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Mevcut şifreniz yanlış.'.encode('utf-8'), response.data)
+
+    def test_change_email_request_duplicate_email(self):
+        u1 = User(username='emailuser1', email='emailuser1@example.com')
+        u1.set_password('password123')
+        u2 = User(username='emailuser2', email='emailuser2@example.com')
+        u2.set_password('password123')
+        db.session.add_all([u1, u2])
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'emailuser1', 'password': 'password123'})
+            
+            response = self.client.post('/auth/change-email-request', data={
+                'new_email': 'emailuser2@example.com',
+                'password': 'password123'
+            })
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Bu e-posta adresi zaten kullanılıyor'.encode('utf-8'), response.data)
+
+    def test_confirm_email_change_success(self):
+        u = User(username='emailuser', email='emailuser@example.com')
+        u.set_password('password123')
+        db.session.add(u)
+        db.session.commit()
+
+        # Generate valid token
+        from app.auth.routes import generate_email_change_token
+        token = generate_email_change_token(u.id, 'newemail@example.com')
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'emailuser', 'password': 'password123'})
+            
+            response = self.client.get(f'/auth/confirm-email-change/{token}', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('E-posta adresiniz başarıyla güncellendi!'.encode('utf-8'), response.data)
+            
+            # Check db
+            db_user = db.session.get(User, u.id)
+            self.assertEqual(db_user.email, 'newemail@example.com')
+
+    def test_confirm_email_change_invalid_token(self):
+        u = User(username='emailuser', email='emailuser@example.com')
+        u.set_password('password123')
+        db.session.add(u)
+        db.session.commit()
+
+        with self.client:
+            self.client.post('/auth/login', data={'username': 'emailuser', 'password': 'password123'})
+            
+            response = self.client.get('/auth/confirm-email-change/invalid-token-string', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('E-posta onaylama bağlantısı geçersiz veya süresi dolmuş.'.encode('utf-8'), response.data)
+
+    def test_confirm_email_change_wrong_user(self):
+        u1 = User(username='emailuser1', email='emailuser1@example.com')
+        u1.set_password('password123')
+        u2 = User(username='emailuser2', email='emailuser2@example.com')
+        u2.set_password('password123')
+        db.session.add_all([u1, u2])
+        db.session.commit()
+
+        # Generate token for user 1
+        from app.auth.routes import generate_email_change_token
+        token = generate_email_change_token(u1.id, 'newemail@example.com')
+
+        with self.client:
+            # Login as user 2
+            self.client.post('/auth/login', data={'username': 'emailuser2', 'password': 'password123'})
+            
+            # Try to confirm with user 1's token
+            response = self.client.get(f'/auth/confirm-email-change/{token}', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('E-posta onaylama bağlantısı geçersiz veya süresi dolmuş.'.encode('utf-8'), response.data)
+            
+            # Verify user 1's email has not changed
+            db_user1 = db.session.get(User, u1.id)
+            self.assertEqual(db_user1.email, 'emailuser1@example.com')
+            
+            # Verify user 2's email has not changed
+            db_user2 = db.session.get(User, u2.id)
+            self.assertEqual(db_user2.email, 'emailuser2@example.com')
+
+

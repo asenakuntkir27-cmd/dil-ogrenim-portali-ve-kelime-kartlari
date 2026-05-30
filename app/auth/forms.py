@@ -70,3 +70,13 @@ class ResetPasswordForm(FlaskForm):
         DataRequired(), EqualTo('password', message='Şifreler eşleşmiyor.')
     ])
     submit = SubmitField('Şifreyi Sıfırla')
+
+class ChangeEmailRequestForm(FlaskForm):
+    new_email = StringField('Yeni E-Posta Adresi', validators=[DataRequired(), Email(), Length(max=120)])
+    password = PasswordField('Mevcut Şifre', validators=[DataRequired()])
+    submit = SubmitField('Değişiklik Bağlantısı Gönder')
+
+    def validate_new_email(self, new_email):
+        user = db.session.scalar(sa.select(User).where(User.email == new_email.data))
+        if user is not None:
+            raise ValidationError('Bu e-posta adresi zaten kullanılıyor. Lütfen farklı bir tane seçin.')

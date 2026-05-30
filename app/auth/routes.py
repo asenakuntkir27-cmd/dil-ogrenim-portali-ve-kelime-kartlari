@@ -1,10 +1,10 @@
 from flask import render_template, flash, redirect, url_for, request, session
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urlsplit
 import sqlalchemy as sa
 from app import db
 from app.auth import auth
-from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
+from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, ChangeEmailRequestForm
 from app.models import User
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app
@@ -18,6 +18,18 @@ def verify_reset_token(token, expiration=3600):
     try:
         email = serializer.loads(token, salt='password-reset-salt', max_age=expiration)
         return email
+    except Exception:
+        return None
+
+def generate_email_change_token(user_id, new_email):
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    return serializer.dumps({'user_id': user_id, 'new_email': new_email}, salt='email-change-salt')
+
+def verify_email_change_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        data = serializer.loads(token, salt='email-change-salt', max_age=expiration)
+        return data
     except Exception:
         return None
 
@@ -109,3 +121,39 @@ def reset_password(token):
         flash('Şifreniz başarıyla güncellendi! Yeni şifrenizle giriş yapabilirsiniz.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', title='Şifreyi Sıfırla', form=form)
+
+@auth.route('/change-email-request', methods=['GET', 'POST'])
+@login_required
+def change_email_request():
+    from flask_login import login_required
+    form = ChangeEmailRequestForm()
+    if form.validate_on_submit():
+        if not current_user.check_password(form.password.data):
+            flash('Mevcut şifreniz yanlış.', 'danger')
+            return redirect(url_for('auth.change_email_request'))
+            
+        token = generate_email_change_token(current_user.id, form.new_email.data)
+        confirm_url = url_for('auth.confirm_email_change', token=token, _external=True)
+        return render_template('auth/change_email_requested.html', confirm_url=confirm_url, email=form.new_email.data, title='Onay Bağlantısı Oluşturuldu')
+    return render_template('auth/change_email_request.html', title='E-posta Değiştirme Talebi', form=form)
+
+@auth.route('/confirm-email-change/<token>', methods=['GET'])
+@login_required
+def confirm_email_change(token):
+    from flask_login import login_required
+    data = verify_email_change_token(token)
+    if not data or data.get('user_id') != current_user.id:
+        flash('E-posta onaylama bağlantısı geçersiz veya süresi dolmuş.', 'danger')
+        return redirect(url_for('main.profile'))
+        
+    new_email = data.get('new_email')
+    # Double check unique email constraint on execution
+    existing_user = db.session.scalar(sa.select(User).where(User.email == new_email))
+    if existing_user:
+        flash('Bu e-posta adresi başka bir kullanıcı tarafından kullanılıyor.', 'danger')
+        return redirect(url_for('main.profile'))
+        
+    current_user.email = new_email
+    db.session.commit()
+    flash('E-posta adresiniz başarıyla güncellendi!', 'pink')
+    return redirect(url_for('main.profile'))
