@@ -53,13 +53,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --zinc-50: #fafafa;
-            --zinc-100: #f4f4f5;
-            --zinc-200: #e4e4e7;
-            --zinc-300: #d4d4d8;
-            --zinc-400: #a1a1aa;
-            --zinc-500: #71717a;
-            --zinc-600: #52525b;
+            --zinc-50: #ffffff;
+            --zinc-100: #f1f5f9;
+            --zinc-200: #e2e8f0;
+            --zinc-300: #cbd5e1;
+            --zinc-400: #94a3b8;
+            --zinc-500: #a0aec0;
+            --zinc-600: #718096;
             --zinc-700: #3f3f46;
             --zinc-800: #27272a;
             --zinc-850: #1f1f23;
@@ -67,18 +67,36 @@
             --zinc-950: #09090b;
         }
         [data-theme="light"] {
-            --zinc-50: #0f172a;
-            --zinc-100: #0f172a;
-            --zinc-200: #1e293b;
+            --zinc-50: #1e293b;
+            --zinc-100: #1e293b;
+            --zinc-200: #2d3748;
             --zinc-300: #334155;
-            --zinc-400: #64748b;
-            --zinc-500: #94a3b8;
-            --zinc-600: #cbd5e1;
+            --zinc-400: #334155;
+            --zinc-500: #4a5568;
+            --zinc-600: #718096;
             --zinc-700: #e2e8f0;
             --zinc-800: #cbd5e1;
             --zinc-850: #f1f5f9;
             --zinc-900: #ffffff;
             --zinc-950: #f8fafc;
+        }
+        /* Dynamic Theme Text Color Polish */
+        body {
+            color: #f1f5f9 !important;
+        }
+        [data-theme="light"] body {
+            color: #334155 !important;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff;
+        }
+        [data-theme="light"] h1,
+        [data-theme="light"] h2,
+        [data-theme="light"] h3,
+        [data-theme="light"] h4,
+        [data-theme="light"] h5,
+        [data-theme="light"] h6 {
+            color: #2d3748 !important;
         }
         /* Custom premium styles */
         body {
