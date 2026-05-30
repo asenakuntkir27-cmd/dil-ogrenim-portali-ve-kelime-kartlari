@@ -37,11 +37,30 @@ def create_app(config_class=Config):
         from app.seeds import seed_db
         seed_db()
 
-    # Automatic database seeding on startup if not in testing mode
+    # Automatic database setup and seeding on startup (if not in testing mode)
     if not app.config.get('TESTING'):
         with app.app_context():
-            db.create_all()
-            from app.seeds import seed_db
-            seed_db()
+            import sqlalchemy as sa
+            from app.models import User
+            try:
+                # Veritabanının sağlıklı olup olmadığını anlamak için deneme sorgusu çek
+                db.session.scalar(sa.select(User.id).limit(1))
+                
+                # Şema sağlamsa doğrudan tohumlama/eksik kontrolü yap
+                from app.seeds import seed_db
+                seed_db()
+            except Exception as e:
+                # Tablolar eksik, bozuk veya eski migrasyonlardan kalma uyumsuzluk var
+                db.session.rollback()
+                print(f"Database check failed: {e}. Attempting auto-recovery...")
+                try:
+                    db.drop_all()
+                    db.create_all()
+                    from app.seeds import seed_db
+                    seed_db()
+                    print("Database auto-recovered successfully.")
+                except Exception as recovery_error:
+                    db.session.rollback()
+                    print(f"CRITICAL: Failed to auto-recover database: {recovery_error}")
 
     return app
