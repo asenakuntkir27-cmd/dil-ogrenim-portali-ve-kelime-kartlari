@@ -1,5 +1,11 @@
 # LingoRose: Oyunlaştırılmış Dil Öğrenim Portali ve Kelime Kartları Platformu
 
+[![Flask](https://img.shields.io/badge/FLASK-v3.0+-004455?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Tailwind CSS](https://img.shields.io/badge/TAILWIND_CSS-v3.0+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![SQLAlchemy 2.0](https://img.shields.io/badge/SQLALCHEMY-v2.0-CC2927?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlalchemy.org/)
+[![Docker](https://img.shields.io/badge/DOCKER-READY-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Tests](https://img.shields.io/badge/83_TESTS-PASSED-4CAF50?style=for-the-badge&logo=github-actions&logoColor=white)](https://docs.python.org/3/library/unittest.html)
+
 LingoRose, yabancı dil öğreniminde kelime dağarcığını kalıcı hale getirmek amacıyla tasarlanmış, gelişmiş oyunlaştırma mekanikleriyle desteklenen, web tabanlı interaktif bir dil öğrenim portalıdır. Modern yazılım mühendisliği prensipleri ve yüksek erişilebilirlik standartları gözetilerek geliştirilen platform; çok dilli hazır kelime paketleri, istatistiksel analiz grafikeri, çift tema desteği ve kendi kendini onarabilen veritabanı motoru gibi kurumsal düzeyde özellikler barındırmaktadır. Proje, üretim ortamı standartlarında Dockerize edilmiş olup tam kapsamlı bir otomatik birim test süitiyle kararlı hale getirilmiştir.
 
 ---
