@@ -58,9 +58,9 @@ Her oturum sonunda `task.md` ve `walkthrough.md` dosyalarının güncellenmesi, 
 
 ---
 
-## 5. Süreç Boyunca Yakalanan ve Düzeltilen 3 Kritik Hata
+## 5. Süreç Boyunca Yakalanan ve Düzeltilen 4 Kritik Hata
 
-AI entegrasyonu esnasında karşılaşılan ve sistemin kararlılığını tehdit eden üç kritik problem geliştirici müdahalesiyle çözülmüştür:
+AI entegrasyonu esnasında karşılaşılan ve sistemin kararlılığını tehdit eden dört kritik problem geliştirici müdahalesiyle çözülmüştür:
 
 ### 1. Eski SQLAlchemy Stilinin Kullanılması
 Ajan, ilk veritabanı sorgularında ve ilişkisel veri çekme işlemlerinde eski SQLAlchemy 1.x stili olan `User.query.filter_by(...)` veya `db.session.query(User)...` yapılarını kullanmıştır. Modern SQLAlchemy 2.0 standartlarında bu kullanım amorti edildiğinden ve performans kayıplarına yol açabileceğinden sorgular `sa.select(User).where(...)` yapısına dönüştürülmüştür.
@@ -70,6 +70,9 @@ Uygulama başlangıcında yerel veritabanında bozuk/eksik şema tespiti için s
 
 ### 3. routes.py Dosyasındaki login_required NameError Hatası
 Ajan, e-posta değiştirme rotalarını eklerken `@login_required` dekoratörünü kullanmıştır. Ancak dekoratörün çalışması için gereken `from flask_login import login_required` import ifadesini dosyanın başına eklemek yerine rota fonksiyonunun içerisine eklemiştir. Python dekoratörleri modül yüklenme (load-time) anında değerlendirildiğinden, uygulamanın ayağa kalkması esnasında `NameError: name 'login_required' is not defined` hatası fırlatılmış ve tüm testlerin çökmesine yol açmıştır. Import ifadesi modül düzeyine çekilerek bu hata tamamen giderilmiştir.
+
+### 4. Karanlık Modda Arama Kutusu Girdi ve Yazı Rengi Çakışması
+Kullanıcı ara yüzündeki en son cila sürecinde, arama çubuğu girdi alanının (`#vocab-search-input`) zemin renginin, bazı durumlarda veya aydınlık/karanlık tema geçişlerindeki CSS değişkenlerinin (`--zinc-900`/`--zinc-950`) farklı çözümlenmesi nedeniyle açık renkte kaldığı, ancak girdi yazı renginin de beyaz (`#FFFFFF`) olarak ayarlandığı tespit edilmiştir. Bu durum, kullanıcının arama çubuğuna yazdığı kelimelerin tamamen görünmez olmasına ve arama altındaki sonuç menüsü metinlerinin okunamaz hale gelmesine yol açmıştır. Hata, `base.html` üzerindeki CSS kurallarına doğrudan müdahale edilerek, karanlık modda girdi zemin renginin yarı şeffaf koyu renk (`rgba(9, 9, 11, 0.7)`), yazı renginin ise tam beyaz (`#FFFFFF`) olarak sabitlenmesiyle giderilmiştir.
 
 ---
 

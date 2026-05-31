@@ -437,3 +437,20 @@ Kullanıcıların platformdaki herhangi bir kelimeyi veya cümleyi imleçle seç
   - `tests/test_inline_translate.py` altında yetkisiz erişim, boş/geçersiz girdi, mocklanmış başarılı MyMemory çeviri yanıtı ve API hata durumlarını denetleyen 4 yeni test eklendi.
   - Testlerin dış ağ bağımlılığını kesmek amacıyla `urlopen` çağrısı mocklandı. 83 birim testinin tamamının başarıyla (`OK`) geçtiği doğrulandı.
 
+---
+
+## Oturum 24: Son Cila, Inline Çeviri ve Kontrast İyileştirmeleri
+**Tarih:** 31 Mayıs 2026
+
+### Hedef
+Kullanıcının seçtiği kelimeleri/cümleleri MyMemory/Lingva API'leri üzerinden çeviren "Inline Translation Tooltip" modülünü ve testlerini tamamlamak; sistem genelindeki renk ve tema kontrastlarını iyileştirerek arama kutusundaki beyaz metin çakışma hatasını çözmek.
+
+### Yapılanlar
+- **Satır İçi Çeviri (Inline Translation):** Ekrandaki metin seçimlerini (highlight) algılayarak dinamik konumlanan mor/pembe neon temalı Tooltip arayüzü kuruldu. Çeviri işlemlerini MyMemory API (öncelikli) ve Lingva API (yedek) kullanarak kararlı şekilde yapan `/main/inline-translate` POST rotası entegre edildi. Yetkisiz erişim, boş girdi ve API hata durumlarını sınayan 4 yeni birim test eklendi ve toplam test sayısı **83**'e çıkarıldı.
+- **Global Tematik Renk ve Kontrast Cilası:** 
+  - *Aydınlık Mod:* Gövde metinleri, formlar ve paragraflar için okunaklı koyu gri (`#1E293B`), başlıklar için koyu füme (`#0F172A`), form alanları ve placeholder metinleri için `#334155` renkleri tanımlandı. Butonlardaki beyaz metinler bu kurallardan muaf tutuldu.
+  - *Karanlık Mod:* Arka plan zeminleri üzerindeki gövde metinleri ve etiketler açık gri (`#F1F5F9`), başlıklar ve girdi metinleri tam beyaz (`#FFFFFF`) yapıldı.
+- **Arama Çubuğu Kontrast Hatası Çözümü:** Karanlık modda, girdi alanının (#vocab-search-input) arka planı ile içine yazılan yazı renginin çakışıp metinlerin görünmez kalması hatası çözüldü. Arama girdi alanı arka planı karanlık modda yarı şeffaf koyu renk (`rgba(9, 9, 11, 0.7)`) yapılarak beyaz yazıların okunabilirliği sağlandı ve neon görsele uyum sağlandı. Arama kutusu altındaki sonuç dropdown menüsündeki tüm bilgilendirme metinleri ("Sonuç bulunamadı." vb.) karanlık modda açık griye (`#F1F5F9`) çekildi.
+
+### Sonraki Adımlar
+- Projenin tamamlanan sürümünü üretim ortamına (Docker) almak ve yayına hazırlamak.
