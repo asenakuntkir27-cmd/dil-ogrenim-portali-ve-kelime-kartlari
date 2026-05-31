@@ -1,88 +1,80 @@
-# LingoRose Proje Sonu Raporu
+# LingoRose Proje Sonu Teknik Tasarım Raporu
 
-Bu rapor, LingoRose Dil Öğrenim Portalı ve Kelime Kartları projesinin geliştirme süreçlerini, mimari yapısını, Vibe Coding deneyimini, Antigravity platformunun sunduğu katkıları ve karşılaşılan teknik zorluklar ile bunların çözümlerini özetlemektedir.
+**Proje Başlığı:** LingoRose Dil Öğrenim Portalı ve Kelime Kartları  
 
----
-
-## 1. Projenin Amacı ve Genel Özeti
-
-Yabancı dil öğreniminde en temel problemlerden biri, kelimelerin kalıcı hafızaya aktarılamaması ve öğrenme sürecinin tekdüze olmasıdır. LingoRose, bu problemi çözmek için tasarlanmış, kullanıcı etkileşimini ve oyunlaştırmayı temel alan modern bir dil öğrenim portalıdır. Uygulama; kullanıcıların İngilizce, Almanca, İspanyolca, Fransızca ve İtalyanca olmak üzere 5 farklı dilde pratik yapmasını sağlar. 
-
-Kullanıcılar sisteme giriş yaptıklarında, her dil için 15 farklı kategoride (örneğin Sayılar, Renkler, Hayvanlar vb.) en az 20'şer kelime barındıran toplam 1500 kelimelik zengin bir başlangıç veri seti (seed data) otomatik olarak hesaplarına tanımlanır. Kullanıcılar ayrıca kendi çalışma kartlarını ve destelerini oluşturabilirler. Öğrenme sürecini desteklemek amacıyla 3D kart çevirme quiz modülü, kelime eşleştirme oyunu, kelime tetrisi (Word Drop), cümle kurma (Sentence Builder), hafıza kartları (Memory Flip) ve boşluk doldurma (Fill in the Blanks) gibi toplam 6 farklı interaktif çalışma ve oyun modülü sunulmaktadır. Platform, koyu modda neon pembe/mor gradyanlar, aydınlık modda ise göz yormayan pastel gül kurusu tonlarıyla tasarlanmış premium bir glassmorphism arayüzüne sahiptir.
-
----
-
-## 2. Mimari Yapı ve Klasör Düzeni
-
-LingoRose projesi, Python dilinin mikro-framework'ü olan Flask 3.x sürümü üzerine inşa edilmiştir. Mimaride modülerliği, bakım kolaylığını ve test edilebilirliği artırmak için Application Factory Pattern (Uygulama Fabrikası Deseni) ve Blueprint yapıları kullanılmıştır.
-
-### Klasör Yapısı ve Bileşenler
-
-- **app/**: Uygulamanın çekirdek kodunu barındırır.
-  - **auth/**: Kimlik doğrulama, profil ayarları, şifre sıfırlama ve e-posta güncelleme formları (`forms.py`) ve rotalarını (`routes.py`) içeren Blueprint.
-  - **main/**: Dashboard, oyunlar, desteler ve kart yönetim rotalarını barındıran ana Blueprint.
-  - **templates/**: HTML şablonları. `base.html` ana iskeleti oluştururken alt klasörler modüler sayfaları barındırır.
-  - **static/**: CSS, JavaScript ve yerel varlıklar.
-  - **models.py**: SQLAlchemy 2.0 standartlarında tanımlanmış veritabanı modelleri (User, Deck, Card, Score, Streak, Badge).
-  - **seeds.py**: Uygulama ayağa kalkarken veya yeni dil seçildiğinde çalışan seeding ve backfill mantığı.
-  - **vocabulary_data.py**: 1500 kelimelik başlangıç sözlük verisi.
-- **tests/**: `unittest` kütüphanesiyle yazılmış ve tüm bileşenleri (auth, seeding, study, language, pagination) kapsayan birim test dosyaları.
-- **config.py**: Uygulamanın çevresel değişkenleri ve SQLite/PostgreSQL veritabanı ayarlarını barındıran yapılandırma dosyası.
-- **Dockerfile & docker-compose.yml**: Uygulamanın izole edilmesini ve production ortamında (gunicorn ile giden) çalışmasını sağlayan konteyner tanımları.
+### Öğrenci Bilgileri
+* **Adı Soyadı:** Ayşe Sena Kuntkır  
+* **Öğrenci Numarası:** 24380102030  
+* **Bölüm:** Bilişim Güvenliği Teknolojileri  
+* **Sınıf / Şube:** 1. Sınıf / 2. Şube  
+* **Teslim Tarihi:** 1 Haziran 2026  
 
 ---
 
-## 3. Vibe Coding Deneyimi: Avantajlar ve Zorluklar
+## 1. Projenin Amacı ve Hedefleri
 
-Doğal dil yönlendirmeleriyle kod yazma pratiği (Vibe Coding), geliştirme hızını inanılmaz ölçüde artırmıştır. Geliştirici sadece sistem tasarımına ve kullanıcı deneyimine (UX) odaklanırken, yapay zeka asistanı mekanik kodlama süreçlerini üstlenmiştir.
-
-### Avantajlar
-- **Hızlı Prototipleme:** 3D kart çevirme ve JS tabanlı eşleştirme oyunu gibi karmaşık mantığa sahip modüllerin arayüz kodları ve mantıksal akışları dakikalar içinde üretilmiştir.
-- **Bilişsel Yükün Azalması:** WTForms doğrulama kuralları, veritabanı ilişkileri ve SQL sorguları gibi standart kalıp kodların (boilerplate) yazılması yapay zekaya devredilmiş, bu da geliştiricinin enerjisini iş mantığına saklamasını sağlamıştır.
-
-### Zorluklar
-- **Büyük Veri Dosyaları ve Bağlam Yönetimi:** 1500 kelime içeren `vocabulary_data.py` gibi büyük boyutlu (176 KB) dosyalarla çalışırken yapay zekanın dosyanın tamamını okuyup düzenlemesi yüksek token maliyetine yol açmış ve yerel düzenleme araçlarının sınırlarını zorlamıştır.
-- **Karmaşık JavaScript Durum Yönetimleri:** Sayfa yenilendiğinde sessionStorage durumlarının korunması ve alt oyun modüllerinde diller arası geçişlerin çakışmadan yönetilmesi, yapay zeka ile geliştirici arasında sıkı bir mantıksal hizalanma gerektirmiştir.
+Yabancı dil öğreniminde kelimelerin kalıcı hafızaya aktarılamaması ve öğrenme sürecinin tekdüzeliği en büyük engellerdendir. LingoRose, bu sorunları ortadan kaldırmak için etkileşimli, oyunlaştırılmış ve kullanıcı dostu bir dil öğrenim deneyimi sunmak amacıyla tasarlanmıştır. Uygulama; İngilizce, Almanca, İspanyolca, Fransızca ve İtalyanca olmak üzere 5 farklı dili destekler. Kayıt olan her kullanıcının hesabına, 15 temel kategoride (renkler, sayılar, hayvanlar, seyahat vb.) her birinde en az 20 kelime bulunan toplam 1500 kelimelik zengin bir başlangıç veri seti (seed data) otomatik olarak aktarılır. Kullanıcılar ayrıca kendi çalışma destelerini ve kelime kartlarını serbestçe oluşturabilirler. Öğrenim sürecini pekiştirmek için tasarlanan 3D kart çevirme modülü, kelime eşleştirme oyunu, kelime tetrisi (Word Drop), cümle kurma (Sentence Builder), hafıza kartları (Memory Flip) ve boşluk doldurma (Fill in the Blanks) olmak üzere toplam 6 farklı çalışma ve oyun modülü kullanıcılara sunulmuştur.
 
 ---
 
-## 4. Antigravity Platformunda En Faydalı Bulunan İki Özellik
+## 2. Kullanılan Teknolojiler ve Mimari Tasarım
 
-Geliştirme sürecinde kullanılan Antigravity platformunun en kritik fayda sağlayan özellikleri şunlardır:
-
-### 1. Plan Modu (Planning Mode)
-Ajanın herhangi bir kod değişikliği yapmadan önce detaylı bir `implementation_plan.md` belgesi oluşturması ve onay alması sürecidir. Bu özellik, ajanın kontrolsüz kod yazmasını engellemiş, her aşamada hangi dosyaların etkileneceğini, hangi yeni bağımlılıkların gerektiğini ve testlerin nasıl etkileneceğini önceden görmemizi sağlayarak mimari bütünlüğü korumuştur.
-
-### 2. Walkthrough ve Eser (Artifact) Takip Yapısı
-Her oturum sonunda `task.md` ve `walkthrough.md` dosyalarının güncellenmesi, süreç izlenebilirliğini maksimuma çıkarmıştır. `task.md` ile işlerin anlık durumu kontrol edilirken, `walkthrough.md` yapılan değişikliklerin ve test çıktılarının net bir özetini sunarak dokümantasyon karmaşasını ortadan kaldırmıştır.
+LingoRose, Python tabanlı mikro-framework olan Flask 3.x üzerine kurulmuştur. Uygulama mimarisinde sürdürülebilirlik, temiz kod prensipleri ve genişletilebilirlik hedeflenerek Application Factory Pattern (Uygulama Fabrikası Deseni) kullanılmıştır. Uygulama başlatma süreçleri `create_app` fonksiyonu altında merkezileştirilmiştir. Rotalar ve formlar mantıksal modüllere ayrılacak şekilde Blueprint yapısı ile yapılandırılmıştır. Kullanıcı kimlik doğrulama, şifre yenileme ve profil işlemleri için `auth` Blueprint'i; kelime desteleri, oyunlar, analiz paneli ve ana dashboard akışları için ise `main` Blueprint'i geliştirilmiştir. Veritabanı yönetiminde modern SQLAlchemy 2.0 standartları benimsenmiş ve veri modeli sorgularının tamamı tip güvenli, performanslı ve sürdürülebilir SQL ifadelerine dönüştürülmüştür. Çevresel yapılandırmalar `config.py` ve `.env` üzerinden yönetilirken, uygulama Docker ve PostgreSQL orkestrasyonu sayesinde üretim ortamına hazır (production-ready) hale getirilmiştir.
 
 ---
 
-## 5. Süreç Boyunca Yakalanan ve Düzeltilen 4 Kritik Hata
+## 3. Veritabanı Şeması ve İlişkileri
 
-AI entegrasyonu esnasında karşılaşılan ve sistemin kararlılığını tehdit eden dört kritik problem geliştirici müdahalesiyle çözülmüştür:
+Uygulamanın ilişkisel veri modeli, modern SQLAlchemy 2.0 stili (`Mapped`, `mapped_column`) kullanılarak `app/models.py` dosyasında tanımlanmıştır. Veritabanı şeması aşağıdaki temel tablolar ve ilişkiler etrafında şekillenmiştir:
 
-### 1. Eski SQLAlchemy Stilinin Kullanılması
-Ajan, ilk veritabanı sorgularında ve ilişkisel veri çekme işlemlerinde eski SQLAlchemy 1.x stili olan `User.query.filter_by(...)` veya `db.session.query(User)...` yapılarını kullanmıştır. Modern SQLAlchemy 2.0 standartlarında bu kullanım amorti edildiğinden ve performans kayıplarına yol açabileceğinden sorgular `sa.select(User).where(...)` yapısına dönüştürülmüştür.
+*   **User (Kullanıcı):** Kullanıcı adı, e-posta, parola hash bilgileri, streak (ardışık gün) takibi, günlük hedef ve günlük ilerleme puanlarını barındırır.
+*   **Deck (Deste):** Kullanıcıya ait kelime gruplarını temsil eder. `user_id` yabancı anahtarı (ForeignKey) ile `User` tablosuna bağlıdır.
+*   **Card (Kelime Kartı):** Kelime, anlamı ve örnek cümle bilgilerini tutar. `deck_id` yabancı anahtarı ile ilişkili olduğu `Deck` tablosuna bağlıdır.
+*   **Score (Skor):** Kullanıcıların oyun modüllerinde elde ettikleri puanları ve oynanma tarihlerini kaydeder. `user_id` üzerinden `User` tablosu ile ilişkilidir.
 
-### 2. Tek Tablo Denetimli Eksik Veritabanı Şeması Çakışması
-Uygulama başlangıcında yerel veritabanında bozuk/eksik şema tespiti için sadece `User.query.first()` sorgusu çekiliyordu. Ancak yerel ortamlarda `User` tablosu var olduğu halde `Card`, `Deck`, `Streak` veya `Badge` tablolarının eksik veya şema uyumsuz olması durumunda bu kontrol yetersiz kalıyor ve kayıt esnasında 500 hatası alınıyordu. Sorun, SQLAlchemy Inspector kullanılarak `db.engine` üzerindeki tüm gerekli tabloların (`user`, `card`, `deck` vb.) mevcudiyetini denetleyen ve eksiklik durumunda `db.session.remove()` ile kilitlenmeleri önleyip `drop_all()` ve `create_all()` adımlarını güvenle tetikleyen kurşun geçirmez bir auto-recovery mekanizmasıyla çözülmüştür.
+İlişkisel yapı bire-çok (One-to-Many) mantığına dayanmaktadır. Bir kullanıcının birden fazla destesi ve skoru olabilir; bir destenin ise birden fazla kelime kartı bulunur. Modeller arasındaki bu ilişkiler `cascade="all, delete-orphan"` parametresi ile tanımlanarak, bir üst kayıt (örneğin bir deste veya kullanıcı) silindiğinde ilişkili tüm alt verilerin (kartlar, skorlar) veritabanında yetim kalmadan otomatik olarak temizlenmesi sağlanmıştır.
 
-### 3. routes.py Dosyasındaki login_required NameError Hatası
-Ajan, e-posta değiştirme rotalarını eklerken `@login_required` dekoratörünü kullanmıştır. Ancak dekoratörün çalışması için gereken `from flask_login import login_required` import ifadesini dosyanın başına eklemek yerine rota fonksiyonunun içerisine eklemiştir. Python dekoratörleri modül yüklenme (load-time) anında değerlendirildiğinden, uygulamanın ayağa kalkması esnasında `NameError: name 'login_required' is not defined` hatası fırlatılmış ve tüm testlerin çökmesine yol açmıştır. Import ifadesi modül düzeyine çekilerek bu hata tamamen giderilmiştir.
-
-### 4. Karanlık Modda Arama Kutusu Girdi ve Yazı Rengi Çakışması
-Kullanıcı ara yüzündeki en son cila sürecinde, arama çubuğu girdi alanının (`#vocab-search-input`) zemin renginin, bazı durumlarda veya aydınlık/karanlık tema geçişlerindeki CSS değişkenlerinin (`--zinc-900`/`--zinc-950`) farklı çözümlenmesi nedeniyle açık renkte kaldığı, ancak girdi yazı renginin de beyaz (`#FFFFFF`) olarak ayarlandığı tespit edilmiştir. Bu durum, kullanıcının arama çubuğuna yazdığı kelimelerin tamamen görünmez olmasına ve arama altındaki sonuç menüsü metinlerinin okunamaz hale gelmesine yol açmıştır. Hata, `base.html` üzerindeki CSS kurallarına doğrudan müdahale edilerek, karanlık modda girdi zemin renginin yarı şeffaf koyu renk (`rgba(9, 9, 11, 0.7)`), yazı renginin ise tam beyaz (`#FFFFFF`) olarak sabitlenmesiyle giderilmiştir.
+| Tablo Adı | Birincil Anahtar | İlişkili Olduğu Tablo | İlişki Tipi | Cascade Özelliği |
+| :--- | :--- | :--- | :--- | :--- |
+| **User** | `id` | - | - | - |
+| **Deck** | `id` | `User` (`user_id`) | Çoktan Bire (Many-to-One) | `all, delete-orphan` |
+| **Card** | `id` | `Deck` (`deck_id`) | Çoktan Bire (Many-to-One) | `all, delete-orphan` |
+| **Score** | `id` | `User` (`user_id`) | Çoktan Bire (Many-to-One) | `all, delete-orphan` |
 
 ---
 
-## 6. AI Desteği Olmayan Proje Süresi Analizi ve Sürdürülebilirlik
+## 4. Kullanıcı Deneyimi (UX) ve Çift Tema Tasarımı
 
-### Geliştirme Süresi Analizi
-LingoRose projesinin sıfırdan, yapay zeka desteği olmadan tek bir geliştirici tarafından yapılması durumunda altyapı kurulumu, form validasyonları, 3D animasyonlar, oyun mantıkları, 1500 kelimelik seed verisinin hazırlanması, Dockerize edilmesi ve birim testlerinin yazılması yaklaşık **70 saatlik (9 iş günü)** yoğun bir çalışma gerektirecekti. Yapay zeka asistanı ile yürütülen pair programming sayesinde proje, tüm testleri yeşil olacak şekilde **yaklaşık 6 saatte** tamamlanmıştır. Bu, geliştirme süresinde **%91.4 oranında zaman tasarrufu** sağlandığını göstermektedir.
+LingoRose, kullanıcıların göz sağlığını korumak ve etkileşimi artırmak amacıyla çift tema desteği sunmaktadır.
 
-### Sürdürülebilirlik ve Sonraki Adımlar
-Platformun gelecekte daha sürdürülebilir olması için şu adımlar planlanmaktadır:
-1. **Aralıklı Tekrarlama Sistemi (Spaced Repetition System):** Kelime öğrenimini kalıcı kılmak için SuperMemo (SM-2) algoritması entegre edilebilir.
-2. **Text-to-Speech (TTS):** Kelime kartlarına sesli okuma özelliği eklenerek işitsel öğrenme pekiştirilebilir.
-3. **Liderlik Tablosu:** Kullanıcılar arasında tatlı bir rekabet oluşturacak haftalık sıralama motoru kurulabilir.
+*   **Karanlık Mod:** Koyu gri ve siyah zeminler üzerine neon pembe ve mor gradyanların kullanıldığı, buzlu cam (glassmorphism) efektli, görsel açıdan son derece zengin ve premium bir arayüze sahiptir.
+*   **Aydınlık Mod:** Aydınlık modda göz yormayan, pastel gül kurusu tonlarında yumuşak bir arka plan (`#FFF5F7` - `#FCECEF`) tercih edilmiştir. Okunabilirliği artırmak amacıyla tüm neon ışımalar ve gölgeler kaldırılmış; başlıklar için koyu füme (`#0F172A`), gövde metinleri için ise koyu gri (`#1E293B`) renk kodları kullanılmıştır. Kelime kartlarının arka planı fildişi beyazına çekilerek kontrast oranı en üst seviyeye taşınmıştır.
+
+Kullanıcı deneyimini güçlendirmek amacıyla CSS 3D Transforms kullanılarak 3D kart çevirme animasyonları entegre edilmiştir. JavaScript tarafında `sessionStorage` ve `localStorage` kullanılarak kullanıcının seçtiği aktif modül durumu, son oynanan oyun filtresi ve gizlilik tercihleri tarayıcı hafızasında saklanmakta; sayfa yenilense dahi arayüz durum kaybı yaşamadan kesintisiz çalışmaktadır.
+
+---
+
+## 5. Ajan Hatalarının Tespiti ve Mühendislik Müdahaleleri
+
+Geliştirme sürecinde yapay zeka ajanının ürettiği kodlarda tespit edilen ve sistem kararlılığını tehdit eden 4 kritik hata, mühendislik müdahaleleriyle giderilmiştir:
+
+1.  **SQLAlchemy 1.x Sorgu Stilinin Kullanılması:** Ajan, veritabanı sorgularında eskiyen ve SQLAlchemy 2.0 ile önerilmeyen `User.query.filter_by(...)` yapısını kullanmıştır. Bu durum modern sürüm uyumluluğu için `sa.select(User).where(...)` yapısına dönüştürülmüştür.
+2.  **Tek Tablo Denetimli Eksik Şema Çakışması:** Uygulama açılışında sadece `User` tablosunun varlığı kontrol ediliyor, diğer tabloların (Card, Deck vb.) eksik olması durumunda 500 hatası alınıyordu. SQLAlchemy Inspector entegre edilerek tüm tabloların mevcudiyeti taranmış; hata durumunda scoped session temizlenerek (`db.session.remove()`) güvenli bir drop-all ve create-all auto-recovery (otomatik kurtarma) mekanizması kurulmuştur.
+3.  **routes.py Dosyasındaki login_required NameError Hatası:** Rotalara eklenen `@login_required` dekoratörü için gereken import ifadesi, ajan tarafından modül düzeyi yerine fonksiyon içine eklenmiş; bu da uygulamanın load-time (yüklenme) anında `NameError` vermesine yol açmıştır. Import ifadesi modül seviyesine çekilerek hata çözülmüştür.
+4.  **Arama Kutusu Kontrast Çakışması:** Karanlık modda, girdi alanının zemin rengi ile yazı renginin beyaz olması nedeniyle yazılan metinlerin okunamaz hale geldiği fark edilmiştir. Arama girdi alanı arka planı karanlık modda yarı şeffaf koyu renk (`rgba(9, 9, 11, 0.7)`), yazı rengi ise parlak açık gri (`#F1F5F9`) yapılarak sorun giderilmiştir.
+
+---
+
+## 6. Test Stratejisi ve Kararlılık
+
+LingoRose projesinin kararlılığı, Python `unittest` kütüphanesi üzerine kurulu kapsamlı bir test suite ile güvence altına alınmıştır. Test süreçleri; kimlik doğrulama (`test_auth.py`), çalışma modülü (`test_study.py`), tohumlama mekanizması (`test_seeding.py`), dil tercihleri (`test_language.py`), sayfalama ve hata sayfaları (`test_errors_and_pagination.py`), başarı rozetleri (`test_achievements.py`) ve satır içi çeviri API'si (`test_inline_translate.py`) gibi uygulamanın tüm kritik yollarını kapsamaktadır.
+
+Toplam **83 birim test (unit test)** yazılmış ve testlerin tamamı **%100 başarı oranıyla (OK)** çalıştırılmıştır. Testlerin harici ağlara bağımlılığını kesmek amacıyla MyMemory ve Lingva gibi çeviri API'lerine yapılan HTTP istekleri mocklanmış, böylece testlerin çevrimdışı ortamlarda bile hızlı ve kararlı çalışması sağlanmıştır.
+
+---
+
+## 7. Sonuç ve Gelecek Çalışmalar
+
+Yapay zeka pair programming desteği (Vibe Coding) sayesinde, normal şartlarda tek bir geliştirici için yaklaşık **70 saat (9 iş günü)** sürecek olan altyapı kurulumu, form doğrulamaları, 3D animasyonlar, oyun modülleri, Dockerize etme ve 83 testlik test suite yazımı süreçleri **yaklaşık 6 saatte** tamamlanarak **%91.4 oranında zaman tasarrufu** sağlanmıştır. Geliştirme esnasında Antigravity platformunun Plan Modu (Planning Mode) ve Walkthrough/Task takip özellikleri, kontrolsüz kod yazımını engelleyerek mimari bütünlüğün korunmasına katkı sunmuştur.
+
+Gelecek çalışmalarda, kelime öğrenimini kalıcı kılmak adına SuperMemo (SM-2) algoritmasına dayalı bir Aralıklı Tekrarlama Sistemi (Spaced Repetition System) entegrasyonu, kelimelerin işitsel telaffuzları için Text-to-Speech (TTS) altyapısı ve kullanıcılar arası rekabeti artıracak haftalık Liderlik Tablosu motorunun kurulması planlanmaktadır.
