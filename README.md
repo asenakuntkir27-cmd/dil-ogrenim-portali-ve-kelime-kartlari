@@ -8,10 +8,10 @@
 
 ---
 
-## Proje Tanıtım ve Demo Videosu
-Projenin tüm fonksiyonel akışlarını, güvenlik mekanizmalarını, çift tema yapısını ve 83 birim testlik test süitini içeren detaylı sunum ve demo videosuna aşağıdaki bağlantı üzerinden erişilebilir:
+## Proje Demo Videosu
+Projenin tüm fonksiyonel akışlarını, arayüz özelliklerini ve test süreçlerini içeren sunum videosuna aşağıdaki bağlantı üzerinden erişilebilir:
 
-👉 [LingoRose Proje Demo Videosu (Google Drive)](https://drive.google.com/file/d/1vGbzEP5YyxEGtwEXq2zZE1HK74Q5A2E_/view?usp=drivesdk)
+[LingoRose Proje Demo Videosu (Google Drive)](https://drive.google.com/file/d/1vGbzEP5YyxEGtwEXq2zZE1HK74Q5A2E_/view?usp=drivesdk)
 
 ---
 
