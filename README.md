@@ -6,6 +6,15 @@
 [![Docker](https://img.shields.io/badge/DOCKER-READY-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Tests](https://img.shields.io/badge/83_TESTS-PASSED-4CAF50?style=for-the-badge&logo=github-actions&logoColor=white)](https://docs.python.org/3/library/unittest.html)
 
+---
+
+## Proje Tanıtım ve Demo Videosu
+Projenin tüm fonksiyonel akışlarını, güvenlik mekanizmalarını, çift tema yapısını ve 83 birim testlik test süitini içeren detaylı sunum ve demo videosuna aşağıdaki bağlantı üzerinden erişilebilir:
+
+👉 [LingoRose Proje Demo Videosu (Google Drive)](https://drive.google.com/file/d/1vGbzEP5YyxEGtwEXq2zZE1HK74Q5A2E_/view?usp=drivesdk)
+
+---
+
 LingoRose, yabancı dil öğreniminde kelime dağarcığını kalıcı hale getirmek amacıyla tasarlanmış, gelişmiş oyunlaştırma mekanikleriyle desteklenen, web tabanlı interaktif bir dil öğrenim portalıdır. Modern yazılım mühendisliği prensipleri ve yüksek erişilebilirlik standartları gözetilerek geliştirilen platform; çok dilli hazır kelime paketleri, istatistiksel analiz grafikeri, çift tema desteği ve kendi kendini onarabilen veritabanı motoru gibi kurumsal düzeyde özellikler barındırmaktadır. Proje, üretim ortamı standartlarında Dockerize edilmiş olup tam kapsamlı bir otomatik birim test süitiyle kararlı hale getirilmiştir.
 
 ---
