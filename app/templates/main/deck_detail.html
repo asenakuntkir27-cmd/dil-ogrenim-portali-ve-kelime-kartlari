@@ -131,7 +131,14 @@
                     <!-- Yabancı Kelime -->
                     <div class="flex items-center justify-between gap-4 mb-2">
                         <span class="text-[10px] font-bold text-pink-400 uppercase tracking-wider">Kelime</span>
-                        <i class="fa-regular fa-clone text-zinc-700 group-hover:text-zinc-500 transition-colors"></i>
+                        <div class="flex items-center gap-1.5 no-print">
+                            <button onclick="speakWord('{{ card.word|escape }}', '{{ current_language_code }}')" 
+                                    class="text-zinc-700 hover:text-pink-400 hover:bg-zinc-800/50 p-1.5 rounded-lg transition-all duration-200 cursor-pointer" 
+                                    title="Sesli Oku">
+                                <i class="fa-solid fa-volume-high text-xs"></i>
+                            </button>
+                            <i class="fa-regular fa-clone text-zinc-700 group-hover:text-zinc-500 transition-colors"></i>
+                        </div>
                     </div>
                     <h4 class="text-xl font-extrabold text-white tracking-tight leading-tight mb-4">{{ card.word }}</h4>
                     
@@ -204,6 +211,30 @@
     {% endif %}
 
     <script>
+        function speakWord(text, langCode = 'en-US') {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                const langMap = {
+                    'en': 'en-US',
+                    'de': 'de-DE',
+                    'es': 'es-ES',
+                    'fr': 'fr-FR',
+                    'it': 'it-IT'
+                };
+                const resolvedLang = langMap[langCode] || langCode;
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = resolvedLang;
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.error("Tarayıcınız ses sentezleme özelliğini desteklememektedir.");
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             var dateSpan = document.getElementById('print-date');
             if (dateSpan) {
