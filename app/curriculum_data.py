@@ -5,7 +5,7 @@ A1_CURRICULUM = [
         "unit_number": 1,
         "title": "Nice to Meet You!",
         "grammar_topic": "Present Simple (be: I, you)",
-        "words_description": "Countries, Numbers 0-10",
+        "words_description": "Countries, Numbers, Greetings",
         "grammar_explanation": """
 <div class="space-y-4">
     <h3 class="text-xl font-bold text-pink-400">1. Present Simple 'be' (I, you)</h3>
@@ -33,25 +33,18 @@ A1_CURRICULUM = [
         "words": [
             {"word": "Turkey", "meaning": "Türkiye"},
             {"word": "England", "meaning": "İngiltere"},
-            {"word": "Spain", "meaning": "İspanya"},
-            {"word": "France", "meaning": "Fransa"},
             {"word": "Germany", "meaning": "Almanya"},
+            {"word": "Spain", "meaning": "İspanya"},
             {"word": "Italy", "meaning": "İtalya"},
-            {"word": "USA", "meaning": "Amerika Birleşik Devletleri"},
-            {"word": "Japan", "meaning": "Japonya"},
-            {"word": "Brazil", "meaning": "Brezilya"},
-            {"word": "Canada", "meaning": "Kanada"},
-            {"word": "Zero", "meaning": "Sıfır"},
+            {"word": "Doctor", "meaning": "Doktor"},
+            {"word": "Teacher", "meaning": "Öğretmen"},
+            {"word": "Student", "meaning": "Öğrenci"},
             {"word": "One", "meaning": "Bir"},
-            {"word": "Two", "meaning": "İki"},
-            {"word": "Three", "meaning": "Üç"},
-            {"word": "Four", "meaning": "Dört"},
             {"word": "Five", "meaning": "Beş"},
-            {"word": "Six", "meaning": "Altı"},
-            {"word": "Seven", "meaning": "Yedi"},
-            {"word": "Eight", "meaning": "Sekiz"},
-            {"word": "Nine", "meaning": "Dokuz"},
-            {"word": "Ten", "meaning": "On"}
+            {"word": "Ten", "meaning": "On"},
+            {"word": "Welcome", "meaning": "Hoş geldiniz"},
+            {"word": "Hello", "meaning": "Merhaba"},
+            {"word": "Name", "meaning": "İsim / Ad"}
         ]
     },
     {
@@ -78,17 +71,19 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
+            {"word": "Turkish", "meaning": "Türkçe / Türk"},
             {"word": "English", "meaning": "İngilizce / İngiliz"},
             {"word": "German", "meaning": "Almanca / Alman"},
             {"word": "Spanish", "meaning": "İspanyolca / İspanyol"},
-            {"word": "French", "meaning": "Fransızca / Fransız"},
             {"word": "Italian", "meaning": "İtalyanca / İtalyan"},
-            {"word": "Turkish", "meaning": "Türkçe / Türk"},
-            {"word": "Japanese", "meaning": "Japonca / Japon"},
-            {"word": "Portuguese", "meaning": "Portekizce / Portekizli"},
-            {"word": "Brazilian", "meaning": "Brezilyalı"},
-            {"word": "Canadian", "meaning": "Kanadalı"},
-            {"word": "American", "meaning": "Amerikalı"}
+            {"word": "Music", "meaning": "Müzik"},
+            {"word": "World", "meaning": "Dünya"},
+            {"word": "Flag", "meaning": "Bayrak"},
+            {"word": "Speak", "meaning": "Konuşmak"},
+            {"word": "Friend", "meaning": "Arkadaş"},
+            {"word": "Guitar", "meaning": "Gitar"},
+            {"word": "Piano", "meaning": "Piyano"},
+            {"word": "Song", "meaning": "Şarkı"}
         ]
     },
     {
@@ -115,35 +110,28 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
-            {"word": "Book", "meaning": "Kitap"},
             {"word": "Pen", "meaning": "Kalem"},
+            {"word": "Book", "meaning": "Kitap"},
             {"word": "Table", "meaning": "Masa"},
             {"word": "Chair", "meaning": "Sandalye"},
             {"word": "Phone", "meaning": "Telefon"},
-            {"word": "Computer", "meaning": "Bilgisayar"},
-            {"word": "Key", "meaning": "Anahtar"},
-            {"word": "Clock", "meaning": "Saat (Duvar)"},
-            {"word": "Bag", "meaning": "Çanta"},
-            {"word": "Watch", "meaning": "Kol Saati"},
-            {"word": "Father", "meaning": "Baba"},
-            {"word": "Mother", "meaning": "Anne"},
-            {"word": "Brother", "meaning": "Erkek Kardeş"},
-            {"word": "Sister", "meaning": "Kız Kardeş"},
-            {"word": "Son", "meaning": "Erkek Evlat"},
-            {"word": "Daughter", "meaning": "Kız Evlat"},
             {"word": "Red", "meaning": "Kırmızı"},
             {"word": "Blue", "meaning": "Mavi"},
             {"word": "Green", "meaning": "Yeşil"},
-            {"word": "Yellow", "meaning": "Sarı"},
             {"word": "Black", "meaning": "Siyah"},
-            {"word": "White", "meaning": "Beyaz"}
+            {"word": "White", "meaning": "Beyaz"},
+            {"word": "Mother", "meaning": "Anne"},
+            {"word": "Father", "meaning": "Baba"},
+            {"word": "Brother", "meaning": "Erkek Kardeş"},
+            {"word": "Sister", "meaning": "Kız Kardeş"},
+            {"word": "Family", "meaning": "Aile"}
         ]
     },
     {
         "unit_number": 4,
         "title": "Time",
         "grammar_topic": "Present Simple (I, you, we, they)",
-        "words_description": "Daily Activities, Months, Seasons",
+        "words_description": "Daily Activities, Seasons, Days",
         "grammar_explanation": """
 <div class="space-y-4">
     <h3 class="text-xl font-bold text-pink-400">1. Present Simple (Genel Zaman - I, you, we, they)</h3>
@@ -160,18 +148,19 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
+            {"word": "Morning", "meaning": "Sabah"},
+            {"word": "Night", "meaning": "Gece"},
+            {"word": "Clock", "meaning": "Saat (Duvar/Masa)"},
             {"word": "Wake up", "meaning": "Uyanmak"},
-            {"word": "Brush teeth", "meaning": "Diş fırçalamak"},
-            {"word": "Have breakfast", "meaning": "Kahvaltı yapmak"},
-            {"word": "Go to work", "meaning": "İşe gitmek"},
-            {"word": "Study", "meaning": "Ders çalışmak"},
-            {"word": "Go home", "meaning": "Eve gitmek"},
-            {"word": "Have dinner", "meaning": "Akşam yemeği yemek"},
-            {"word": "Sleep", "meaning": "Uyumak"},
-            {"word": "Spring", "meaning": "İlkbahar"},
+            {"word": "Breakfast", "meaning": "Kahvaltı"},
+            {"word": "School", "meaning": "Okul"},
+            {"word": "Work", "meaning": "Çalışmak / İş"},
             {"word": "Summer", "meaning": "Yaz"},
+            {"word": "Winter", "meaning": "Kış"},
+            {"word": "Spring", "meaning": "İlkbahar"},
             {"word": "Autumn", "meaning": "Sonbahar"},
-            {"word": "Winter", "meaning": "Kış"}
+            {"word": "Monday", "meaning": "Pazartesi"},
+            {"word": "Sunday", "meaning": "Pazar"}
         ]
     },
     {
@@ -198,23 +187,21 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
-            {"word": "Read", "meaning": "Okumak"},
-            {"word": "Play football", "meaning": "Futbol oynamak"},
-            {"word": "Watch TV", "meaning": "Televizyon izlemek"},
-            {"word": "Listen to music", "meaning": "Müzik dinlemek"},
-            {"word": "Swim", "meaning": "Yüzmek"},
-            {"word": "Ride a bike", "meaning": "Bisiklete binmek"},
-            {"word": "Breakfast", "meaning": "Kahvaltı"},
-            {"word": "Lunch", "meaning": "Öğle yemeği"},
-            {"word": "Dinner", "meaning": "Akşam yemeği"},
-            {"word": "Bread", "meaning": "Ekmek"},
-            {"word": "Cheese", "meaning": "Peynir"},
-            {"word": "Egg", "meaning": "Yumurta"},
-            {"word": "Apple", "meaning": "Elma"},
-            {"word": "Banana", "meaning": "Muz"},
-            {"word": "Milk", "meaning": "Süt"},
+            {"word": "Football", "meaning": "Futbol"},
+            {"word": "Cinema", "meaning": "Sinema"},
+            {"word": "Book", "meaning": "Kitap"},
+            {"word": "Coffee", "meaning": "Kahve"},
             {"word": "Tea", "meaning": "Çay"},
-            {"word": "Coffee", "meaning": "Kahve"}
+            {"word": "Apple", "meaning": "Elma"},
+            {"word": "Bread", "meaning": "Ekmek"},
+            {"word": "Water", "meaning": "Su"},
+            {"word": "Breakfast", "meaning": "Kahvaltı"},
+            {"word": "Lunch", "meaning": "Öğle Yemeği"},
+            {"word": "Dinner", "meaning": "Akşam Yemeği"},
+            {"word": "Delicious", "meaning": "Lezzetli"},
+            {"word": "Cook", "meaning": "Yemek Pişirmek"},
+            {"word": "Eat", "meaning": "Yemek yemek"},
+            {"word": "Drink", "meaning": "İçmek"}
         ]
     },
     {
@@ -241,28 +228,28 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
+            {"word": "Bank", "meaning": "Banka"},
             {"word": "School", "meaning": "Okul"},
             {"word": "Hospital", "meaning": "Hastane"},
             {"word": "Park", "meaning": "Park"},
-            {"word": "Library", "meaning": "Kütüphane"},
-            {"word": "Cafe", "meaning": "Kafe"},
-            {"word": "Supermarket", "meaning": "Süpermarket"},
-            {"word": "Cinema", "meaning": "Sinema"},
-            {"word": "Station", "meaning": "İstasyon / Gar"},
-            {"word": "Sofa", "meaning": "Kanepe / Koltuk"},
+            {"word": "Street", "meaning": "Sokak / Cadde"},
+            {"word": "House", "meaning": "Ev"},
             {"word": "Bed", "meaning": "Yatak"},
+            {"word": "Sofa", "meaning": "Kanepe"},
+            {"word": "Door", "meaning": "Kapı"},
+            {"word": "Window", "meaning": "Pencere"},
             {"word": "Wardrobe", "meaning": "Gardırop"},
-            {"word": "Desk", "meaning": "Çalışma Masası"},
-            {"word": "Mirror", "meaning": "Ayna"},
-            {"word": "Lamp", "meaning": "Lamba"},
-            {"word": "Cupboard", "meaning": "Dolap / Büfe"}
+            {"word": "Kitchen", "meaning": "Mutfak"},
+            {"word": "Room", "meaning": "Oda"},
+            {"word": "City", "meaning": "Şehir"},
+            {"word": "Town", "meaning": "Kasaba"}
         ]
     },
     {
         "unit_number": 7,
         "title": "Skills",
         "grammar_topic": "Can / Can't",
-        "words_description": "Abilities",
+        "words_description": "Abilities, Skills",
         "grammar_explanation": """
 <div class="space-y-4">
     <h3 class="text-xl font-bold text-pink-400">1. Can / Can't</h3>
@@ -279,22 +266,29 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
+            {"word": "Run", "meaning": "Koşmak"},
+            {"word": "Swim", "meaning": "Yüzmek"},
+            {"word": "Fly", "meaning": "Uçmak"},
+            {"word": "Drive", "meaning": "Araba Sürmek"},
             {"word": "Speak", "meaning": "Konuşmak"},
+            {"word": "Play", "meaning": "Oynamak"},
+            {"word": "Cook", "meaning": "Yemek Pişirmek"},
+            {"word": "Write", "meaning": "Yazmak"},
+            {"word": "Read", "meaning": "Okumak"},
+            {"word": "Jump", "meaning": "Zıplamak / Atlamak"},
             {"word": "Sing", "meaning": "Şarkı söylemek"},
             {"word": "Dance", "meaning": "Dans etmek"},
-            {"word": "Swim", "meaning": "Yüzmek"},
-            {"word": "Drive", "meaning": "Araba sürmek"},
-            {"word": "Cook", "meaning": "Yemek pişirmek"},
-            {"word": "Paint", "meaning": "Resim yapmak"},
-            {"word": "Run", "meaning": "Koşmak"},
-            {"word": "Write", "meaning": "Yazmak"}
+            {"word": "Fast", "meaning": "Hızlı"},
+            {"word": "Slow", "meaning": "Yavaş"},
+            {"word": "Clever", "meaning": "Zeki"},
+            {"word": "Skill", "meaning": "Beceri / Yetenek"}
         ]
     },
     {
         "unit_number": 8,
         "title": "The Here and Now",
         "grammar_topic": "Present Continuous",
-        "words_description": "Verb phrases, Clothes",
+        "words_description": "Clothes, Verbs",
         "grammar_explanation": """
 <div class="space-y-4">
     <h3 class="text-xl font-bold text-pink-400">1. Present Continuous (Şimdiki Zaman)</h3>
@@ -311,24 +305,27 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
-            {"word": "Reading a book", "meaning": "Kitap okumak"},
-            {"word": "Listening to music", "meaning": "Müzik dinlemek"},
-            {"word": "Watching a movie", "meaning": "Film izlemek"},
-            {"word": "Cooking dinner", "meaning": "Akşam yemeği hazırlamak"},
-            {"word": "Walking", "meaning": "Yürümek"},
-            {"word": "T-shirt", "meaning": "Tişört"},
-            {"word": "Jeans", "meaning": "Kot Pantolon"},
-            {"word": "Jacket", "meaning": "Ceket"},
+            {"word": "Shirt", "meaning": "Gömlek"},
+            {"word": "Pants", "meaning": "Pantolon"},
             {"word": "Dress", "meaning": "Elbise"},
+            {"word": "Jacket", "meaning": "Ceket"},
             {"word": "Shoes", "meaning": "Ayakkabı"},
-            {"word": "Hat", "meaning": "Şapka"}
+            {"word": "Wear", "meaning": "Giymek"},
+            {"word": "Buy", "meaning": "Satın almak"},
+            {"word": "Look", "meaning": "Bakmak"},
+            {"word": "Beautiful", "meaning": "Güzel"},
+            {"word": "New", "meaning": "Yeni"},
+            {"word": "Old", "meaning": "Eski"},
+            {"word": "Shopping", "meaning": "Alışveriş"},
+            {"word": "Clean", "meaning": "Temiz"},
+            {"word": "Dirty", "meaning": "Kirli"}
         ]
     },
     {
         "unit_number": 9,
         "title": "Looking Back",
         "grammar_topic": "Past Simple (was/were, regular verbs)",
-        "words_description": "Dates and years, Everyday verbs",
+        "words_description": "Everyday verbs, Dates and years",
         "grammar_explanation": """
 <div class="space-y-4">
     <h3 class="text-xl font-bold text-pink-400">1. Past Simple: 'was' / 'were'</h3>
@@ -349,21 +346,26 @@ A1_CURRICULUM = [
 """,
         "words": [
             {"word": "Yesterday", "meaning": "Dün"},
-            {"word": "Last week", "meaning": "Geçen hafta"},
-            {"word": "Two days ago", "meaning": "İki gün önce"},
-            {"word": "Worked", "meaning": "Çalıştı"},
-            {"word": "Studied", "meaning": "Ders çalıştı"},
-            {"word": "Played", "meaning": "Oynadı"},
-            {"word": "Watched", "meaning": "İzledi"},
-            {"word": "Walked", "meaning": "Yürüdü"},
-            {"word": "Cleaned", "meaning": "Temizledi"}
+            {"word": "Year", "meaning": "Yıl / Sene"},
+            {"word": "Month", "meaning": "Ay"},
+            {"word": "Day", "meaning": "Gün"},
+            {"word": "Ago", "meaning": "Önce"},
+            {"word": "Start", "meaning": "Başlamak"},
+            {"word": "Finish", "meaning": "Bitirmek"},
+            {"word": "Live", "meaning": "Yaşamak"},
+            {"word": "Work", "meaning": "Çalışmak"},
+            {"word": "Study", "meaning": "Ders çalışmak"},
+            {"word": "Travel", "meaning": "Seyahat etmek"},
+            {"word": "Visit", "meaning": "Ziyaret etmek"},
+            {"word": "History", "meaning": "Tarih"},
+            {"word": "Past", "meaning": "Geçmiş"}
         ]
     },
     {
         "unit_number": 10,
         "title": "It's History",
         "grammar_topic": "Past Simple (irregular verbs)",
-        "words_description": "Time phrases, Life events",
+        "words_description": "Life events, History",
         "grammar_explanation": """
 <div class="space-y-4">
     <h3 class="text-xl font-bold text-pink-400">1. Past Simple: Düzensiz Fiiller (Irregular Verbs)</h3>
@@ -390,17 +392,20 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
-            {"word": "Went", "meaning": "Gitti (go V2)"},
-            {"word": "Had", "meaning": "Sahip oldu (have V2)"},
-            {"word": "Saw", "meaning": "Gördü (see V2)"},
-            {"word": "Ate", "meaning": "Yedi (eat V2)"},
-            {"word": "Drank", "meaning": "İçti (drink V2)"},
-            {"word": "Bought", "meaning": "Satın aldı (buy V2)"},
-            {"word": "Born", "meaning": "Doğmuş"},
-            {"word": "Grow up", "meaning": "Büyümek"},
+            {"word": "Born", "meaning": "Doğmuş / Doğmak"},
+            {"word": "Die", "meaning": "Ölmek"},
+            {"word": "Marry", "meaning": "Evlenmek"},
             {"word": "Graduate", "meaning": "Mezun olmak"},
-            {"word": "Get a job", "meaning": "İş bulmak"},
-            {"word": "Marry", "meaning": "Evlenmek"}
+            {"word": "Win", "meaning": "Kazanmak"},
+            {"word": "Lose", "meaning": "Kaybetmek"},
+            {"word": "King", "meaning": "Kral"},
+            {"word": "Queen", "meaning": "Kraliçe"},
+            {"word": "Century", "meaning": "Yüzyıl / Asır"},
+            {"word": "Famous", "meaning": "Ünlü"},
+            {"word": "Life", "meaning": "Hayat / Yaşam"},
+            {"word": "Event", "meaning": "Olay / Etkinlik"},
+            {"word": "Ago", "meaning": "Önce"},
+            {"word": "Important", "meaning": "Önemli"}
         ]
     },
     {
@@ -427,14 +432,21 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
-            {"word": "Playing chess", "meaning": "Satranç oynamak"},
-            {"word": "Cooking", "meaning": "Yemek pişirme"},
-            {"word": "Traveling", "meaning": "Seyahat etme"},
-            {"word": "Taking photos", "meaning": "Fotoğraf çekme"},
-            {"word": "Movie", "meaning": "Film / Sinema eseri"},
-            {"word": "Concert", "meaning": "Konser"},
-            {"word": "Theater", "meaning": "Tiyatro"},
-            {"word": "Entertainment", "meaning": "Eğlence"}
+            {"word": "Movie", "meaning": "Film"},
+            {"word": "Game", "meaning": "Oyun"},
+            {"word": "Fun", "meaning": "Eğlence"},
+            {"word": "Love", "meaning": "Sevmek / Aşk"},
+            {"word": "Like", "meaning": "Beğenmek / Hoşlanmak"},
+            {"word": "Hate", "meaning": "Nefret etmek"},
+            {"word": "Enjoy", "meaning": "Keyif almak / Eğlenmek"},
+            {"word": "Happy", "meaning": "Mutlu"},
+            {"word": "Sad", "meaning": "Üzgün"},
+            {"word": "Interesting", "meaning": "İlginç"},
+            {"word": "Boring", "meaning": "Sıkıcı"},
+            {"word": "Music", "meaning": "Müzik"},
+            {"word": "Party", "meaning": "Parti"},
+            {"word": "Watch", "meaning": "İzlemek"},
+            {"word": "Listen", "meaning": "Dinlemek"}
         ]
     },
     {
@@ -461,16 +473,21 @@ A1_CURRICULUM = [
 </div>
 """,
         "words": [
-            {"word": "Ticket", "meaning": "Bilet"},
-            {"word": "Passport", "meaning": "Pasaport"},
-            {"word": "Luggage", "meaning": "Bagaj / Valizler"},
+            {"word": "Sea", "meaning": "Deniz"},
+            {"word": "Beach", "meaning": "Plaj / Sahil"},
             {"word": "Hotel", "meaning": "Otel"},
-            {"word": "Flight", "meaning": "Uçuş"},
-            {"word": "Train", "meaning": "Tren"},
-            {"word": "Beach holiday", "meaning": "Deniz tatili"},
-            {"word": "City break", "meaning": "Kısa şehir gezisi"},
-            {"word": "Skiing holiday", "meaning": "Kayak tatili"},
-            {"word": "Camping", "meaning": "Kamp yapma"}
+            {"word": "Passport", "meaning": "Pasaport"},
+            {"word": "Ticket", "meaning": "Bilet"},
+            {"word": "Plane", "meaning": "Uçak"},
+            {"word": "Bus", "meaning": "Otobüs"},
+            {"word": "Suitcase", "meaning": "Valiz / Bavul"},
+            {"word": "Summer", "meaning": "Yaz"},
+            {"word": "Camera", "meaning": "Kamera / Fotoğraf Makinesi"},
+            {"word": "Map", "meaning": "Harita"},
+            {"word": "Sun", "meaning": "Güneş"},
+            {"word": "Nature", "meaning": "Doğa"},
+            {"word": "Tour", "meaning": "Tur / Gezi"},
+            {"word": "Relax", "meaning": "Rahatlamak / Dinlenmek"}
         ]
     }
 ]

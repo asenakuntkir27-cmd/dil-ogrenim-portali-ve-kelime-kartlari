@@ -108,24 +108,21 @@ def seed_curriculum_units():
     from app.curriculum_data import A1_CURRICULUM
     
     try:
-        # Check if units already exist
-        unit_count = db.session.scalar(sa.select(sa.func.count(CurriculumUnit.id)))
-        if unit_count < 12:
-            # Delete existing to prevent overlaps
-            db.session.execute(sa.delete(CurriculumUnit))
-            
-            for unit in A1_CURRICULUM:
-                db_unit = CurriculumUnit(
-                    unit_number=unit["unit_number"],
-                    title=unit["title"],
-                    grammar_topic=unit["grammar_topic"],
-                    grammar_explanation=unit["grammar_explanation"],
-                    words_description=unit["words_description"]
-                )
-                db.session.add(db_unit)
-            db.session.commit()
-            print("Successfully seeded CurriculumUnit table with 12 units.")
-            return True
+        # Delete existing to prevent overlaps
+        db.session.execute(sa.delete(CurriculumUnit))
+        
+        for unit in A1_CURRICULUM:
+            db_unit = CurriculumUnit(
+                unit_number=unit["unit_number"],
+                title=unit["title"],
+                grammar_topic=unit["grammar_topic"],
+                grammar_explanation=unit["grammar_explanation"],
+                words_description=unit["words_description"]
+            )
+            db.session.add(db_unit)
+        db.session.commit()
+        print("Successfully seeded CurriculumUnit table with 12 units.")
+        return True
     except Exception as e:
         db.session.rollback()
         print(f"Error seeding curriculum units: {e}")
