@@ -14,6 +14,8 @@ class LanguageTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        from app.seeds import seed_curriculum_units
+        seed_curriculum_units()
         self.client = self.app.test_client()
 
     def tearDown(self):
@@ -84,6 +86,46 @@ class LanguageTestCase(unittest.TestCase):
         # Check if the idioms are listed
         self.assertIn(b'Break a leg', response.data)
         self.assertIn('Şansın bol olsun'.encode('utf-8'), response.data)
+
+    def test_a1_course_route_requires_login(self):
+        # Accessing /a1-kursu without login redirects to login
+        response = self.client.get('/a1-kursu')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/auth/login', response.headers['Location'])
+
+    def test_a1_course_route_logged_in(self):
+        from app.models import User
+        # Register and log in a user
+        u = User(username='testuser', email='test@example.com')
+        u.set_password('password')
+        db.session.add(u)
+        db.session.commit()
+        
+        # Log in
+        self.client.post('/auth/login', data={'username': 'testuser', 'password': 'password'})
+        
+        # Access /a1-kursu
+        response = self.client.get('/a1-kursu')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('A1 İngilizce Kurs Müfredatı'.encode('utf-8'), response.data)
+        self.assertIn('Nice to Meet You!'.encode('utf-8'), response.data)
+
+    def test_a1_unit_detail_route_logged_in(self):
+        from app.models import User
+        # Register and log in a user
+        u = User(username='testuser', email='test@example.com')
+        u.set_password('password')
+        db.session.add(u)
+        db.session.commit()
+        
+        # Log in
+        self.client.post('/auth/login', data={'username': 'testuser', 'password': 'password'})
+        
+        # Access /a1-kursu/unite/1
+        response = self.client.get('/a1-kursu/unite/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Nice to Meet You!'.encode('utf-8'), response.data)
+        self.assertIn("Present Simple 'be' (I, you)".encode('utf-8'), response.data)
 
 if __name__ == '__main__':
     unittest.main()

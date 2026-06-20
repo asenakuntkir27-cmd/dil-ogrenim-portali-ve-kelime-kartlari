@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* 3D Flip Card custom utility styles */
+    .perspective-1000 {
+        perspective: 1000px;
+    }
+    .transform-style-3d {
+        transform-style: preserve-3d;
+    }
+    .backface-hidden {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+        transform: rotateY(180deg);
+    }
+    .flip-card-inner {
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flip-card-inner.flipped {
+        transform: rotateY(180deg);
+    }
+</style>
+
+<div class="w-full mb-12">
+    <!-- Sayfa Başlığı ve Geri Dön -->
+    <div class="mb-8">
+        <a href="{{ url_for('main.a1_course') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-pink-400 transition-colors mb-3">
+            <i class="fa-solid fa-arrow-left"></i> Üniteler Listesine Dön
+        </a>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <span class="inline-flex items-center gap-1 rounded-lg bg-pink-950/40 border border-pink-900/40 px-2.5 py-1 text-xs font-bold text-pink-400 uppercase tracking-wider mb-2">
+                    Ünite {{ unit.unit_number }}
+                </span>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
+                    {{ unit.title }}
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- İki Sekmeli Tab Yapısı -->
+    <div class="mb-8 max-w-md">
+        <div class="bg-zinc-950 p-1 rounded-2xl flex border border-zinc-850">
+            <button id="btn-tab-grammar" onclick="switchTab('grammar')" class="flex-1 py-3 text-sm font-bold text-white bg-pink-600 rounded-xl transition-all duration-200 shadow-lg shadow-pink-500/10 cursor-pointer select-none">
+                <i class="fa-solid fa-book-open mr-2 text-xs"></i>Konu Anlatımı
+            </button>
+            <button id="btn-tab-words" onclick="switchTab('words')" class="flex-1 py-3 text-sm font-semibold text-zinc-400 hover:text-white transition-all duration-200 cursor-pointer select-none">
+                <i class="fa-solid fa-layer-group mr-2 text-xs"></i>Kelime Destesi
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. Konu Anlatımı Sekmesi İçeriği -->
+    <div id="tab-content-grammar" class="w-full bg-zinc-900/20 border border-zinc-800/80 rounded-3xl p-6 sm:p-8 backdrop-blur-md">
+        {{ unit.grammar_explanation|safe }}
+    </div>
+
+    <!-- 2. Kelime Destesi Sekmesi İçeriği -->
+    <div id="tab-content-words" class="w-full hidden">
+        {% if cards %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+                {% for card in cards %}
+                <div class="w-full aspect-[3/2] perspective-1000 cursor-pointer group" onclick="this.querySelector('.flip-card-inner').classList.toggle('flipped')">
+                    <div class="relative w-full h-full transform-style-3d flip-card-inner duration-500">
+                        <!-- Front (English Word) -->
+                        <div class="absolute inset-0 w-full h-full backface-hidden bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between hover:border-pink-500/30 transition-all duration-300">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] font-bold text-pink-400 uppercase tracking-wider">İngilizce</span>
+                                <button onclick="event.stopPropagation(); speakWord('{{ card.word|escape }}', 'en')" class="text-zinc-500 hover:text-pink-400 hover:bg-zinc-800/50 p-2 rounded-xl transition-all duration-200 cursor-pointer" title="Sesli Oku">
+                                    <i class="fa-solid fa-volume-high text-sm"></i>
+                                </button>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center">
+                                <h4 class="text-2xl font-black text-white text-center tracking-tight leading-tight select-none">{{ card.word }}</h4>
+                            </div>
+                            <div class="text-center text-[10px] text-zinc-500 font-semibold uppercase tracking-wider select-none">
+                                Anlamı için tıkla <i class="fa-solid fa-rotate-right ml-1"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Back (Turkish Meaning) -->
+                        <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-pink-950/20 via-zinc-900 to-zinc-900 border border-pink-950/50 rounded-3xl p-6 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Türkçe Karşılığı</span>
+                                <i class="fa-solid fa-check-double text-emerald-400 text-xs"></i>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center">
+                                <p class="text-xl font-bold text-zinc-200 text-center leading-snug select-none">{{ card.meaning }}</p>
+                            </div>
+                            <div class="text-center text-[10px] text-zinc-500 font-semibold uppercase tracking-wider select-none">
+                                Kartı çevir <i class="fa-solid fa-rotate-left ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Boş Durum -->
+            <div class="flex flex-col items-center justify-center text-center py-16 px-4 bg-zinc-900/20 border border-dashed border-zinc-800 rounded-2xl">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 text-zinc-650 mb-3 border border-zinc-800">
+                    <i class="fa-regular fa-folder-open text-lg"></i>
+                </div>
+                <p class="text-sm text-zinc-400 font-medium">Bu ünitede henüz kelime kartı bulunmuyor.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        const btnGrammar = document.getElementById('btn-tab-grammar');
+        const btnWords = document.getElementById('btn-tab-words');
+        const contentGrammar = document.getElementById('tab-content-grammar');
+        const contentWords = document.getElementById('tab-content-words');
+        
+        if (tab === 'grammar') {
+            btnGrammar.className = 'flex-1 py-3 text-sm font-bold text-white bg-pink-600 rounded-xl transition-all duration-200 shadow-lg shadow-pink-500/10 cursor-pointer select-none';
+            btnWords.className = 'flex-1 py-3 text-sm font-semibold text-zinc-400 hover:text-white transition-all duration-200 cursor-pointer select-none';
+            contentGrammar.classList.remove('hidden');
+            contentWords.classList.add('hidden');
+        } else {
+            btnWords.className = 'flex-1 py-3 text-sm font-bold text-white bg-pink-600 rounded-xl transition-all duration-200 shadow-lg shadow-pink-500/10 cursor-pointer select-none';
+            btnGrammar.className = 'flex-1 py-3 text-sm font-semibold text-zinc-400 hover:text-white transition-all duration-200 cursor-pointer select-none';
+            contentGrammar.classList.add('hidden');
+            contentWords.classList.remove('hidden');
+        }
+    }
+
+    function speakWord(text, langCode = 'en-US') {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            
+            const langMap = {
+                'en': 'en-US',
+                'de': 'de-DE',
+                'es': 'es-ES',
+                'fr': 'fr-FR',
+                'it': 'it-IT'
+            };
+            const resolvedLang = langMap[langCode] || langCode;
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = resolvedLang;
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            
+            window.speechSynthesis.speak(utterance);
+        } else {
+            console.error("Tarayıcınız ses sentezleme özelliğini desteklememektedir.");
+        }
+    }
+</script>
+{% endblock %}

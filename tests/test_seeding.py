@@ -42,9 +42,9 @@ class SeedingTestCase(unittest.TestCase):
         self.assertEqual(admin.email, 'admin@example.com')
         self.assertTrue(admin.check_password('admin123'))
 
-        # Verify all 5 languages (English with 16, others with 15) = 76 decks are created for admin
+        # Verify all 5 languages (English with 16, others with 15) = 76 decks + 12 curriculum decks = 88 decks are created for admin
         admin_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == admin.id)).all()
-        self.assertEqual(len(admin_decks), 76)
+        self.assertEqual(len(admin_decks), 88)
 
         # Verify a specific deck is created
         english_numbers_deck = db.session.scalar(
@@ -74,9 +74,9 @@ class SeedingTestCase(unittest.TestCase):
         user_count = db.session.scalar(sa.select(sa.func.count(User.id)))
         self.assertEqual(user_count, 1)
 
-        # But all 76 decks should be backfilled for testuser!
+        # But all 88 decks should be backfilled for testuser!
         testuser_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == u.id)).all()
-        self.assertEqual(len(testuser_decks), 76)
+        self.assertEqual(len(testuser_decks), 88)
 
         # Verify one of the backfilled decks
         spanish_colors_deck = db.session.scalar(

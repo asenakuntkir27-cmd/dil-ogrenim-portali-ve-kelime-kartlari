@@ -64,6 +64,62 @@ def idioms():
         
     return render_template('main/idioms.html', title='Popüler Kalıplar', cards=cards, deck=deck)
 
+@main.route('/a1-kursu')
+@login_required
+def a1_course():
+    from app.models import CurriculumUnit
+    # Fetch all 12 units
+    units = db.session.scalars(
+        sa.select(CurriculumUnit).order_by(CurriculumUnit.unit_number.asc())
+    ).all()
+    
+    return render_template('main/a1_units.html', title='A1 İngilizce Kursu', units=units)
+
+@main.route('/a1-kursu/unite/<int:id>')
+@login_required
+def a1_unit_detail(id):
+    from app.models import CurriculumUnit, Deck, Card
+    # Get the unit
+    unit = db.session.scalar(
+        sa.select(CurriculumUnit).where(CurriculumUnit.unit_number == id)
+    )
+    if not unit:
+        abort(404)
+        
+    # Get the corresponding vocabulary deck for the current user
+    deck_name = f"A1 Kursu - Unit {unit.unit_number}: {unit.title}"
+    deck = db.session.scalar(
+        sa.select(Deck).where(
+            Deck.user_id == current_user.id,
+            Deck.name == deck_name
+        )
+    )
+    
+    # Auto-seed curriculum if missing for this user
+    if not deck:
+        from app.seeds import seed_curriculum_for_user
+        seed_curriculum_for_user(current_user)
+        deck = db.session.scalar(
+            sa.select(Deck).where(
+                Deck.user_id == current_user.id,
+                Deck.name == deck_name
+            )
+        )
+        
+    cards = []
+    if deck:
+        cards = db.session.scalars(
+            sa.select(Card).where(Card.deck_id == deck.id)
+        ).all()
+        
+    return render_template(
+        'main/a1_detail.html',
+        title=f'Ünite {unit.unit_number}: {unit.title}',
+        unit=unit,
+        deck=deck,
+        cards=cards
+    )
+
 @main.route('/deck/new', methods=['GET', 'POST'])
 @login_required
 def create_deck():

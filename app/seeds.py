@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from app import db
-from app.models import User, Deck, Card
+from app.models import User, Deck, Card, CurriculumUnit
 from app.vocabulary_data import VOCABULARY_DATA
 
 LANG_NAMES = {
@@ -61,8 +61,81 @@ def seed_language_decks_for_user(user, lang_code):
         print(f"Error seeding {lang_name} decks for user {user.username}: {e}")
     return False
 
+def seed_curriculum_for_user(user):
+    from app.curriculum_data import A1_CURRICULUM
+    seeded_any = False
+    try:
+        for unit in A1_CURRICULUM:
+            deck_name = f"A1 Kursu - Unit {unit['unit_number']}: {unit['title']}"
+            
+            # Check if this deck already exists for this user
+            deck = db.session.scalar(
+                sa.select(Deck).where(Deck.user_id == user.id, Deck.name == deck_name)
+            )
+            if not deck:
+                # Create deck
+                deck = Deck(
+                    name=deck_name,
+                    description=f"A1 İngilizce Kursu Ünite {unit['unit_number']} kelimeleri: {unit['words_description']}",
+                    user=user
+                )
+                db.session.add(deck)
+                db.session.flush() # To get deck.id
+            
+            # Add cards
+            for card_info in unit["words"]:
+                card_exists = db.session.scalar(
+                    sa.select(Card).where(Card.deck_id == deck.id, Card.word == card_info["word"])
+                )
+                if not card_exists:
+                    card = Card(
+                        word=card_info["word"],
+                        meaning=card_info["meaning"],
+                        example_sentence="",
+                        deck=deck
+                    )
+                    db.session.add(card)
+                    seeded_any = True
+        if seeded_any:
+            db.session.commit()
+            return True
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error seeding curriculum decks for user {user.username}: {e}")
+    return False
+
+def seed_curriculum_units():
+    from app.curriculum_data import A1_CURRICULUM
+    
+    try:
+        # Check if units already exist
+        unit_count = db.session.scalar(sa.select(sa.func.count(CurriculumUnit.id)))
+        if unit_count < 12:
+            # Delete existing to prevent overlaps
+            db.session.execute(sa.delete(CurriculumUnit))
+            
+            for unit in A1_CURRICULUM:
+                db_unit = CurriculumUnit(
+                    unit_number=unit["unit_number"],
+                    title=unit["title"],
+                    grammar_topic=unit["grammar_topic"],
+                    grammar_explanation=unit["grammar_explanation"],
+                    words_description=unit["words_description"]
+                )
+                db.session.add(db_unit)
+            db.session.commit()
+            print("Successfully seeded CurriculumUnit table with 12 units.")
+            return True
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error seeding curriculum units: {e}")
+    return False
+
 def seed_db():
     try:
+        # First seed the static curriculum units
+        seed_curriculum_units()
+
         # Check if database is empty by checking if any User exists
         user_exists = db.session.scalar(sa.select(User.id).limit(1))
         if user_exists is None:
@@ -76,6 +149,9 @@ def seed_db():
             for code in LANG_NAMES.keys():
                 seed_language_decks_for_user(admin, code)
             
+            # Seed curriculum for admin
+            seed_curriculum_for_user(admin)
+            
             print("Database successfully seeded with default user 'admin' and all language decks.")
             return True
         else:
@@ -86,10 +162,12 @@ def seed_db():
                 for code in LANG_NAMES.keys():
                     if seed_language_decks_for_user(u, code):
                         seeded_count += 1
+                if seed_curriculum_for_user(u):
+                    seeded_count += 1
             if seeded_count > 0:
-                print(f"Successfully seeded/backfilled decks for {seeded_count} user-language combinations.")
+                print(f"Successfully seeded/backfilled decks for {seeded_count} user combinations.")
             else:
-                print("All existing users already have all language decks.")
+                print("All existing users already have all language/curriculum decks.")
             return True
     except (OperationalError, ProgrammingError) as e:
         db.session.rollback()

@@ -109,3 +109,15 @@ class Score(db.Model):
 
     def __repr__(self) -> str:
         return f"<Score {self.game_name}: {self.score} by User {self.user_id}>"
+
+
+class CurriculumUnit(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    unit_number: Mapped[int] = mapped_column()
+    title: Mapped[str] = mapped_column(String(128))
+    grammar_topic: Mapped[str] = mapped_column(String(128))
+    grammar_explanation: Mapped[str] = mapped_column(Text)
+    words_description: Mapped[str] = mapped_column(String(256))
+
+    def __repr__(self) -> str:
+        return f"<CurriculumUnit Unit {self.unit_number}: {self.title}>"
