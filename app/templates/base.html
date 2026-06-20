@@ -372,93 +372,83 @@
 <body class="h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-pink-600 selection:text-white">
 
     <header class="sticky top-0 z-40 w-full glass-nav">
-        <div class="mx-auto w-full md:max-w-4xl px-4 sm:px-6">
-            <div class="flex flex-col md:flex-row min-h-16 h-auto py-3 md:py-0 md:h-16 items-center justify-between gap-3 md:gap-0">
-                <!-- Logo -->
-                <div class="flex items-center gap-2">
-                    <a href="{{ url_for('main.index') }}" class="flex items-center gap-2.5 group">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-pink-500 to-fuchsia-650 text-white shadow-lg shadow-pink-500/20 group-hover:scale-105 transition-transform duration-300">
-                            <i class="fa-solid fa-graduation-cap text-lg"></i>
-                        </div>
-                        <span class="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">LingoRose</span>
-                    </a>
+        <div class="flex flex-col md:flex-row items-center justify-between w-full py-4 px-6 bg-slate-900/50 backdrop-blur-md">
+            <!-- Sol tarafta: Logo -->
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="{{ url_for('main.index') }}" class="flex items-center gap-2.5 group">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-pink-500 to-fuchsia-650 text-white shadow-lg shadow-pink-500/20 group-hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">LingoRose</span>
+                </a>
+            </div>
+
+            <!-- Orta tarafta: Navigasyon linkleri -->
+            <div class="flex items-center gap-4 sm:gap-6 my-3 md:my-0">
+                <a href="{{ url_for('main.index') }}" class="text-sm font-medium {% if request.path == url_for('main.index') or request.path == '/' %}text-pink-400 border-b-2 border-pink-500/80 pb-1{% else %}text-zinc-400 hover:text-white{% endif %} transition-colors duration-200">
+                    <i class="fa-solid fa-house mr-1.5"></i>Ana Sayfa
+                </a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.leaderboard') }}" class="text-sm font-medium transition-all duration-200 {% if request.path == url_for('main.leaderboard') %}text-pink-400 border-b-2 border-pink-500/80 pb-1{% else %}text-zinc-400 hover:text-white{% endif %}">
+                    <i class="fa-solid fa-trophy mr-1.5 text-yellow-500"></i>Liderlik Tablosu
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Sağ tarafta: Kullanıcı bilgileri ve butonlar -->
+            <div class="flex flex-wrap items-center justify-center md:justify-end gap-3 shrink-0">
+                <!-- Theme Switcher Button -->
+                <button id="theme-toggle-btn" class="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-zinc-850 hover:border-pink-500/30 bg-zinc-900/35 hover:bg-pink-500/10 text-zinc-400 hover:text-pink-400 transition-all duration-200 cursor-pointer select-none" title="Temayı Değiştir">
+                    <i id="theme-toggle-icon" class="fa-solid fa-sun text-sm"></i>
+                </button>
+
+                <!-- Language Selector Dropdown -->
+                <div class="relative group/lang">
+                    <button id="lang-dropdown-btn" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-zinc-850 hover:border-pink-500/30 bg-zinc-900/35 hover:bg-zinc-900/60 text-xs font-semibold text-zinc-300 hover:text-white transition-all duration-200 cursor-pointer select-none">
+                        <span class="text-sm leading-none">{{ current_language.flag }}</span>
+                        <span>{{ current_language.name }}</span>
+                        <i class="fa-solid fa-chevron-down text-[9px] text-zinc-500 transition-transform duration-200"></i>
+                    </button>
+                    <div id="lang-dropdown-menu" class="absolute right-0 mt-2 w-40 rounded-xl border border-zinc-800/80 bg-zinc-950/95 backdrop-blur-md p-1 shadow-2xl shadow-black/90 hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-500 uppercase tracking-wider border-b border-zinc-900 mb-1">Öğrenilen Dil</div>
+                        {% for code, lang in learning_languages.items() %}
+                            <a href="{{ url_for('main.set_language', lang_code=code) }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-150 {% if code == current_language_code %} bg-pink-500/10 text-pink-400 border border-pink-950/30 {% else %} text-zinc-400 hover:text-white hover:bg-zinc-900/60 {% endif %}">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm leading-none">{{ lang.flag }}</span>
+                                    <span>{{ lang.name }}</span>
+                                </div>
+                                {% if code == current_language_code %}
+                                    <i class="fa-solid fa-check text-[9px] text-pink-400"></i>
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </div>
                 </div>
 
-                <!-- Navigation Links -->
-                <nav class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4 mt-1 md:mt-0">
-                    <a href="{{ url_for('main.index') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">
-                        <i class="fa-solid fa-house mr-1.5"></i>Ana Sayfa
+                <div class="hidden md:block h-4 w-px bg-zinc-800"></div>
+
+                {% if current_user.is_anonymous %}
+                    <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200 px-2 py-1">Giriş Yap</a>
+                    <a href="{{ url_for('auth.register') }}" class="nav-register-btn relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-650 rounded-xl hover:from-pink-500 hover:to-fuchsia-550 transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]" style="box-shadow: 0 0 15px rgba(236, 72, 153, 0.45);">
+                        Kayıt Ol
                     </a>
-                    
-                    {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('main.leaderboard') }}" class="text-sm font-medium transition-all duration-200 {% if request.path == url_for('main.leaderboard') %}text-pink-400 border-b-2 border-pink-500/80 pb-1{% else %}text-zinc-400 hover:text-white{% endif %}">
-                        <i class="fa-solid fa-trophy mr-1.5 text-yellow-500"></i>Liderlik Tablosu
+                {% else %}
+                    <span class="text-sm text-zinc-400 hidden lg:inline">
+                        <i id="navbar-avatar-icon" class="fa-solid {{ current_user.avatar_url or 'fa-user' }} mr-1.5 text-pink-400"></i>Hoş geldin, <strong class="text-zinc-200 font-semibold">{{ current_user.username }}</strong>
+                    </span>
+                    <a href="{{ url_for('main.profile') }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-300 hover:text-white border border-zinc-800 hover:border-pink-500/50 rounded-xl bg-zinc-900/30 hover:bg-pink-500/10 transition-all duration-200">
+                        <i class="fa-solid fa-gear text-pink-400"></i>Profil Ayarları
                     </a>
-                    {% endif %}
-
-                    <a href="{{ url_for('main.profile') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-all duration-200 {% if request.path == url_for('main.profile') %}text-pink-400{% endif %}" title="Ayarlar">
-                        <i class="fa-solid fa-gear"></i>
+                    <a href="{{ url_for('auth.logout') }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-red-400 border border-zinc-800 hover:border-red-900/50 rounded-xl bg-zinc-900/30 transition-all duration-200">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>Çıkış Yap
                     </a>
-                    
-                    <div class="hidden md:block h-4 w-px bg-zinc-800"></div>
-
-                    <!-- Theme Switcher Button -->
-                    <button id="theme-toggle-btn" class="inline-flex items-center justify-center h-11 w-11 md:h-9 md:w-9 rounded-xl border border-zinc-850 hover:border-pink-500/30 bg-zinc-900/35 hover:bg-pink-500/10 text-zinc-400 hover:text-pink-400 transition-all duration-200 cursor-pointer select-none" title="Temayı Değiştir">
-                        <i id="theme-toggle-icon" class="fa-solid fa-sun text-sm"></i>
-                    </button>
-
-                    <div class="hidden md:block h-4 w-px bg-zinc-800"></div>
-
-                    <!-- Language Selector Dropdown -->
-                    <div class="relative group/lang">
-                        <button id="lang-dropdown-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-850 hover:border-pink-500/30 bg-zinc-900/35 hover:bg-zinc-900/60 text-xs font-semibold text-zinc-300 hover:text-white transition-all duration-200 cursor-pointer select-none">
-                            <span class="text-sm leading-none">{{ current_language.flag }}</span>
-                            <span>{{ current_language.name }}</span>
-                            <i class="fa-solid fa-chevron-down text-[9px] text-zinc-500 transition-transform duration-200"></i>
-                        </button>
-                        <div id="lang-dropdown-menu" class="absolute right-0 mt-2 w-40 rounded-xl border border-zinc-800/80 bg-zinc-950/95 backdrop-blur-md p-1 shadow-2xl shadow-black/90 hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                            <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-500 uppercase tracking-wider border-b border-zinc-900 mb-1">Öğrenilen Dil</div>
-                            {% for code, lang in learning_languages.items() %}
-                                <a href="{{ url_for('main.set_language', lang_code=code) }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-150 {% if code == current_language_code %} bg-pink-500/10 text-pink-400 border border-pink-950/30 {% else %} text-zinc-400 hover:text-white hover:bg-zinc-900/60 {% endif %}">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm leading-none">{{ lang.flag }}</span>
-                                        <span>{{ lang.name }}</span>
-                                    </div>
-                                    {% if code == current_language_code %}
-                                        <i class="fa-solid fa-check text-[9px] text-pink-400"></i>
-                                    {% endif %}
-                                </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="hidden md:block h-4 w-px bg-zinc-800"></div>
-
-                    {% if current_user.is_anonymous %}
-                        <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">Giriş Yap</a>
-                        <a href="{{ url_for('auth.register') }}" class="nav-register-btn relative inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-fuchsia-650 rounded-xl hover:from-pink-500 hover:to-fuchsia-550 transition-all duration-200 shadow-md shadow-pink-500/10 hover:shadow-pink-500/25 active:scale-[0.98]" style="box-shadow: 0 0 15px rgba(236, 72, 153, 0.45);">
-                            Kayıt Ol
-                        </a>
-                    {% else %}
-                        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-                            <span class="text-sm text-zinc-400 hidden sm:inline">
-                                <i id="navbar-avatar-icon" class="fa-solid {{ current_user.avatar_url or 'fa-user' }} mr-1.5 text-pink-400"></i>Hoş geldin, <strong class="text-zinc-200 font-semibold">{{ current_user.username }}</strong>
-                            </span>
-                            <a href="{{ url_for('main.profile') }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-300 hover:text-white border border-zinc-800 hover:border-pink-500/50 rounded-xl bg-zinc-900/30 hover:bg-pink-500/10 transition-all duration-200">
-                                <i class="fa-solid fa-gear text-pink-400"></i>Profil Ayarları
-                            </a>
-                            <a href="{{ url_for('auth.logout') }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-red-400 border border-zinc-800 hover:border-red-900/50 rounded-xl bg-zinc-900/30 transition-all duration-200">
-                                <i class="fa-solid fa-arrow-right-from-bracket"></i>Çıkış Yap
-                            </a>
-                        </div>
-                    {% endif %}
-                </nav>
+                {% endif %}
             </div>
         </div>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 mx-auto w-full md:max-w-4xl px-4 py-8 sm:px-6">
+    <main class="flex-1 mx-auto w-full px-4 sm:px-8 lg:px-12 py-8">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -495,7 +485,7 @@
 
     <!-- Footer -->
     <footer class="w-full border-t border-zinc-900 bg-zinc-950 py-6">
-        <div class="mx-auto w-full md:max-w-4xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+        <div class="mx-auto w-full px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
             <!-- Left Side Links -->
             <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2">
                 <a href="#" class="hover:text-zinc-300 transition-colors">Hakkımızda</a>
@@ -575,7 +565,7 @@
     </script>
 
     <!-- Neon Toast Notification Popup -->
-    <div id="neon-reminder-toast" class="fixed top-20 right-4 z-50 transform translate-x-full opacity-0 pointer-events-none transition-all duration-500 max-w-sm w-full bg-zinc-950/80 backdrop-blur-md border border-pink-500/30 rounded-2xl p-4 flex gap-3">
+    <div id="neon-reminder-toast" class="fixed bottom-4 right-4 z-50 transform translate-x-full opacity-0 pointer-events-none transition-all duration-500 max-w-sm w-full bg-zinc-950/80 backdrop-blur-md border border-pink-500/30 rounded-2xl p-4 flex gap-3">
         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-pink-500 to-fuchsia-600 text-white shadow-lg shadow-pink-500/20">
             <i class="fa-solid fa-bullhorn text-lg"></i>
         </div>
