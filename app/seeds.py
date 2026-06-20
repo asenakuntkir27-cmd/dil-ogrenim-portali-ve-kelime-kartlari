@@ -25,32 +25,33 @@ def seed_language_decks_for_user(user, lang_code):
             deck_name = f"{lang_name} - {category}"
             
             # Check if this deck already exists for this user
-            exists = db.session.scalar(
+            deck = db.session.scalar(
                 sa.select(Deck).where(Deck.user_id == user.id, Deck.name == deck_name)
             )
-            if exists:
-                continue
-
-            # Create deck
-            deck = Deck(
-                name=deck_name,
-                description=f"{lang_name} dilinde {category} konusuna ait en sık kullanılan kelimeler ve örnek cümleleri.",
-                user=user
-            )
-            db.session.add(deck)
-            db.session.flush() # To get deck.id
-            
-            # Add cards
-            for card_info in cards_list:
-                card = Card(
-                    word=card_info["word"],
-                    meaning=card_info["meaning"],
-                    example_sentence=card_info["example_sentence"],
-                    deck=deck
+            if not deck:
+                # Create deck
+                deck = Deck(
+                    name=deck_name,
+                    description=f"{lang_name} dilinde {category} konusuna ait en sık kullanılan kelimeler ve örnek cümleleri.",
+                    user=user
                 )
-                db.session.add(card)
+                db.session.add(deck)
+                db.session.flush() # To get deck.id
             
-            seeded_any = True
+            # Add cards if they do not already exist in the deck
+            for card_info in cards_list:
+                card_exists = db.session.scalar(
+                    sa.select(Card).where(Card.deck_id == deck.id, Card.word == card_info["word"])
+                )
+                if not card_exists:
+                    card = Card(
+                        word=card_info["word"],
+                        meaning=card_info["meaning"],
+                        example_sentence=card_info["example_sentence"],
+                        deck=deck
+                    )
+                    db.session.add(card)
+                    seeded_any = True
             
         if seeded_any:
             db.session.commit()

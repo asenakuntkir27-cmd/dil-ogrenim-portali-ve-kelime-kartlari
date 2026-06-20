@@ -331,6 +331,26 @@ VOCABULARY_DATA = {
             {"word": "Work", "meaning": "Çalışmak", "example_sentence": "He works at a software company."},
             {"word": "Call", "meaning": "Aramak/Seslenmek", "example_sentence": "Call me when you reach home."},
             {"word": "Try", "meaning": "Denemek", "example_sentence": "Please try to arrive on time."}
+        ],
+        'Popüler İngilizce Kalıplar ve Deyimler': [
+            {"word": "Break a leg", "meaning": "Şansın bol olsun (Şeytanın bacağını kır)", "example_sentence": ""},
+            {"word": "Hit the nail on the head", "meaning": "Tam üstüne basmak / Tam isabet ettirmek", "example_sentence": ""},
+            {"word": "Keep in touch", "meaning": "İrtibatta kalmak", "example_sentence": ""},
+            {"word": "Piece of cake", "meaning": "Çocuk oyuncağı (Çok kolay)", "example_sentence": ""},
+            {"word": "Cost an arm and a leg", "meaning": "Ateş pahası (Çok pahalı)", "example_sentence": ""},
+            {"word": "Once in a blue moon", "meaning": "Ayda yılda bir (Çok nadir)", "example_sentence": ""},
+            {"word": "See eye to eye", "meaning": "Aynı fikirde olmak / Anlaşmak", "example_sentence": ""},
+            {"word": "Under the weather", "meaning": "Hafif kırgın / Keyifsiz (Hasta)", "example_sentence": ""},
+            {"word": "Better late than never", "meaning": "Geç olsun da güç olmasın", "example_sentence": ""},
+            {"word": "Call it a day", "meaning": "Paydos etmek / Bugünlük bu kadar yeter", "example_sentence": ""},
+            {"word": "Cutting corners", "meaning": "Kolaya kaçmak / Baştan savma yapmak", "example_sentence": ""},
+            {"word": "Get out of hand", "meaning": "Çığırından çıkmak / Kontrolden kaçmak", "example_sentence": ""},
+            {"word": "No pain, no gain", "meaning": "Emek olmadan yemek olmaz", "example_sentence": ""},
+            {"word": "Speak of the devil", "meaning": "İti an çomağını hazırla (Lafın üstüne gelmek)", "example_sentence": ""},
+            {"word": "The best of both worlds", "meaning": "Bir taşla iki kuş / İki avantajı birden yakalamak", "example_sentence": ""},
+            {"word": "Time flies when you're having fun", "meaning": "Zaman keyifliyken su gibi akıp geçer", "example_sentence": ""},
+            {"word": "Go the extra mile", "meaning": "Gereğinden fazlasını yapmak / Büyük çaba sarf etmek", "example_sentence": ""},
+            {"word": "On the same page", "meaning": "Aynı fikirde olmak / Aynı şeyi konuşmak", "example_sentence": ""}
         ]
     },
     'de': {
