@@ -74,9 +74,9 @@
         </div>
 
         <!-- Dört Ana Modül Kutusu (Module Selector Cards) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-12">
             <!-- Kelime Destelerim Modülü -->
-            <div id="module-decks-btn" onclick="selectModule('decks')" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
+            <div id="module-decks-btn" onclick="selectModule('decks')" class="w-full group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
                 <div class="flex items-center gap-4">
                     <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-pink-950/40 border border-pink-900/30 text-pink-400 group-hover:scale-105 transition-transform duration-300">
                         <i class="fa-solid fa-folder-open text-2xl"></i>
@@ -89,7 +89,7 @@
             </div>
 
             <!-- Popüler Kalıplar Modülü -->
-            <a href="{{ url_for('main.idioms') }}" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
+            <a href="{{ url_for('main.idioms') }}" class="w-full group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
                 <div class="flex items-center gap-4">
                     <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-950/40 border border-sky-900/30 text-sky-400 group-hover:scale-105 transition-transform duration-300">
                         <i class="fa-solid fa-comments text-2xl"></i>
@@ -102,7 +102,7 @@
             </a>
 
             <!-- Eğitim Oyunları Modülü -->
-            <div id="module-games-btn" onclick="selectModule('games')" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
+            <div id="module-games-btn" onclick="selectModule('games')" class="w-full group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
                 <div class="flex items-center gap-4">
                     <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-purple-950/40 border border-purple-900/30 text-purple-400 group-hover:scale-105 transition-transform duration-300">
                         <i class="fa-solid fa-gamepad text-2xl"></i>
@@ -115,7 +115,7 @@
             </div>
 
             <!-- İlerleme Analizlerim Modülü -->
-            <a href="{{ url_for('main.analytics') }}" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
+            <a href="{{ url_for('main.analytics') }}" class="w-full group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
                 <div class="flex items-center gap-4">
                     <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-fuchsia-950/40 border border-fuchsia-900/30 text-fuchsia-400 group-hover:scale-105 transition-transform duration-300">
                         <i class="fa-solid fa-chart-simple text-2xl"></i>
