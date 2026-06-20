@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="LingoRose, etkileşimli 3D kelime kartları (flashcards) ile dil öğreniminizi hızlandıran modern bir öğrenim portalıdır.">
     <title>{{ title if title else 'Uygulama' }} - LingoRose</title>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#0F172A">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+      }
+    </script>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -337,14 +344,36 @@
         [data-theme="light"] #inline-translate-result-box #close-inline-translate:hover {
             color: #4A2834 !important;
         }
+
+        /* Mobile touch optimization for input/button elements */
+        @media (max-width: 768px) {
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="search"],
+            textarea,
+            select,
+            #vocab-search-input {
+                min-height: 48px !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+                font-size: 16px !important; /* Prevents iOS auto-zoom on input focus */
+            }
+            button, 
+            .btn,
+            a.nav-register-btn {
+                min-height: 44px;
+                padding-top: 0.5rem !important;
+                padding-bottom: 0.5rem !important;
+            }
+        }
     </style>
 </head>
 <body class="h-full bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-pink-600 selection:text-white">
 
-    <!-- Header / Navbar -->
     <header class="sticky top-0 z-40 w-full glass-nav">
-        <div class="mx-auto w-full max-w-none px-4 sm:px-8 lg:px-12">
-            <div class="flex h-16 items-center justify-between">
+        <div class="mx-auto w-full md:max-w-4xl px-4 sm:px-6">
+            <div class="flex flex-col md:flex-row min-h-16 h-auto py-3 md:py-0 md:h-16 items-center justify-between gap-3 md:gap-0">
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
                     <a href="{{ url_for('main.index') }}" class="flex items-center gap-2.5 group">
@@ -356,7 +385,7 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <nav class="flex items-center gap-4">
+                <nav class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4 mt-1 md:mt-0">
                     <a href="{{ url_for('main.index') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">
                         <i class="fa-solid fa-house mr-1.5"></i>Ana Sayfa
                     </a>
@@ -371,14 +400,14 @@
                         <i class="fa-solid fa-gear"></i>
                     </a>
                     
-                    <div class="h-4 w-px bg-zinc-800"></div>
+                    <div class="hidden md:block h-4 w-px bg-zinc-800"></div>
 
                     <!-- Theme Switcher Button -->
-                    <button id="theme-toggle-btn" class="inline-flex items-center justify-center h-9 w-9 rounded-xl border border-zinc-850 hover:border-pink-500/30 bg-zinc-900/35 hover:bg-pink-500/10 text-zinc-400 hover:text-pink-400 transition-all duration-200 cursor-pointer select-none" title="Temayı Değiştir">
+                    <button id="theme-toggle-btn" class="inline-flex items-center justify-center h-11 w-11 md:h-9 md:w-9 rounded-xl border border-zinc-850 hover:border-pink-500/30 bg-zinc-900/35 hover:bg-pink-500/10 text-zinc-400 hover:text-pink-400 transition-all duration-200 cursor-pointer select-none" title="Temayı Değiştir">
                         <i id="theme-toggle-icon" class="fa-solid fa-sun text-sm"></i>
                     </button>
 
-                    <div class="h-4 w-px bg-zinc-800"></div>
+                    <div class="hidden md:block h-4 w-px bg-zinc-800"></div>
 
                     <!-- Language Selector Dropdown -->
                     <div class="relative group/lang">
@@ -403,7 +432,7 @@
                         </div>
                     </div>
 
-                    <div class="h-4 w-px bg-zinc-800"></div>
+                    <div class="hidden md:block h-4 w-px bg-zinc-800"></div>
 
                     {% if current_user.is_anonymous %}
                         <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200">Giriş Yap</a>
@@ -411,7 +440,7 @@
                             Kayıt Ol
                         </a>
                     {% else %}
-                        <div class="flex items-center gap-3">
+                        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                             <span class="text-sm text-zinc-400 hidden sm:inline">
                                 <i id="navbar-avatar-icon" class="fa-solid {{ current_user.avatar_url or 'fa-user' }} mr-1.5 text-pink-400"></i>Hoş geldin, <strong class="text-zinc-200 font-semibold">{{ current_user.username }}</strong>
                             </span>
@@ -429,7 +458,7 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 mx-auto w-full max-w-none px-4 py-8 sm:px-8 lg:px-12">
+    <main class="flex-1 mx-auto w-full md:max-w-4xl px-4 py-8 sm:px-6">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -466,7 +495,7 @@
 
     <!-- Footer -->
     <footer class="w-full border-t border-zinc-900 bg-zinc-950 py-6">
-        <div class="mx-auto w-full max-w-none px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+        <div class="mx-auto w-full md:max-w-4xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
             <!-- Left Side Links -->
             <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2">
                 <a href="#" class="hover:text-zinc-300 transition-colors">Hakkımızda</a>
@@ -657,7 +686,7 @@
             <span>Çevir</span>
         </button>
         <!-- Result Box -->
-        <div id="inline-translate-result-box" class="hidden mt-2 p-3.5 rounded-2xl border backdrop-blur-xl max-w-xs w-72">
+        <div id="inline-translate-result-box" class="hidden mt-2 p-3.5 rounded-2xl border backdrop-blur-xl max-w-[calc(100vw-32px)] sm:max-w-xs w-72">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-[9px] font-extrabold uppercase tracking-wider text-pink-400">Çeviri Sonucu 📯</span>
                 <button id="close-inline-translate" class="text-zinc-400 hover:text-white transition-colors cursor-pointer p-0.5">
@@ -711,7 +740,7 @@
                 tooltip.style.left = `${left}px`;
             }
 
-            document.addEventListener('mouseup', function(e) {
+            function checkSelection(e) {
                 if (tooltip.contains(e.target)) return;
 
                 clearTimeout(selectionTimeout);
@@ -736,16 +765,22 @@
                         hideTooltip();
                     }
                 }, 80);
-            });
+            }
 
-            document.addEventListener('mousedown', function(e) {
+            function clearSelectionOnStart(e) {
                 if (!tooltip.contains(e.target)) {
                     const selection = window.getSelection();
                     if (selection.toString().trim() === "") {
                         hideTooltip();
                     }
                 }
-            });
+            }
+
+            document.addEventListener('mouseup', checkSelection);
+            document.addEventListener('touchend', checkSelection);
+
+            document.addEventListener('mousedown', clearSelectionOnStart);
+            document.addEventListener('touchstart', clearSelectionOnStart);
 
             triggerBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
