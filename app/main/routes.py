@@ -37,6 +37,33 @@ def index():
     
     return render_template('main/index.html', title='Destelerim', decks=pagination.items, pagination=pagination)
 
+@main.route('/idioms')
+@login_required
+def idioms():
+    deck = db.session.scalar(
+        sa.select(Deck).where(
+            Deck.user_id == current_user.id,
+            Deck.name == "İngilizce - Popüler İngilizce Kalıplar ve Deyimler"
+        )
+    )
+    if not deck:
+        from app.seeds import seed_language_decks_for_user
+        seed_language_decks_for_user(current_user, 'en')
+        deck = db.session.scalar(
+            sa.select(Deck).where(
+                Deck.user_id == current_user.id,
+                Deck.name == "İngilizce - Popüler İngilizce Kalıplar ve Deyimler"
+            )
+        )
+        
+    cards = []
+    if deck:
+        cards = db.session.scalars(
+            sa.select(Card).where(Card.deck_id == deck.id)
+        ).all()
+        
+    return render_template('main/idioms.html', title='Popüler Kalıplar', cards=cards, deck=deck)
+
 @main.route('/deck/new', methods=['GET', 'POST'])
 @login_required
 def create_deck():

@@ -59,5 +59,31 @@ class LanguageTestCase(unittest.TestCase):
             response2 = self.client.get('/')
             self.assertIn('İngilizce'.encode('utf-8'), response2.data)
 
+    def test_idioms_route_requires_login(self):
+        # Accessing /idioms without login should redirect to login page
+        response = self.client.get('/idioms')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/auth/login', response.headers['Location'])
+
+    def test_idioms_route_logged_in(self):
+        from app.models import User
+        # Register and log in a user
+        u = User(username='testuser', email='test@example.com')
+        u.set_password('password')
+        db.session.add(u)
+        db.session.commit()
+        
+        # Log in the user
+        self.client.post('/auth/login', data={'username': 'testuser', 'password': 'password'})
+        
+        # Access /idioms
+        response = self.client.get('/idioms')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Popüler Kalıplar'.encode('utf-8'), response.data)
+        
+        # Check if the idioms are listed
+        self.assertIn(b'Break a leg', response.data)
+        self.assertIn('Şansın bol olsun'.encode('utf-8'), response.data)
+
 if __name__ == '__main__':
     unittest.main()

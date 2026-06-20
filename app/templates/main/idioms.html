@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Sayfa Başlığı ve Açıklama -->
+    <div class="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div>
+            <!-- Geri Dönüş Linki -->
+            <a href="{{ url_for('main.index') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-pink-400 transition-colors mb-3">
+                <i class="fa-solid fa-arrow-left"></i> Ana Sayfaya Dön
+            </a>
+            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent flex items-center gap-3">
+                <i class="fa-solid fa-comments text-sky-400"></i> Popüler Kalıplar
+            </h1>
+            <p class="mt-3 text-base sm:text-lg leading-relaxed text-zinc-400 max-w-2xl">
+                Günlük hayatta sıkça kullanılan popüler İngilizce kalıpları, deyimleri ve doğru telaffuzlarını dinleyerek öğrenin.
+            </p>
+        </div>
+    </div>
+
+    <!-- Kalıplar Grid Listesi -->
+    {% if cards %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for card in cards %}
+            <div class="group relative bg-zinc-900/30 border border-zinc-800/80 rounded-2xl p-6 hover:bg-zinc-900/60 hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between min-h-[160px]">
+                <div>
+                    <!-- Kart Üst Bilgisi & Seslendirme -->
+                    <div class="flex items-center justify-between gap-4 mb-2">
+                        <span class="text-[10px] font-bold text-sky-400 uppercase tracking-wider">Kalıp / Deyim</span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="speakWord('{{ card.word|escape }}', 'en')" 
+                                    class="text-zinc-500 hover:text-sky-400 hover:bg-zinc-800/50 p-1.5 rounded-lg transition-all duration-200 cursor-pointer" 
+                                    title="Sesli Oku">
+                                <i class="fa-solid fa-volume-high text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <h4 class="text-xl font-extrabold text-white tracking-tight leading-tight mb-4">{{ card.word }}</h4>
+                    
+                    <!-- Divider -->
+                    <div class="border-t border-zinc-800/50 mb-4"></div>
+                    
+                    <!-- Anlamı -->
+                    <div class="mb-2">
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Türkçe Karşılığı</span>
+                        <p class="text-sm font-semibold text-zinc-300 mt-0.5 leading-snug">{{ card.meaning }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Boş Durum -->
+        <div class="flex flex-col items-center justify-center text-center py-16 px-4 bg-zinc-900/20 border border-dashed border-zinc-800 rounded-2xl">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 text-zinc-650 mb-3 border border-zinc-800">
+                <i class="fa-regular fa-comments text-lg"></i>
+            </div>
+            <p class="text-sm text-zinc-400 font-medium">Henüz hiçbir kalıp yüklenmemiş.</p>
+            <p class="text-xs text-zinc-500 mt-1">Lütfen veritabanı besleme scriptinin başarıyla çalıştığından emin olun.</p>
+        </div>
+    {% endif %}
+
+    <script>
+        function speakWord(text, langCode = 'en-US') {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                const langMap = {
+                    'en': 'en-US',
+                    'de': 'de-DE',
+                    'es': 'es-ES',
+                    'fr': 'fr-FR',
+                    'it': 'it-IT'
+                };
+                const resolvedLang = langMap[langCode] || langCode;
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = resolvedLang;
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.error("Tarayıcınız ses sentezleme özelliğini desteklememektedir.");
+            }
+        }
+    </script>
+{% endblock %}
