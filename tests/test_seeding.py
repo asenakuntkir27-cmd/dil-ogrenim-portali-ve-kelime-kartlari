@@ -94,8 +94,8 @@ class SeedingTestCase(unittest.TestCase):
         response = self.client.post('/auth/register', data={
             'username': 'newuser',
             'email': 'newuser@example.com',
-            'password': 'password123',
-            'password_confirm': 'password123'
+            'password': 'Password123',
+            'password_confirm': 'Password123'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 

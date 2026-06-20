@@ -20,6 +20,22 @@ class RegistrationForm(FlaskForm):
     ])
     submit = SubmitField('Kayıt Ol')
 
+    def validate_password(self, password):
+        val = password.data
+        errors = []
+        if len(val) < 6:
+            errors.append("en az 6 karakter uzunluğunda olmalı")
+        if not any(char.isupper() for char in val):
+            errors.append("en az bir büyük harf (A-Z) içermeli")
+        if not any(char.isdigit() for char in val):
+            errors.append("en az bir rakam (0-9) içermeli")
+            
+        if errors:
+            raise ValidationError(
+                'Siber Güvenlik Politikası Uyarısı: Belirlediğiniz şifre güvenlik standartlarını karşılamıyor. '
+                'Şifreniz ' + ' ve '.join(errors) + 'dir. Güvenliğiniz için lütfen kurallara uygun, tahmin edilmesi güç bir şifre seçiniz.'
+            )
+
     def validate_username(self, username):
         user = db.session.scalar(sa.select(User).where(User.username == username.data))
         if user is not None:
