@@ -20,6 +20,11 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login_manager.init_app(app)
     
+    from flask_talisman import Talisman
+    # Geliştirme/yerel ağ testlerinde (0.0.0.0:5000) mobil cihazların HTTPS yönlendirme hatası
+    # almaması için force_https=False olarak yapılandırılmıştır.
+    Talisman(app, content_security_policy=None, force_https=False)
+    
     # Import models
     from app import models
     

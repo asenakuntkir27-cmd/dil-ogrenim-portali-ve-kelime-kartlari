@@ -7,3 +7,4 @@ python-dotenv
 email-validator
 gunicorn
 psycopg2-binary
+flask-talisman
