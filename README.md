@@ -4,7 +4,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/TAILWIND_CSS-v3.0+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![SQLAlchemy 2.0](https://img.shields.io/badge/SQLALCHEMY-v2.0-CC2927?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlalchemy.org/)
 [![Docker](https://img.shields.io/badge/DOCKER-READY-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Tests](https://img.shields.io/badge/83_TESTS-PASSED-4CAF50?style=for-the-badge&logo=github-actions&logoColor=white)](https://docs.python.org/3/library/unittest.html)
+[![Tests](https://img.shields.io/badge/88_TESTS-PASSED-4CAF50?style=for-the-badge&logo=github-actions&logoColor=white)](https://docs.python.org/3/library/unittest.html)
 
 ---
 
@@ -73,6 +73,17 @@ Sistem genelindeki geçersiz rotalarda (`404 Not Found`) kullanıcıyı statik b
 3.  Sağlıklı tablo şemaları sıfırdan oluşturulur (`db.create_all()`).
 4.  Sistem `seeds.py` üzerinden 5 dilde toplam 1500 kelimelik başlangıç sözlük veri setini otomatik olarak yeniden tohumlar (`seed_db()`).
 
+### Siber Güvenlik Katmanı
+Platform, Bilişim Güvenliği Teknolojileri bölümü kurumsal standartlarına uygun olarak sıkılaştırılmıştır:
+-   **Flask-Talisman Entegrasyonu:** HTTP üst bilgilerini (Headers) güvence altına alarak siteler arası betik çalıştırma (XSS), Clickjacking ve MIME Sniffing saldırılarını tarayıcı düzeyinde engeller.
+-   **Güçlü Parola Politikası Doğrulaması:** Kayıt formunda (Register Form) Regex tabanlı doğrulama uygulanarak en az bir büyük harf, bir küçük harf ve bir rakam içeren parolaların kullanılması zorunlu kılınmıştır.
+
+### A1 Kurs Müfredatı ve Sözlük Modülü
+Eğitim kalitesini ve içeriğini artırmak adına eklenen modüller:
+-   **A1 Kurs Müfredatı:** Uluslararası standartlarda 12 üniteden oluşan kapsamlı konu anlatımları ve kelime desteleri içeren, çift sekmeli modern bir öğrenim paneli entegre edilmiştir.
+-   **Genişletilebilir Sözlük:** Gelecekte B ve C seviyelerine kolayca ölçeklenebilecek şekilde tasarlanan, Türkçe çevirili, örnek cümleli ve Web Speech API entegrasyonu sayesinde sesli telaffuz destekli alfabetik "Sözlük" modülü sisteme kazandırılmıştır.
+-   **Responsive Düzen:** Tüm panel, butonlar ve navigasyon elemanları mobil ve geniş ekran (Full Width) uyumluluğu için tam esnek Tailwind grid yapısına uyarılmıştır.
+
 ---
 
 ## 3. Test Stratejisi ve Kararlılık Kontrolleri
@@ -82,7 +93,7 @@ LingoRose kod tabanının kararlılığı, Python `unittest` kütüphanesiyle ya
 Otomatik test süiti başarı çıktısı aşağıdaki şekildedir:
 
 ```text
-Ran 83 tests in 41.212s
+Ran 88 tests in 118.502s
 
 OK
 ```

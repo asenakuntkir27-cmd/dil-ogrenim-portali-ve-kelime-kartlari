@@ -454,3 +454,25 @@ Kullanıcının seçtiği kelimeleri/cümleleri MyMemory/Lingva API'leri üzerin
 
 ### Sonraki Adımlar
 - Projenin tamamlanan sürümünü üretim ortamına (Docker) almak ve yayına hazırlamak.
+
+---
+
+## Oturum 25: A1 Seviye Kurs Müfredatı, Ölçeklenebilir Sözlük Yapısı ve Siber Güvenlik Katmanı Entegrasyonu
+**Tarih:** 24 Haziran 2026
+
+### Hedef
+Kullanıcılara uluslararası standartlarda bir dil öğrenim yapısı sunmak amacıyla 12 ünitelik A1 Seviye Kurs Müfredatını ve geleceğe yönelik seviyelerle ölçeklenebilir alfabetik "Sözlük" modülünü sisteme dahil etmek; platformun siber güvenlik duruşunu güçlendirmek için tarayıcı seviyesinde güvenlik başlıkları ve parola doğrulama politikaları uygulamak.
+
+### Yapılanlar
+- **Teknik ve Fonksiyonel Geliştirmeler (Müfredat & Sözlük):**
+  - Uluslararası standartlara uygun 12 üniteden oluşan "A1 Seviye Kurs Müfredatı" geliştirildi. Her ünite, kullanıcı deneyimini artıracak şekilde "Konu Anlatımı (Grammar)" ve "Kelime Destesi" sekmelerini barındıran çift sekmeli bir mimariyle sunuldu.
+  - Gelecekte B ve C seviyelerine de kolayca ölçeklenebilecek şekilde tasarlanan, örnek cümle ve Türkçe çeviri destekli, Web Speech API tabanlı sesli okuma özelliğine sahip alfabetik "Sözlük" (A1_Dictionary) modülü sisteme entegre edildi.
+  - Arayüzün mobil ve masaüstü ekranlarındaki uyumluluğunu en üst seviyeye çıkarmak adına Navbar ve Dashboard modülleri tam responsive ve esnek (Full Width) grid yapısına uyarlandı.
+- **Siber Güvenlik Katmanı Entegrasyonu:**
+  - Uygulama genelinde HTTP başlıklarını (Header) güvenceye almak, XSS (Cross-Site Scripting), Clickjacking ve MIME Sniffing saldırılarını tarayıcı seviyesinde engellemek amacıyla **Flask-Talisman** entegrasyonu tamamlandı. Yerel ağlarda (`0.0.0.0`) testlerin kesintisiz çalışması için `force_https=False` parametresiyle esnek bir yapı kuruldu.
+  - Kullanıcı kayıt ekranında (`Register Form`) güvenliği artırmak adına Regex (Düzenli İfade) tabanlı **"Güçlü Şifre Politikası Doğrulaması"** eklendi. En az bir büyük harf, bir küçük harf ve bir rakam içeren güvenlik kuralları zorunlu kılındı.
+- **Şema Uyumlaştırma ve Robust Başlangıç Kontrolü:**
+  - `Deck` modeline eklenen `deck_type` kolonu sonrasında eski veritabanı şemalarının kilitlenmeye (OperationalError) yol açmasını engellemek üzere otomatik kurtarma mekanizması iyileştirildi. Başlangıçta hem `User` hem de `Deck` modellerinin mevcudiyeti sorgulanarak eksik/eski şemalarda scoped session temizliği (`db.session.remove()`), drop-all ve create-all süreci otomatik tetiklendi.
+- **Doğrulama ve Unit Testler:**
+  - Yeni eklenen yapılarla birlikte test suite güncellendi. `test_seeding.py` ve `test_errors_and_pagination.py` dosyalarındaki veri doğrulama sayıları güncellenerek toplam birim test sayısı **88 test** seviyesine ulaştı. Tüm testlerin başarı oranı %100 (`OK`) olarak kaydedildi.
+
