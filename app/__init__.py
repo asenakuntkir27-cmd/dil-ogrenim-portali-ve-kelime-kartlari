@@ -58,12 +58,15 @@ def create_app(config_class=Config):
                 
                 # Tablolar mevcutsa temel bir sorgu çekmeyi dene (bütünlük testi)
                 import sqlalchemy as sa
-                from app.models import User
+                from app.models import User, Deck
                 db.session.scalar(sa.select(User.id).limit(1))
+                db.session.scalars(sa.select(Deck).limit(1)).first()
                 
                 # Şema sağlamsa doğrudan tohumlama/eksik kontrolü yap
                 from app.seeds import seed_db
-                seed_db()
+                success = seed_db()
+                if not success:
+                    raise Exception("Veritabanı tohumlama başarısız oldu, şema uyuşmazlığı olabilir.")
             except Exception as e:
                 # Tablolar eksik, bozuk veya eski migrasyonlardan kalma uyumsuzluk var
                 db.session.remove()  # Scoped session'ı tamamen kaldır
