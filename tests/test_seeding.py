@@ -42,9 +42,9 @@ class SeedingTestCase(unittest.TestCase):
         self.assertEqual(admin.email, 'admin@example.com')
         self.assertTrue(admin.check_password('admin123'))
 
-        # Verify all 5 languages (English with 5, others with 15) = 65 decks + 12 curriculum decks = 77 decks are created for admin
+        # Verify all 5 languages (English with 20, others with 15) = 80 decks + 12 curriculum decks = 92 decks are created for admin
         admin_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == admin.id)).all()
-        self.assertEqual(len(admin_decks), 77)
+        self.assertEqual(len(admin_decks), 92)
 
         # Verify a specific deck is created
         english_numbers_deck = db.session.scalar(
@@ -74,9 +74,9 @@ class SeedingTestCase(unittest.TestCase):
         user_count = db.session.scalar(sa.select(sa.func.count(User.id)))
         self.assertEqual(user_count, 1)
 
-        # But all 77 decks should be backfilled for testuser!
+        # But all 92 decks should be backfilled for testuser!
         testuser_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == u.id)).all()
-        self.assertEqual(len(testuser_decks), 77)
+        self.assertEqual(len(testuser_decks), 92)
 
         # Verify one of the backfilled decks
         spanish_colors_deck = db.session.scalar(
@@ -103,9 +103,9 @@ class SeedingTestCase(unittest.TestCase):
         user = db.session.scalar(sa.select(User).where(User.username == 'newuser'))
         self.assertIsNotNone(user)
 
-        # Verify they automatically got the 5 English decks (default language 'en')
+        # Verify they automatically got the 20 English decks (default language 'en')
         user_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == user.id)).all()
-        self.assertEqual(len(user_decks), 5)
+        self.assertEqual(len(user_decks), 20)
 
         english_animals = db.session.scalar(
             sa.select(Deck).where(Deck.user_id == user.id, Deck.name == 'İngilizce - A1 Seviyesi - A Harfi Destesi')
@@ -132,9 +132,9 @@ class SeedingTestCase(unittest.TestCase):
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 
-        # Verify they got the 5 English decks
+        # Verify they got the 20 English decks
         user_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == u.id)).all()
-        self.assertEqual(len(user_decks), 5)
+        self.assertEqual(len(user_decks), 20)
 
         english_verbs = db.session.scalar(
             sa.select(Deck).where(Deck.user_id == u.id, Deck.name == 'İngilizce - A1 Seviyesi - B Harfi Destesi')

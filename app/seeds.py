@@ -22,31 +22,38 @@ def seed_language_decks_for_user(user, lang_code):
         if lang_code == 'en':
             from app.a1_alphabetical_data import A1_ALPHABETICAL_DECKS
             
-            # 1. Eski gün tabanlı veya geçici tüm kelime paketlerini temizle (delete old English decks, but keep idioms)
+            # 1. System deck names list to clean up precisely
+            system_deck_names = [f"{lang_name} - {k}" for k in A1_ALPHABETICAL_DECKS.keys()]
+            system_deck_names += [f"{lang_name} - {k}" for k in VOCABULARY_DATA['en'].keys()]
+
             existing_en_decks = db.session.scalars(
                 sa.select(Deck).where(
                     Deck.user_id == user.id,
-                    Deck.name.like("İngilizce - %"),
-                    Deck.name != "İngilizce - Popüler İngilizce Kalıplar ve Deyimler"
+                    Deck.name.in_(system_deck_names)
                 )
             ).all()
             for d in existing_en_decks:
                 db.session.delete(d)
             db.session.flush()
 
-            # 2. Alfabetik desteleri oluştur ve kelimeleri örnek cümleleri/çevirileriyle aktar
+            # 2. A1 Sözlük alfabetik harf destelerini oluştur (deck_type='a1_dictionary')
             for deck_key, cards_list in A1_ALPHABETICAL_DECKS.items():
                 deck_name = f"{lang_name} - {deck_key}"
                 
                 # Check duplicate (redundancy check)
                 deck = db.session.scalar(
-                    sa.select(Deck).where(Deck.user_id == user.id, Deck.name == deck_name)
+                    sa.select(Deck).where(
+                        Deck.user_id == user.id,
+                        Deck.name == deck_name,
+                        Deck.deck_type == 'a1_dictionary'
+                    )
                 )
                 if not deck:
                     deck = Deck(
                         name=deck_name,
                         description=f"A1 Seviyesi İngilizce kelimeleri ve örnek cümleleri ({deck_key}).",
-                        user=user
+                        user=user,
+                        deck_type='a1_dictionary'
                     )
                     db.session.add(deck)
                     db.session.flush()
@@ -65,34 +72,42 @@ def seed_language_decks_for_user(user, lang_code):
                         db.session.add(card)
                         seeded_any = True
 
-            # 3. İngilizce Kalıplar ve Deyimler destesini kontrol et ve oluştur/güncelle
-            idioms_category = 'Popüler İngilizce Kalıplar ve Deyimler'
-            idioms_deck_name = f"{lang_name} - {idioms_category}"
-            idioms_deck = db.session.scalar(
-                sa.select(Deck).where(Deck.user_id == user.id, Deck.name == idioms_deck_name)
-            )
-            if not idioms_deck:
-                idioms_deck = Deck(
-                    name=idioms_deck_name,
-                    description=f"{lang_name} dilinde {idioms_category} konusuna ait en sık kullanılan kelimeler ve örnek cümleleri.",
-                    user=user
-                )
-                db.session.add(idioms_deck)
-                db.session.flush()
-            idioms_cards = VOCABULARY_DATA['en'].get(idioms_category, [])
-            for card_info in idioms_cards:
-                card_exists = db.session.scalar(
-                    sa.select(Card).where(Card.deck_id == idioms_deck.id, Card.word == card_info["word"])
-                )
-                if not card_exists:
-                    card = Card(
-                        word=card_info["word"],
-                        meaning=card_info["meaning"],
-                        example_sentence=card_info["example_sentence"],
-                        deck=idioms_deck
+            # 3. Orijinal İngilizce kategori destelerini ve kelimelerini oluştur (deck_type='standard')
+            lang_data = VOCABULARY_DATA['en']
+            for category, cards_list in lang_data.items():
+                deck_name = f"{lang_name} - {category}"
+                
+                # Check duplicate (redundancy check)
+                deck = db.session.scalar(
+                    sa.select(Deck).where(
+                        Deck.user_id == user.id,
+                        Deck.name == deck_name,
+                        Deck.deck_type == 'standard'
                     )
-                    db.session.add(card)
-                    seeded_any = True
+                )
+                if not deck:
+                    deck = Deck(
+                        name=deck_name,
+                        description=f"{lang_name} dilinde {category} konusuna ait en sık kullanılan kelimeler ve örnek cümleleri.",
+                        user=user,
+                        deck_type='standard'
+                    )
+                    db.session.add(deck)
+                    db.session.flush()
+                
+                for card_info in cards_list:
+                    card_exists = db.session.scalar(
+                        sa.select(Card).where(Card.deck_id == deck.id, Card.word == card_info["word"])
+                    )
+                    if not card_exists:
+                        card = Card(
+                            word=card_info["word"],
+                            meaning=card_info["meaning"],
+                            example_sentence=card_info["example_sentence"],
+                            deck=deck
+                        )
+                        db.session.add(card)
+                        seeded_any = True
         else:
             lang_data = VOCABULARY_DATA[lang_code]
             for category, cards_list in lang_data.items():

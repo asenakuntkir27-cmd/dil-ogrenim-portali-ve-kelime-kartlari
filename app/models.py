@@ -78,6 +78,7 @@ class Deck(db.Model):
     description: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    deck_type: Mapped[str] = mapped_column(String(64), default='standard', server_default='standard')
 
     user: Mapped["User"] = relationship(back_populates="decks")
     cards: Mapped[List["Card"]] = relationship(back_populates="deck", cascade="all, delete-orphan")

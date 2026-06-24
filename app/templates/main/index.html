@@ -100,8 +100,8 @@
             </a>
         </div>
 
-        <!-- Dört Ana Modül Kutusu (Module Selector Cards) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-12">
+        <!-- Beş Ana Modül Kutusu (Module Selector Cards) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full mb-12">
             <!-- Kelime Destelerim Modülü -->
             <div id="module-decks-btn" onclick="selectModule('decks')" class="w-full group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">
                 <div class="flex items-center gap-4">
@@ -114,6 +114,21 @@
                     </div>
                 </div>
             </div>
+
+            <!-- A1 Sözlük Modülü -->
+            <a href="{{ url_for('main.a1_dictionary') }}" class="w-full group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-amber-500 bg-amber-950/20 p-6 hover:bg-amber-900/30 hover:border-amber-400 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 cursor-pointer select-none">
+                <!-- Glowing background effect -->
+                <div class="absolute -inset-px bg-gradient-to-r from-amber-500/10 to-pink-500/10 rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-300 blur-sm pointer-events-none"></div>
+                <div class="relative z-10 flex items-center gap-4">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-950/40 border border-amber-900/30 text-amber-400 group-hover:scale-105 transition-transform duration-300 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                        <i class="fa-solid fa-spell-check text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-amber-300 group-hover:text-white transition-colors duration-250">A1 Sözlük</h3>
+                        <p class="mt-1 text-xs sm:text-sm text-zinc-400">Harf tabanlı A1 İngilizce kelimeleri, Türkçe çevirileri ve telaffuzları.</p>
+                    </div>
+                </div>
+            </a>
 
             <!-- Popüler Kalıplar Modülü -->
             <a href="{{ url_for('main.idioms') }}" class="w-full group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 hover:bg-zinc-900/50 hover:border-zinc-700 hover:shadow-xl transition-all duration-300 cursor-pointer select-none">

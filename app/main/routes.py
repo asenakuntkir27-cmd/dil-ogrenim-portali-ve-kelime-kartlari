@@ -31,7 +31,8 @@ def index():
     page = request.args.get('page', 1, type=int)
     query = sa.select(Deck).where(
         Deck.user_id == current_user.id,
-        Deck.name.like(f"{lang_name} - %")
+        Deck.name.like(f"{lang_name} - %"),
+        Deck.deck_type != 'a1_dictionary'
     ).order_by(Deck.created_at.desc())
     pagination = db.paginate(query, page=page, per_page=10, error_out=False)
     
@@ -63,6 +64,35 @@ def idioms():
         ).all()
         
     return render_template('main/idioms.html', title='Popüler Kalıplar', cards=cards, deck=deck)
+
+@main.route('/a1-sozluk')
+@login_required
+def a1_dictionary():
+    # Only list A1 alphabetical decks (deck_type == 'a1_dictionary') for the current user
+    query = sa.select(Deck).where(
+        Deck.user_id == current_user.id,
+        Deck.deck_type == 'a1_dictionary'
+    ).order_by(Deck.name.asc())
+    decks = db.session.scalars(query).all()
+
+    # If the decks are empty, seed them just to be safe
+    if not decks:
+        from app.seeds import seed_language_decks_for_user
+        seed_language_decks_for_user(current_user, 'en')
+        decks = db.session.scalars(query).all()
+
+    # Get current language details to pass flag/name to the template
+    lang_code = session.get('learning_language', 'en')
+    languages = {
+        'en': {'name': 'İngilizce', 'flag': '🇺🇸'},
+        'de': {'name': 'Almanca', 'flag': '🇩🇪'},
+        'es': {'name': 'İspanyolca', 'flag': '🇪🇸'},
+        'fr': {'name': 'Fransızca', 'flag': '🇫🇷'},
+        'it': {'name': 'İtalyanca', 'flag': '🇮🇹'}
+    }
+    current_language = languages.get(lang_code, {'name': 'İngilizce', 'flag': '🇺🇸'})
+
+    return render_template('main/a1_dictionary.html', title='A1 Sözlük', decks=decks, current_language=current_language)
 
 @main.route('/a1-kursu')
 @login_required
