@@ -181,11 +181,13 @@
     // Game data from Flask
     const deckCards = [
         {% for card in cards %}
+        {% set parts = card.example_sentence.split(' | ') if card.example_sentence else ['', ''] %}
         {
             id: {{ card.id }},
             word: {{ card.word|tojson }},
             meaning: {{ card.meaning|tojson }},
-            example_sentence: {{ card.example_sentence|tojson }}
+            example_sentence: {{ parts[0]|tojson }},
+            example_translation: {{ (parts[1] if parts|length > 1 else '')|tojson }}
         }{% if not loop.last %},{% endif %}
         {% endfor %}
     ];
@@ -444,7 +446,7 @@
         document.getElementById('masked-sentence').textContent = masked;
 
         // Display translation clue
-        const translation = translationDict[card.example_sentence] || `"${card.meaning}" kelimesini içeren cümle boşluğunu doldurun.`;
+        const translation = card.example_translation || translationDict[card.example_sentence] || `"${card.meaning}" kelimesini içeren cümle boşluğunu doldurun.`;
         document.getElementById('clue-text').textContent = translation;
 
         // Render options buttons

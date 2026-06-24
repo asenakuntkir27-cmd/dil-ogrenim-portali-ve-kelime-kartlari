@@ -64,8 +64,8 @@ class ErrorsAndPaginationTestCase(unittest.TestCase):
         self.assertNotIn(b'Deste 01', response.data)
 
         # Verify page 2 links and info text are visible
-        self.assertIn(b'Toplam <span class="font-semibold text-zinc-300">28</span> deste', response.data)
-        self.assertIn(b'sayfa <span class="font-semibold text-zinc-300">1</span> / <span class="font-semibold text-zinc-300">3</span>', response.data)
+        self.assertIn(b'Toplam <span class="font-semibold text-zinc-300">17</span> deste', response.data)
+        self.assertIn(b'sayfa <span class="font-semibold text-zinc-300">1</span> / <span class="font-semibold text-zinc-300">2</span>', response.data)
 
         # Fetch page 2
         response_page2 = self.client.get('/?page=2')

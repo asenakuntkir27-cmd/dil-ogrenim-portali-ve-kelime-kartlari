@@ -42,19 +42,19 @@ class SeedingTestCase(unittest.TestCase):
         self.assertEqual(admin.email, 'admin@example.com')
         self.assertTrue(admin.check_password('admin123'))
 
-        # Verify all 5 languages (English with 16, others with 15) = 76 decks + 12 curriculum decks = 88 decks are created for admin
+        # Verify all 5 languages (English with 5, others with 15) = 65 decks + 12 curriculum decks = 77 decks are created for admin
         admin_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == admin.id)).all()
-        self.assertEqual(len(admin_decks), 88)
+        self.assertEqual(len(admin_decks), 77)
 
         # Verify a specific deck is created
         english_numbers_deck = db.session.scalar(
-            sa.select(Deck).where(Deck.user_id == admin.id, Deck.name == 'İngilizce - Sayılar')
+            sa.select(Deck).where(Deck.user_id == admin.id, Deck.name == 'İngilizce - A1 Seviyesi - A Harfi Destesi')
         )
         self.assertIsNotNone(english_numbers_deck)
 
-        # Verify 20 cards are created for that deck
+        # Verify 48 cards are created for that deck
         cards = db.session.scalars(sa.select(Card).where(Card.deck_id == english_numbers_deck.id)).all()
-        self.assertEqual(len(cards), 20)
+        self.assertEqual(len(cards), 48)
 
     def test_database_seeding_when_not_empty_backfills(self):
         # Create a user manually
@@ -74,9 +74,9 @@ class SeedingTestCase(unittest.TestCase):
         user_count = db.session.scalar(sa.select(sa.func.count(User.id)))
         self.assertEqual(user_count, 1)
 
-        # But all 88 decks should be backfilled for testuser!
+        # But all 77 decks should be backfilled for testuser!
         testuser_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == u.id)).all()
-        self.assertEqual(len(testuser_decks), 88)
+        self.assertEqual(len(testuser_decks), 77)
 
         # Verify one of the backfilled decks
         spanish_colors_deck = db.session.scalar(
@@ -103,17 +103,17 @@ class SeedingTestCase(unittest.TestCase):
         user = db.session.scalar(sa.select(User).where(User.username == 'newuser'))
         self.assertIsNotNone(user)
 
-        # Verify they automatically got the 16 English decks (default language 'en')
+        # Verify they automatically got the 5 English decks (default language 'en')
         user_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == user.id)).all()
-        self.assertEqual(len(user_decks), 16)
+        self.assertEqual(len(user_decks), 5)
 
         english_animals = db.session.scalar(
-            sa.select(Deck).where(Deck.user_id == user.id, Deck.name == 'İngilizce - Hayvanlar')
+            sa.select(Deck).where(Deck.user_id == user.id, Deck.name == 'İngilizce - A1 Seviyesi - A Harfi Destesi')
         )
         self.assertIsNotNone(english_animals)
         
         cards = db.session.scalars(sa.select(Card).where(Card.deck_id == english_animals.id)).all()
-        self.assertEqual(len(cards), 20)
+        self.assertEqual(len(cards), 48)
 
     def test_login_automatically_seeds_deck_if_missing(self):
         # Create user manually without a deck
@@ -132,12 +132,12 @@ class SeedingTestCase(unittest.TestCase):
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 
-        # Verify they got the 16 English decks
+        # Verify they got the 5 English decks
         user_decks = db.session.scalars(sa.select(Deck).where(Deck.user_id == u.id)).all()
-        self.assertEqual(len(user_decks), 16)
+        self.assertEqual(len(user_decks), 5)
 
         english_verbs = db.session.scalar(
-            sa.select(Deck).where(Deck.user_id == u.id, Deck.name == 'İngilizce - En Temel Fiiller')
+            sa.select(Deck).where(Deck.user_id == u.id, Deck.name == 'İngilizce - A1 Seviyesi - B Harfi Destesi')
         )
         self.assertIsNotNone(english_verbs)
 

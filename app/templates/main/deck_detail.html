@@ -154,9 +154,20 @@
 
                 <!-- Örnek Cümle (Varsa) -->
                 {% if card.example_sentence %}
+                {% set parts = card.example_sentence.split(' | ') %}
                 <div class="mt-4 bg-zinc-950/60 border border-zinc-850 rounded-xl p-3">
-                    <span class="text-[9px] font-bold text-zinc-500 uppercase tracking-wider block">Örnek Cümle</span>
-                    <p class="text-xs text-zinc-400 italic mt-0.5 leading-relaxed">"{{ card.example_sentence }}"</p>
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <span class="text-[9px] font-bold text-zinc-500 uppercase tracking-wider block">Örnek Cümle</span>
+                        <button onclick="speakWord('{{ parts[0]|escape }}', '{{ current_language_code }}')" 
+                                class="text-zinc-700 hover:text-pink-400 hover:bg-zinc-800/50 p-1.5 rounded-lg transition-all duration-200 cursor-pointer" 
+                                title="Sesli Oku">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-zinc-400 italic leading-relaxed">"{{ parts[0] }}"</p>
+                    {% if parts|length > 1 %}
+                    <p class="text-xs text-zinc-500 mt-1 leading-relaxed border-t border-zinc-800/30 pt-1.5">"{{ parts[1] }}"</p>
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>

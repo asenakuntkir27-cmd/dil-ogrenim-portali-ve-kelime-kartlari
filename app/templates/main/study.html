@@ -160,11 +160,13 @@
 <script>
     const cards = [
         {% for card in cards %}
+        {% set parts = card.example_sentence.split(' | ') if card.example_sentence else ['', ''] %}
         {
             id: {{ card.id }},
             word: {{ card.word|tojson }},
             meaning: {{ card.meaning|tojson }},
-            example_sentence: {{ (card.example_sentence or '')|tojson }}
+            example_sentence: {{ parts[0]|tojson }},
+            example_translation: {{ (parts[1] if parts|length > 1 else '')|tojson }}
         }{% if not loop.last %},{% endif %}
         {% endfor %}
     ];
@@ -206,7 +208,11 @@
         const exampleBox = document.getElementById('example-box');
         const cardExample = document.getElementById('card-example');
         if (card.example_sentence && card.example_sentence.trim() !== '') {
-            cardExample.textContent = card.example_sentence;
+            let htmlText = `"${card.example_sentence}"`;
+            if (card.example_translation && card.example_translation.trim() !== '') {
+                htmlText += `<br><span class="text-zinc-500 font-normal block mt-1">"${card.example_translation}"</span>`;
+            }
+            cardExample.innerHTML = htmlText;
             exampleBox.classList.remove('hidden');
         } else {
             exampleBox.classList.add('hidden');

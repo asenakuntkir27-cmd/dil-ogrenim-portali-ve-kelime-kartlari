@@ -141,11 +141,13 @@
     // Game data payload passed from Flask
     const deckCards = [
         {% for card in cards %}
+        {% set parts = card.example_sentence.split(' | ') if card.example_sentence else ['', ''] %}
         {
             id: {{ card.id }},
             word: {{ card.word|tojson }},
             meaning: {{ card.meaning|tojson }},
-            example_sentence: {{ card.example_sentence|tojson }}
+            example_sentence: {{ parts[0]|tojson }},
+            example_translation: {{ (parts[1] if parts|length > 1 else '')|tojson }}
         }{% if not loop.last %},{% endif %}
         {% endfor %}
     ];
@@ -331,7 +333,7 @@
         
         // Set translation clue
         const rawSentence = card.example_sentence;
-        const translation = translationDict[rawSentence] || `"${card.meaning}" kelimesini içeren örnek bir cümle oluşturun.`;
+        const translation = card.example_translation || translationDict[rawSentence] || `"${card.meaning}" kelimesini içeren örnek bir cümle oluşturun.`;
         document.getElementById('clue-text').textContent = translation;
         document.getElementById('keyword-hint').innerHTML = `Anahtar Kelime: <span class="text-zinc-200 font-bold">${card.word}</span> (${card.meaning})`;
 

@@ -331,7 +331,7 @@ class StudyTestCase(unittest.TestCase):
 
             response = self.client.get('/analytics')
             self.assertEqual(response.status_code, 200)
-            self.assertIn(b'Renkler', response.data) # Should render a seeded deck name
+            self.assertIn('A Harfi Destesi'.encode('utf-8'), response.data) # Should render a seeded deck name
             self.assertIn(b'Haftal\xc4\xb1k \xc3\x87al\xc4\xb1\xc5\x9fma', response.data) # Haftalık Çalışma in utf-8
             self.assertIn(b'Ayl\xc4\xb1k \xc4\xb0lerleme', response.data) # Aylık İlerleme in utf-8
             self.assertIn(b'Destelere G\xc3\xb6re Da\xc4\x9f\xc4\xb1l\xc4\xb1m', response.data) # Destelere Göre Dağılım in utf-8

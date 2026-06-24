@@ -43,6 +43,7 @@ class AchievementsTestCase(unittest.TestCase):
             u_db = db.session.get(User, u.id)
             u_db.current_streak = 3
             db.session.commit()
+            db.session.expire_all()
 
         with self.client:
             # Re-access profile page - badge_first_spark should be True
